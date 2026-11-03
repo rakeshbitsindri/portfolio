@@ -84,8 +84,28 @@
 
   <style>
     .wrap { max-width: 960px; margin: 0 auto; padding: 2.5rem 1.5rem; }
-    h1 { font-family: var(--serif); font-size: 2rem; margin-bottom: .5rem; }
-    .sub { color: var(--sub); margin-bottom: 1.75rem; }
+    .awards-head {
+      display: flex; justify-content: space-between; gap: 1.5rem;
+      align-items: flex-start; margin-bottom: 1.75rem; flex-wrap: wrap;
+    }
+    .awards-head h1 { font-family: var(--serif); font-size: 2rem; margin-bottom: .5rem; }
+    .sub { color: var(--sub); }
+    
+    .qr-box {
+      background: #fff; border: 1px solid var(--rule); border-radius: 10px;
+      padding: 14px; text-align: center; width: fit-content; flex-shrink: 0;
+      box-shadow: 0 2px 12px rgba(14,14,12,.07);
+    }
+    .qr-box a { display: block; line-height: 0; }
+    .qr-box img {
+      width: 188px; height: 188px; display: block; border-radius: 6px;
+      object-fit: contain;
+    }
+    .qr-caption {
+      font-size: .72rem; color: var(--sub); margin-top: .55rem;
+      font-family: var(--mono); letter-spacing: .04em;
+    }
+
     .agrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.1rem; }
     .acard { background:#fff; border:1px solid var(--rule); border-radius:8px; overflow:hidden; }
     .acard img { width:100%; display:block; aspect-ratio: 4/3; object-fit: cover; }
@@ -105,8 +125,19 @@
   </div>
 </nav>
 <div class="wrap">
-  <h1>Awards &amp; achievements</h1>
-  <p class="sub">Engineering excellence and IP contributions across 19 years at Keysight/Ixia</p>
+  <div class="awards-head">
+    <div>
+      <h1>Awards &amp; achievements</h1>
+      <p class="sub">Engineering excellence and IP contributions across 19 years at Keysight/Ixia</p>
+    </div>
+    
+  <div class="qr-box">
+    <a href="https://rakeshbitsindri.github.io/portfolio/" target="_blank" rel="noopener">
+      <img src="assets/qrcode.png" alt="QR — portfolio" width="188" height="188">
+    </a>
+    <div class="qr-caption">scan · portfolio</div>
+  </div>
+  </div>
   <div class="agrid">
         <article class="acard">
           <img src="awards/award_2011_engineering_star.jpg" alt="Engineering Star 2011" loading="lazy">

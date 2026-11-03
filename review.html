@@ -98,7 +98,11 @@
       font-size: 1rem; color: var(--sub); max-width: 44rem; line-height: 1.7;
       margin-bottom: 1.5rem;
     }
-    .actions { display: flex; flex-wrap: wrap; gap: .65rem; margin-bottom: 2rem; }
+    .intro {
+      display: grid; grid-template-columns: 1fr auto; gap: 1.75rem;
+      align-items: start; margin-bottom: 2rem;
+    }
+    .actions { display: flex; flex-wrap: wrap; gap: .65rem; margin-bottom: 0; }
     .btn {
       display: inline-flex; align-items: center; gap: .35rem;
       font-size: .82rem; font-weight: 600; padding: .55rem 1.15rem;
@@ -110,6 +114,20 @@
       background: #fff; color: var(--text); border-color: var(--rule);
     }
     .btn-ghost:hover { border-color: var(--orange); color: var(--orange); }
+    .qr-box {
+      background: #fff; border: 1px solid var(--rule); border-radius: 10px;
+      padding: 14px; text-align: center; width: fit-content; flex-shrink: 0;
+      box-shadow: 0 2px 12px rgba(14,14,12,.07);
+    }
+    .qr-box a { display: block; line-height: 0; }
+    .qr-box img {
+      width: 188px; height: 188px; display: block; border-radius: 6px;
+      object-fit: contain;
+    }
+    .qr-caption {
+      font-size: .72rem; color: var(--sub); margin-top: .55rem;
+      font-family: var(--mono); letter-spacing: .04em;
+    }
     .panel {
       background: #fff; border: 1px solid var(--rule); border-radius: 10px;
       padding: 1.25rem 1.4rem; margin-bottom: 1.75rem;
@@ -168,6 +186,7 @@
     .sample-cta:hover { text-decoration: underline; }
     @media (max-width: 640px) {
       h1 { font-size: 1.7rem; }
+      .intro { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -184,18 +203,28 @@
 </nav>
 
 <div class="wrap">
-  <div class="eyebrow">Résumé · selected work</div>
-  <h1>Work that speaks for itself</h1>
-  <p class="lede">
-    Principal system test engineer — network validation, lab platforms, and AI-assisted automation.
-    This page is a broad snapshot; the samples are the proof. Open them, download the résumé, judge the delivery.
-  </p>
-  <div class="actions">
-    <a class="btn btn-primary" href="/portfolio/Rakesh_Kumar_Resume_2026.pdf" download="Rakesh_Kumar_Resume_2026.pdf">Download résumé PDF</a>
-    <a class="btn btn-ghost" href="/portfolio/resume.html" target="_blank" rel="noopener">Interactive résumé</a>
-    <a class="btn btn-ghost" href="/portfolio/" target="_blank" rel="noopener">Full portfolio</a>
-    <a class="btn btn-ghost" href="/portfolio/awards.html" target="_blank" rel="noopener">Awards</a>
-    <a class="btn btn-ghost" href="mailto:rakesh.kumar@keysight.com">Email</a>
+  <div class="intro">
+    <div>
+      <div class="eyebrow">Résumé · selected work</div>
+      <h1>Work that speaks for itself</h1>
+      <p class="lede">
+        Principal system test engineer — network validation, lab platforms, and AI-assisted automation.
+        This page is a broad snapshot; the samples are the proof. Open them, download the résumé, judge the delivery.
+      </p>
+      <div class="actions">
+        <a class="btn btn-primary" href="/portfolio/Rakesh_Kumar_Resume_2026.pdf" download="Rakesh_Kumar_Resume_2026.pdf">Download résumé PDF</a>
+        <a class="btn btn-ghost" href="/portfolio/resume.html" target="_blank" rel="noopener">Interactive résumé</a>
+        <a class="btn btn-ghost" href="/portfolio/" target="_blank" rel="noopener">Full portfolio</a>
+        <a class="btn btn-ghost" href="/portfolio/awards.html" target="_blank" rel="noopener">Awards</a>
+        <a class="btn btn-ghost" href="mailto:rakesh.kumar@keysight.com">Email</a>
+      </div>
+    </div>
+    <div class="qr-box">
+      <a href="https://rakeshbitsindri.github.io/portfolio/" target="_blank" rel="noopener">
+        <img src="/portfolio/assets/qrcode.png" alt="QR — portfolio" width="188" height="188">
+      </a>
+      <div class="qr-caption">scan · portfolio</div>
+    </div>
   </div>
 
   <div class="panel">
