@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/portfolio/">
+  <title>Page studio · web part composer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,600&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --paper:#f4f1ea; --ink:#1c1915; --muted:#6d675f; --line:#e2dcd1; --accent:#9a3412; --card:#fffdf8; }
+    * { box-sizing:border-box; margin:0; }
+    body { font-family:Outfit, sans-serif; background:var(--paper); color:var(--ink); min-height:100vh; }
+    header { display:flex; justify-content:space-between; align-items:center; padding:.9rem 1.2rem; border-bottom:1px solid var(--line); background:rgba(255,253,248,.9); position:sticky; top:0; }
+    h1 { font-family:Literata, serif; font-size:1.35rem; }
+    .kicker { font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); }
+    a { color:var(--muted); text-decoration:none; font-size:.85rem; }
+    .layout { display:grid; grid-template-columns:240px 1fr; min-height:calc(100vh - 64px); }
+    .palette { border-right:1px solid var(--line); padding:1rem; }
+    .part-src, .dropped { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:.75rem .8rem; margin-bottom:.55rem; cursor:grab; }
+    .part-src strong, .dropped strong { display:block; }
+    .part-src span, .hint { color:var(--muted); font-size:.8rem; }
+    .canvas { padding:1.1rem 1.3rem 2rem; }
+    .drop {
+      min-height:280px; border:1.5px dashed #c9bfb1; border-radius:16px; padding:.8rem;
+      background: repeating-linear-gradient(-45deg, transparent, transparent 8px, rgba(154,52,18,.03) 8px, rgba(154,52,18,.03) 16px);
+    }
+    .drop.over { border-color:var(--accent); background:#fff7f2; }
+    .dropped { cursor:default; position:relative; }
+    .dropped button { position:absolute; top:.55rem; right:.55rem; border:0; background:#f3ebe4; border-radius:999px; padding:.15rem .45rem; cursor:pointer; }
+    .kpi { display:flex; gap:1rem; margin-top:.4rem; }
+    .kpi b { font-family:Literata, serif; font-size:1.4rem; display:block; }
+    .empty { color:var(--muted); padding:2rem 1rem; text-align:center; }
+    @media (max-width:800px) { .layout { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <div class="kicker">SharePoint-style · drag web parts</div>
+      <h1>Page studio</h1>
+    </div>
+    <a href="demos/">← All demos</a>
+  </header>
+  <div class="layout">
+    <aside class="palette">
+      <p class="hint" style="margin-bottom:.7rem">Drag a part onto the page, or click it.</p>
+      <div class="part-src" draggable="true" data-kind="hero"><strong>Hero</strong><span>Banner and page title</span></div>
+      <div class="part-src" draggable="true" data-kind="news"><strong>News</strong><span>Three story cards</span></div>
+      <div class="part-src" draggable="true" data-kind="kpi"><strong>Lab KPIs</strong><span>Live-looking counters</span></div>
+      <div class="part-src" draggable="true" data-kind="people"><strong>People</strong><span>Site owners</span></div>
+    </aside>
+    <main class="canvas">
+      <p class="hint" id="count" style="margin-bottom:.6rem">0 web parts on this page</p>
+      <div class="drop" id="drop">
+        <div class="empty" id="empty">Drop web parts here. This is the page an editor would publish.</div>
+      </div>
+    </main>
+  </div>
+  <script>
+    const bodies = {
+      hero: "<strong>Northline lab home</strong><span>Change window Thursday. Optics frozen after 18:00.</span>",
+      news: "<strong>News</strong><span>TLS runbook updated · CapEx queue cleared · Fiber audit Friday</span>",
+      kpi: `<strong>This week</strong><div class="kpi"><div><b>42</b><span>runs</span></div><div><b>3</b><span>fails</span></div><div><b>99.1%</b><span>pass</span></div></div>`,
+      people: "<strong>Owners</strong><span>Rakesh · Lab ops · QA lead</span>"
+    };
+    const drop = document.getElementById("drop");
+    const empty = document.getElementById("empty");
+    const count = document.getElementById("count");
+    let dragKind = null;
+    function refresh() {
+      const n = drop.querySelectorAll(".dropped").length;
+      count.textContent = n + (n === 1 ? " web part on this page" : " web parts on this page");
+      empty.hidden = n > 0;
+    }
+    function add(kind) {
+      const el = document.createElement("article");
+      el.className = "dropped";
+      el.innerHTML = bodies[kind] + `<button type="button" aria-label="Remove">Remove</button>`;
+      el.querySelector("button").onclick = () => { el.remove(); refresh(); };
+      drop.appendChild(el);
+      refresh();
+    }
+    document.querySelectorAll(".part-src").forEach((src) => {
+      src.addEventListener("dragstart", () => { dragKind = src.dataset.kind; });
+      src.addEventListener("click", () => add(src.dataset.kind));
+    });
+    drop.addEventListener("dragover", (e) => { e.preventDefault(); drop.classList.add("over"); });
+    drop.addEventListener("dragleave", () => drop.classList.remove("over"));
+    drop.addEventListener("drop", (e) => {
+      e.preventDefault();
+      drop.classList.remove("over");
+      if (dragKind) add(dragKind);
+      dragKind = null;
+    });
+  </script>
+</body>
+</html>

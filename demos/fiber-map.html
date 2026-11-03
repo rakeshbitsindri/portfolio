@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/portfolio/">
+  <title>Fiber map · optical cross-connect demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560;9..144,680&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg:#120e0b; --ink:#f6efe4; --muted:#b5a89a; --copper:#e7a15a; --live:#ffd27a; --plan:#7eb6c9; }
+    * { box-sizing: border-box; margin: 0; }
+    body {
+      min-height: 100vh; color: var(--ink);
+      font-family: Fraunces, Georgia, serif;
+      background:
+        radial-gradient(700px 380px at 70% 0%, rgba(231,161,90,.22), transparent 60%),
+        var(--bg);
+    }
+    header { display:flex; justify-content:space-between; align-items:flex-end; padding:1.1rem 1.4rem .4rem; gap:1rem; }
+    h1 { font-size:1.8rem; font-weight:560; letter-spacing:-.03em; }
+    .kicker { font-family:"IBM Plex Mono", monospace; font-size:.68rem; letter-spacing:.14em; text-transform:uppercase; color:var(--copper); }
+    a.back { color:var(--muted); font-family:"IBM Plex Mono", monospace; font-size:.75rem; text-decoration:none; }
+    .stage { display:grid; grid-template-columns:1fr 260px; gap:1rem; padding:0 1.2rem 1.4rem; }
+    svg { width:100%; height:auto; background:rgba(255,255,255,.02); border:1px solid rgba(246,239,228,.12); border-radius:18px; }
+    .port { cursor:pointer; }
+    .port circle { fill:#2a211b; stroke:#e7a15a; stroke-width:2; }
+    .port.on circle { fill:#e7a15a; }
+    .port text { fill:var(--ink); font-family:"IBM Plex Mono", monospace; font-size:13px; }
+    .fiber { fill:none; stroke-width:3; cursor:pointer; }
+    .fiber.live { stroke:var(--live); filter:drop-shadow(0 0 6px #ffd27a); }
+    .fiber.plan { stroke:var(--plan); stroke-dasharray:7 6; }
+    .pkt { fill:var(--live); }
+    aside { border:1px solid rgba(246,239,228,.12); border-radius:18px; padding:1rem; background:rgba(255,255,255,.03); }
+    aside h2 { font-size:1.15rem; margin-bottom:.35rem; }
+    aside p, .log { font-family:"IBM Plex Mono", monospace; font-size:.75rem; color:var(--muted); line-height:1.55; }
+    .row { display:flex; gap:.4rem; margin:.8rem 0; flex-wrap:wrap; }
+    button { font-family:"IBM Plex Mono", monospace; border:0; border-radius:999px; padding:.45rem .8rem; cursor:pointer; background:var(--copper); color:#1a120c; font-weight:500; }
+    button.ghost { background:transparent; color:var(--ink); border:1px solid rgba(246,239,228,.3); }
+    .log { margin-top:.6rem; min-height:4.5rem; }
+    @media (max-width:800px) { .stage { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <div class="kicker">HTML5 · SVG · optical plan / commit</div>
+      <h1>Fiber map</h1>
+    </div>
+    <a class="back" href="demos/">← All demos</a>
+  </header>
+  <div class="stage">
+    <svg id="map" viewBox="0 0 920 520" role="img" aria-label="Optical topology">
+      <g id="fibers"></g>
+      <g id="pkts"></g>
+      <g id="ports"></g>
+    </svg>
+    <aside>
+      <h2 id="title">Pick two ports</h2>
+      <p id="help">Click a source, then a destination. Plan draws the fiber. Commit lights it and starts traffic.</p>
+      <div class="row">
+        <button id="plan" type="button">Plan</button>
+        <button id="commit" type="button">Commit</button>
+        <button id="clear" class="ghost" type="button">Clear</button>
+      </div>
+      <div class="log" id="log">One cross-connect is already live so you can see the light move.</div>
+    </aside>
+  </div>
+  <script>
+    const ports = [
+      { id: "ares", x: 120, y: 170, label: "Ares 100G" },
+      { id: "ocs", x: 430, y: 260, label: "OCS" },
+      { id: "dut", x: 760, y: 130, label: "Firewall" },
+      { id: "cap", x: 760, y: 390, label: "Capture" }
+    ];
+    const byId = Object.fromEntries(ports.map((p) => [p.id, p]));
+    let fibers = [{ id: "f1", a: "ares", b: "ocs", state: "live" }];
+    let pick = [];
+    const svg = document.getElementById("map");
+    const fiberLayer = document.getElementById("fibers");
+    const portLayer = document.getElementById("ports");
+    const pktLayer = document.getElementById("pkts");
+    const logEl = document.getElementById("log");
+
+    function pathFor(a, b) {
+      const A = byId[a], B = byId[b];
+      const mx = (A.x + B.x) / 2;
+      const my = Math.min(A.y, B.y) - 70;
+      return `M ${A.x} ${A.y} Q ${mx} ${my} ${B.x} ${B.y}`;
+    }
+    function log(line) { logEl.textContent = line; }
+    function draw() {
+      portLayer.innerHTML = ports.map((p) => `
+        <g class="port ${pick.includes(p.id) ? "on" : ""}" data-id="${p.id}">
+          <circle cx="${p.x}" cy="${p.y}" r="16"></circle>
+          <text x="${p.x + 22}" y="${p.y + 4}">${p.label}</text>
+        </g>`).join("");
+      fiberLayer.innerHTML = fibers.map((f) =>
+        `<path class="fiber ${f.state}" data-id="${f.id}" d="${pathFor(f.a, f.b)}"></path>`).join("");
+      portLayer.querySelectorAll(".port").forEach((el) => el.addEventListener("click", () => toggle(el.dataset.id)));
+    }
+    function toggle(id) {
+      if (pick.includes(id)) pick = pick.filter((x) => x !== id);
+      else if (pick.length < 2) pick.push(id);
+      else pick = [id];
+      const names = pick.map((id) => byId[id].label).join(" → ") || "none";
+      document.getElementById("title").textContent = pick.length === 2 ? names : "Pick two ports";
+      draw();
+    }
+    document.getElementById("plan").onclick = () => {
+      if (pick.length !== 2) return log("Select two ports first.");
+      fibers.push({ id: "f" + Date.now(), a: pick[0], b: pick[1], state: "plan" });
+      log("Planned. Nothing is lit until you commit.");
+      pick = [];
+      draw();
+    };
+    document.getElementById("commit").onclick = () => {
+      const planned = fibers.filter((f) => f.state === "plan");
+      if (!planned.length) return log("No planned fiber. Plan one, then commit.");
+      planned.forEach((f) => { f.state = "live"; });
+      log("Committed. Light is on the new cross-connect.");
+      draw();
+    };
+    document.getElementById("clear").onclick = () => {
+      fibers = fibers.filter((f) => f.state === "live").slice(0, 1);
+      pick = [];
+      log("Cleared extra fibers. The original path stays live.");
+      draw();
+    };
+    draw();
+
+    const dots = {};
+    function tick(t) {
+      pktLayer.innerHTML = "";
+      fibers.filter((f) => f.state === "live").forEach((f) => {
+        const path = fiberLayer.querySelector(`[data-id="${f.id}"]`);
+        if (!path) return;
+        const len = path.getTotalLength();
+        const at = ((t / 18) % len);
+        const p = path.getPointAtLength(at);
+        const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        c.setAttribute("class", "pkt");
+        c.setAttribute("r", "5");
+        c.setAttribute("cx", p.x);
+        c.setAttribute("cy", p.y);
+        pktLayer.appendChild(c);
+      });
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  </script>
+</body>
+</html>

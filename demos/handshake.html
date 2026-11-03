@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/portfolio/">
+  <title>Handshake theater · TLS 1.3</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg:#0c1014; --ink:#f2efe8; --muted:#9aa3ad; --amber:#f0b45a; --line:#24303a; }
+    * { box-sizing:border-box; margin:0; }
+    body { min-height:100vh; background:var(--bg); color:var(--ink); font-family:Manrope, sans-serif; }
+    header { display:flex; justify-content:space-between; align-items:flex-end; padding:1.1rem 1.4rem .2rem; }
+    h1 { font-family:"Instrument Serif", serif; font-size:2.2rem; font-weight:400; letter-spacing:-.03em; }
+    .kicker { color:var(--amber); letter-spacing:.16em; text-transform:uppercase; font-size:.68rem; }
+    a { color:var(--muted); text-decoration:none; font-size:.8rem; }
+    .stage { margin:1rem 1.2rem; border:1px solid var(--line); border-radius:20px; padding:1.2rem; position:relative; overflow:hidden; min-height:280px; background:radial-gradient(500px 180px at 50% 100%, rgba(240,180,90,.12), transparent 70%); }
+    .ends { display:flex; justify-content:space-between; position:relative; z-index:1; }
+    .end { width:180px; border:1px solid var(--line); border-radius:14px; padding:.8rem; background:#12181e; }
+    .end b { display:block; font-size:1rem; }
+    .end span { color:var(--muted); font-size:.78rem; }
+    .lane { position:absolute; left:200px; right:200px; top:46%; height:2px; background:#2c3a46; }
+    .packet {
+      position:absolute; top:calc(46% - 14px); left:200px; height:28px; padding:0 .7rem;
+      border-radius:999px; background:var(--amber); color:#1b1408; font-size:.75rem; font-weight:700;
+      display:flex; align-items:center; transition:left .7s cubic-bezier(.2,.8,.2,1), opacity .3s;
+      opacity:0;
+    }
+    .packet.show { opacity:1; }
+    .caption { margin-top:5.5rem; font-family:"Instrument Serif", serif; font-size:1.7rem; }
+    .why { color:var(--muted); max-width:40rem; margin-top:.3rem; }
+    .controls { display:flex; gap:.5rem; align-items:center; padding:.2rem 1.2rem 1.4rem; flex-wrap:wrap; }
+    button { background:var(--amber); color:#1b1408; border:0; border-radius:999px; padding:.5rem .9rem; font:inherit; font-weight:700; cursor:pointer; }
+    button.ghost { background:transparent; color:var(--ink); border:1px solid var(--line); }
+    .steps { display:flex; gap:.4rem; flex-wrap:wrap; }
+    .steps button { background:#182028; color:var(--muted); font-weight:600; font-size:.75rem; }
+    .steps button.on { background:var(--amber); color:#1b1408; }
+    @media (max-width:720px) {
+      .lane, .packet { display:none; }
+      .caption { margin-top:1rem; font-size:1.4rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <div class="kicker">HTML5 · CSS motion · protocol story</div>
+      <h1>Handshake theater</h1>
+    </div>
+    <a href="demos/">← All demos</a>
+  </header>
+  <section class="stage">
+    <div class="ends">
+      <div class="end"><b>Client</b><span>Browser · HTTP/3</span></div>
+      <div class="end"><b>Server</b><span>TLS 1.3 endpoint</span></div>
+    </div>
+    <div class="lane"></div>
+    <div class="packet" id="pkt">ClientHello</div>
+    <div class="caption" id="cap">Press play</div>
+    <p class="why" id="why">Six beats from the first flight to the first response. Scrub any step.</p>
+  </section>
+  <div class="controls">
+    <button id="play" type="button">Play</button>
+    <button id="step" class="ghost" type="button">Step</button>
+    <div class="steps" id="steps"></div>
+  </div>
+  <script>
+    const beats = [
+      { name: "ClientHello", dir: "right", cap: "ClientHello", why: "The client offers TLS 1.3 and its key share in one flight." },
+      { name: "ServerHello", dir: "left", cap: "ServerHello", why: "The server picks the suite and sends its key share back." },
+      { name: "Certificate", dir: "left", cap: "Certificate", why: "Identity follows immediately. The handshake is encrypted from here." },
+      { name: "Finished", dir: "right", cap: "Finished", why: "Both sides confirm the transcript. The tunnel is up." },
+      { name: "GET /", dir: "right", cap: "HTTP/3 request", why: "Application data rides QUIC. No extra round trip for the first GET." },
+      { name: "200", dir: "left", cap: "200 OK", why: "The response comes back on the same connection." }
+    ];
+    const pkt = document.getElementById("pkt");
+    const steps = document.getElementById("steps");
+    let i = -1;
+    let timer = null;
+    beats.forEach((b, idx) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.textContent = b.name;
+      btn.onclick = () => { stop(); show(idx); };
+      steps.appendChild(btn);
+    });
+    function show(idx) {
+      i = idx;
+      const b = beats[idx];
+      pkt.textContent = b.name;
+      pkt.classList.add("show");
+      pkt.style.left = b.dir === "right" ? "calc(100% - 360px)" : "200px";
+      document.getElementById("cap").textContent = b.cap;
+      document.getElementById("why").textContent = b.why;
+      [...steps.children].forEach((el, n) => el.classList.toggle("on", n === idx));
+    }
+    function stop() { clearInterval(timer); timer = null; document.getElementById("play").textContent = "Play"; }
+    document.getElementById("play").onclick = () => {
+      if (timer) return stop();
+      document.getElementById("play").textContent = "Pause";
+      show((i + 1) % beats.length);
+      timer = setInterval(() => show((i + 1) % beats.length), 1400);
+    };
+    document.getElementById("step").onclick = () => { stop(); show((i + 1) % beats.length); };
+  </script>
+</body>
+</html>
