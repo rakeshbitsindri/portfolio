@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/portfolio/">
+  <title>SharePoint-style site demo · Northline intranet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --suite: #0b3a4a;
+      --suite-2: #0e4c61;
+      --accent: #0f6e78;
+      --page: #f3f2f1;
+      --card: #ffffff;
+      --ink: #201f1e;
+      --muted: #605e5c;
+      --line: #edebe9;
+      --link: #0b5f69;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Source Sans 3", "Segoe UI", sans-serif; background: var(--page); color: var(--ink); }
+    .suite {
+      background: var(--suite); color: #fff; display: flex; align-items: center;
+      justify-content: space-between; padding: 0 1rem; height: 48px; gap: 1rem;
+    }
+    .suite a { color: #fff; text-decoration: none; font-size: .85rem; }
+    .waffle { display: flex; align-items: center; gap: .65rem; font-weight: 700; }
+    .dots { width: 16px; height: 16px; background:
+      radial-gradient(circle, #fff 1.1px, transparent 1.3px);
+      background-size: 5px 5px;
+    }
+    .hub {
+      background: #fff; border-bottom: 1px solid var(--line);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: .55rem 1rem; gap: .75rem; flex-wrap: wrap;
+    }
+    .hub nav { display: flex; gap: .35rem; }
+    .hub button, .edit {
+      border: 0; background: transparent; font: inherit; cursor: pointer;
+      padding: .35rem .7rem; border-radius: 4px; color: var(--ink);
+    }
+    .hub button.on { background: #e6f3f4; color: var(--accent); font-weight: 700; }
+    .edit { background: var(--accent); color: #fff; font-weight: 700; }
+    .edit.on { background: #8a3b12; }
+    .layout { display: grid; grid-template-columns: 220px 1fr; min-height: calc(100vh - 96px); }
+    .left { background: #fff; border-right: 1px solid var(--line); padding: 1rem .75rem; }
+    .left h2 { font-size: .95rem; margin: 0 .4rem .6rem; }
+    .left button {
+      display: block; width: 100%; text-align: left; border: 0; background: transparent;
+      font: inherit; padding: .45rem .55rem; border-radius: 4px; cursor: pointer; color: var(--muted);
+    }
+    .left button.on { background: #f3f2f1; color: var(--ink); font-weight: 700; border-left: 3px solid var(--accent); }
+    .canvas { padding: 1.1rem 1.25rem 2rem; max-width: 1040px; }
+    .crumb { font-size: .78rem; color: var(--muted); margin-bottom: .6rem; }
+    .hero {
+      background: linear-gradient(120deg, #0b3a4a, #147a86 60%, #d7efe8);
+      color: #fff; border-radius: 6px; padding: 1.6rem 1.5rem; margin-bottom: .9rem;
+      min-height: 150px; display: flex; flex-direction: column; justify-content: flex-end;
+    }
+    .hero input {
+      font: inherit; font-size: 1.7rem; font-weight: 700; background: transparent; color: #fff;
+      border: 0; border-bottom: 1px dashed rgba(255,255,255,.6); width: min(100%, 36rem);
+    }
+    .hero p { max-width: 36rem; margin-top: .4rem; }
+    .grid { display: grid; grid-template-columns: 1.4fr .8fr; gap: .75rem; }
+    .part {
+      background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: .9rem 1rem;
+      position: relative;
+    }
+    .part h3 { font-size: .95rem; margin-bottom: .55rem; }
+    .chrome {
+      display: none; position: absolute; top: .4rem; right: .4rem; gap: .25rem;
+    }
+    body.editing .chrome { display: flex; }
+    body.editing .part { outline: 1px dashed #c8c6c4; }
+    .chrome button {
+      border: 1px solid var(--line); background: #fff; font-size: .72rem; padding: .15rem .4rem; cursor: pointer;
+    }
+    .news { display: flex; flex-direction: column; gap: .55rem; }
+    .news article { display: grid; grid-template-columns: 72px 1fr; gap: .65rem; align-items: center; }
+    .swatch { height: 56px; border-radius: 4px; }
+    .news h4 { font-size: .9rem; }
+    .news p { font-size: .78rem; color: var(--muted); }
+    .links { display: flex; flex-direction: column; gap: .4rem; }
+    .links a { color: var(--link); text-decoration: none; font-weight: 600; font-size: .9rem; }
+    .links a:hover { text-decoration: underline; }
+    table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+    th, td { text-align: left; padding: .45rem .3rem; border-bottom: 1px solid var(--line); }
+    th button { border: 0; background: transparent; font: inherit; font-weight: 700; cursor: pointer; }
+    .tools { display: flex; gap: .4rem; margin-bottom: .6rem; }
+    .tools input, .tools select {
+      border: 1px solid #c8c6c4; border-radius: 2px; padding: .35rem .5rem; font: inherit;
+    }
+    .people { display: flex; gap: .6rem; }
+    .person { text-align: center; font-size: .75rem; color: var(--muted); }
+    .avatar {
+      width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center;
+      color: #fff; font-weight: 700; margin-bottom: .25rem;
+    }
+    .hidden-note { display: none; color: var(--muted); font-size: .85rem; margin-bottom: .6rem; }
+    body.editing .hidden-note { display: block; }
+    .page-docs h1, .page-cal h1 { font-size: 1.4rem; margin-bottom: .7rem; }
+    .cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+    .cal div { background: #fff; border: 1px solid var(--line); min-height: 64px; padding: .3rem; font-size: .75rem; }
+    .cal .mark { background: #e5f4f5; font-weight: 700; }
+    @media (max-width: 860px) {
+      .layout, .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="suite">
+    <div class="waffle"><span class="dots" aria-hidden="true"></span> Northline</div>
+    <a href="demos/">← Portfolio demos</a>
+  </header>
+  <div class="hub">
+    <nav>
+      <button class="on" data-page="home" type="button">Home</button>
+      <button data-page="docs" type="button">Documents</button>
+      <button data-page="cal" type="button">Lab calendar</button>
+    </nav>
+    <button class="edit" id="edit" type="button">Edit page</button>
+  </div>
+  <div class="layout">
+    <aside class="left">
+      <h2>Northline Lab</h2>
+      <button class="on" data-page="home" type="button">Home</button>
+      <button data-page="docs" type="button">Document library</button>
+      <button data-page="cal" type="button">Lab calendar</button>
+      <button type="button" id="restore">Show hidden parts</button>
+    </aside>
+    <main class="canvas">
+      <div class="crumb">Sites · Northline Lab · <span id="crumb">Home</span></div>
+      <p class="hidden-note">Edit mode: rename the hero, reorder web parts, or hide one. This is a customization sample, not a Microsoft product.</p>
+
+      <section id="home">
+        <div class="hero part" data-part="hero">
+          <div class="chrome"><button type="button" data-move="up">Up</button><button type="button" data-move="down">Down</button><button type="button" data-hide>Hide</button></div>
+          <input id="title" value="Lab home" aria-label="Page title">
+          <p>Team site for reservations, runbooks, and the week’s validation plan.</p>
+        </div>
+        <div class="grid" id="parts">
+          <section class="part" data-part="news">
+            <div class="chrome"><button type="button" data-move="up">Up</button><button type="button" data-move="down">Down</button><button type="button" data-hide>Hide</button></div>
+            <h3>News</h3>
+            <div class="news">
+              <article><div class="swatch" style="background:#0f6e78"></div><div><h4>Thursday change window</h4><p>Optical cross-connects frozen 18:00–22:00.</p></div></article>
+              <article><div class="swatch" style="background:#8a3b12"></div><div><h4>New runbook: TLS inspect</h4><p>Updated policy matrix is in the library.</p></div></article>
+              <article><div class="swatch" style="background:#1b3a4b"></div><div><h4>CapEx queue cleared</h4><p>Two optics orders moved to procurement.</p></div></article>
+            </div>
+          </section>
+          <section class="part" data-part="links">
+            <div class="chrome"><button type="button" data-move="up">Up</button><button type="button" data-move="down">Down</button><button type="button" data-hide>Hide</button></div>
+            <h3>Quick links</h3>
+            <div class="links">
+              <a href="demos/angular-console.html">Open the AngularJS run console</a>
+              <a href="resume.html">Résumé</a>
+              <a href="review.html">Review pack</a>
+              <a href="awards.html">Awards</a>
+            </div>
+            <h3 style="margin-top:1rem">Site owners</h3>
+            <div class="people">
+              <div class="person"><div class="avatar" style="background:#0f6e78">RK</div>Rakesh</div>
+              <div class="person"><div class="avatar" style="background:#8a3b12">LN</div>Lab ops</div>
+              <div class="person"><div class="avatar" style="background:#1b3a4b">QA</div>QA lead</div>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section id="docs" class="page-docs" hidden>
+        <h1>Document library</h1>
+        <div class="tools">
+          <input id="q" placeholder="Filter by name" aria-label="Filter documents">
+          <select id="kind" aria-label="Type">
+            <option value="all">All types</option>
+            <option value="Runbook">Runbook</option>
+            <option value="Policy">Policy</option>
+            <option value="Diagram">Diagram</option>
+          </select>
+        </div>
+        <div class="part">
+          <table>
+            <thead>
+              <tr>
+                <th><button type="button" id="sort">Name</button></th>
+                <th>Type</th>
+                <th>Modified</th>
+              </tr>
+            </thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="cal" class="page-cal" hidden>
+        <h1>Lab calendar</h1>
+        <div class="cal" id="cal"></div>
+      </section>
+    </main>
+  </div>
+  <script>
+    const pages = ["home", "docs", "cal"];
+    const titles = { home: "Home", docs: "Documents", cal: "Lab calendar" };
+    function show(page) {
+      pages.forEach((id) => {
+        document.getElementById(id).hidden = id !== page;
+      });
+      document.querySelectorAll("[data-page]").forEach((btn) => {
+        btn.classList.toggle("on", btn.dataset.page === page);
+      });
+      document.getElementById("crumb").textContent = titles[page];
+    }
+    document.querySelectorAll("[data-page]").forEach((btn) => {
+      btn.addEventListener("click", () => show(btn.dataset.page));
+    });
+    document.getElementById("edit").addEventListener("click", () => {
+      document.body.classList.toggle("editing");
+      const on = document.body.classList.contains("editing");
+      document.getElementById("edit").classList.toggle("on", on);
+      document.getElementById("edit").textContent = on ? "Stop editing" : "Edit page";
+      document.getElementById("title").readOnly = !on;
+    });
+    document.getElementById("title").readOnly = true;
+    document.getElementById("home").addEventListener("click", (ev) => {
+      const btn = ev.target.closest("button");
+      if (!btn) return;
+      const part = btn.closest(".part");
+      if (!part) return;
+      if (btn.hasAttribute("data-hide")) {
+        part.hidden = true;
+        return;
+      }
+      const dir = btn.dataset.move;
+      const parent = part.parentElement;
+      if (dir === "up" && part.previousElementSibling) parent.insertBefore(part, part.previousElementSibling);
+      if (dir === "down" && part.nextElementSibling) parent.insertBefore(part.nextElementSibling, part);
+    });
+    document.getElementById("restore").addEventListener("click", () => {
+      document.querySelectorAll(".part").forEach((p) => { p.hidden = false; });
+    });
+
+    const docs = [
+      { name: "TLS-inspect-runbook.docx", kind: "Runbook", mod: "Nov 2" },
+      { name: "Firewall-policy-matrix.xlsx", kind: "Policy", mod: "Oct 28" },
+      { name: "Optics-floor-map.pdf", kind: "Diagram", mod: "Oct 19" },
+      { name: "QUIC-negative-tests.docx", kind: "Runbook", mod: "Oct 11" },
+      { name: "Change-window-rules.pdf", kind: "Policy", mod: "Sep 30" }
+    ];
+    let asc = true;
+    function render() {
+      const q = document.getElementById("q").value.toLowerCase();
+      const kind = document.getElementById("kind").value;
+      const rows = docs
+        .filter((d) => d.name.toLowerCase().includes(q) && (kind === "all" || d.kind === kind))
+        .sort((a, b) => asc ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name));
+      document.getElementById("rows").innerHTML = rows.map((d) =>
+        `<tr><td>${d.name}</td><td>${d.kind}</td><td>${d.mod}</td></tr>`).join("");
+    }
+    document.getElementById("q").addEventListener("input", render);
+    document.getElementById("kind").addEventListener("change", render);
+    document.getElementById("sort").addEventListener("click", () => { asc = !asc; render(); });
+    render();
+
+    const cal = document.getElementById("cal");
+    const marks = { 6: "Change window", 12: "TLS review", 19: "CapEx sync" };
+    for (let d = 1; d <= 30; d++) {
+      const cell = document.createElement("div");
+      cell.textContent = marks[d] ? `${d} ${marks[d]}` : String(d);
+      if (marks[d]) cell.className = "mark";
+      cal.appendChild(cell);
+    }
+  </script>
+</body>
+</html>

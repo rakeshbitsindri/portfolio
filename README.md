@@ -7,6 +7,7 @@ Static site for résumé and work samples.
 | Page | URL |
 |------|-----|
 | Home | https://rakeshbitsindri.github.io/portfolio/ |
+| Demos | https://rakeshbitsindri.github.io/portfolio/demos/ |
 | Review pack | https://rakeshbitsindri.github.io/portfolio/review.html |
 | Résumé | https://rakeshbitsindri.github.io/portfolio/resume.html |
 | PDF | https://rakeshbitsindri.github.io/portfolio/Rakesh_Kumar_Resume_2026.pdf |

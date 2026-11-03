@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="labConsole">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/portfolio/">
+  <title>AngularJS demo · Lab run console</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+  <style>
+    :root {
+      --ink: #101612;
+      --panel: #18211c;
+      --panel-2: #1f2b24;
+      --line: #314239;
+      --lime: #d6f25c;
+      --cream: #f4f0e6;
+      --muted: #9aab9f;
+      --warn: #f0b429;
+      --bad: #ff6b57;
+      --ok: #7ddea2;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      font-family: "Familjen Grotesk", sans-serif;
+      color: var(--cream);
+      background:
+        radial-gradient(900px 420px at 90% -10%, rgba(214,242,92,.16), transparent 55%),
+        linear-gradient(180deg, #141c18 0%, var(--ink) 40%);
+    }
+    a { color: inherit; }
+    .top {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 1rem; padding: .85rem 1.25rem;
+      border-bottom: 1px solid var(--line);
+      background: rgba(16,22,18,.8);
+      backdrop-filter: blur(8px);
+      position: sticky; top: 0; z-index: 5;
+    }
+    .brand { display: flex; flex-direction: column; gap: .1rem; text-decoration: none; }
+    .brand b { font-size: 1.05rem; letter-spacing: -.02em; }
+    .brand span { font-family: "IBM Plex Mono", monospace; font-size: .68rem; color: var(--lime); letter-spacing: .08em; text-transform: uppercase; }
+    .back { font-size: .8rem; color: var(--muted); text-decoration: none; }
+    .back:hover { color: var(--cream); }
+    .shell { display: grid; grid-template-columns: 220px 1fr; min-height: calc(100vh - 58px); }
+    nav.side { border-right: 1px solid var(--line); padding: 1rem .75rem; }
+    nav.side button {
+      width: 100%; text-align: left; background: transparent; color: var(--muted);
+      border: 0; border-radius: 8px; padding: .65rem .75rem; font: inherit; cursor: pointer;
+      margin-bottom: .25rem;
+    }
+    nav.side button.on { background: var(--panel-2); color: var(--cream); }
+    nav.side button.on::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--lime); margin-right: .5rem; }
+    .main { padding: 1.25rem 1.4rem 2rem; }
+    .head { display: flex; justify-content: space-between; gap: 1rem; align-items: flex-end; flex-wrap: wrap; margin-bottom: 1rem; }
+    h1 { font-size: 1.7rem; letter-spacing: -.03em; font-weight: 650; }
+    .sub { color: var(--muted); font-size: .88rem; margin-top: .2rem; }
+    .filters { display: flex; gap: .5rem; flex-wrap: wrap; }
+    input, select {
+      background: var(--panel); color: var(--cream); border: 1px solid var(--line);
+      border-radius: 8px; padding: .5rem .7rem; font: inherit;
+    }
+    input:focus, select:focus { outline: 2px solid var(--lime); outline-offset: 1px; }
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: .7rem; margin-bottom: 1rem; }
+    .stat { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: .8rem .9rem; }
+    .stat b { display: block; font-family: "IBM Plex Mono", monospace; font-size: 1.25rem; color: var(--lime); }
+    .stat span { color: var(--muted); font-size: .75rem; }
+    .list { display: flex; flex-direction: column; gap: .55rem; }
+    .run {
+      display: grid; grid-template-columns: 1.4fr .7fr .8fr 90px;
+      gap: .75rem; align-items: center;
+      background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+      padding: .75rem .9rem; cursor: pointer; text-align: left; color: inherit; font: inherit; width: 100%;
+    }
+    .run:hover { border-color: #58705f; }
+    .run.on { border-color: var(--lime); }
+    .name { font-weight: 650; }
+    .meta { color: var(--muted); font-size: .75rem; font-family: "IBM Plex Mono", monospace; margin-top: .15rem; }
+    .pill { font-size: .72rem; font-weight: 650; letter-spacing: .04em; text-transform: uppercase; border-radius: 999px; padding: .2rem .5rem; width: fit-content; }
+    .pill.running { background: rgba(214,242,92,.15); color: var(--lime); }
+    .pill.pass { background: rgba(125,222,162,.15); color: var(--ok); }
+    .pill.fail { background: rgba(255,107,87,.15); color: var(--bad); }
+    .pill.queued { background: rgba(240,180,41,.15); color: var(--warn); }
+    .bar { height: 6px; background: #0d1411; border-radius: 99px; overflow: hidden; }
+    .bar i { display: block; height: 100%; background: var(--lime); width: 0; }
+    .drawer {
+      margin-top: 1rem; background: var(--panel-2); border: 1px solid var(--line);
+      border-radius: 14px; padding: 1rem 1.1rem;
+    }
+    .drawer h2 { font-size: 1.05rem; margin-bottom: .35rem; }
+    .kvs { display: grid; grid-template-columns: 140px 1fr; gap: .35rem .75rem; font-size: .88rem; margin-top: .6rem; }
+    .kvs dt { color: var(--muted); }
+    form.add {
+      display: grid; grid-template-columns: 1.4fr .7fr .7fr auto; gap: .5rem;
+      margin-bottom: 1rem;
+    }
+    button.go {
+      background: var(--lime); color: #14200f; border: 0; border-radius: 8px;
+      font-weight: 700; padding: .5rem .9rem; cursor: pointer; font: inherit;
+    }
+    .note { margin-top: .8rem; color: var(--lime); font-size: .82rem; min-height: 1.2em; }
+    .topo { display: grid; grid-template-columns: repeat(3, 1fr); gap: .7rem; }
+    .node { background: var(--panel); border: 1px dashed var(--line); border-radius: 14px; padding: 1rem; min-height: 120px; }
+    .node strong { display: block; margin-bottom: .35rem; }
+    .node p { color: var(--muted); font-size: .82rem; }
+    .empty { color: var(--muted); padding: 1rem 0; }
+    @media (max-width: 800px) {
+      .shell { grid-template-columns: 1fr; }
+      .stats, form.add, .run { grid-template-columns: 1fr; }
+      nav.side { display: flex; gap: .35rem; border-right: 0; border-bottom: 1px solid var(--line); }
+      nav.side button { width: auto; }
+    }
+  </style>
+</head>
+<body ng-controller="ConsoleCtrl">
+  <header class="top">
+    <a class="brand" href="demos/">
+      <b>Runboard</b>
+      <span>AngularJS 1.8 · HTML5 · CSS</span>
+    </a>
+    <a class="back" href="demos/">← All demos</a>
+  </header>
+  <div class="shell">
+    <nav class="side">
+      <button ng-class="{on: view==='runs'}" ng-click="view='runs'">Runs</button>
+      <button ng-class="{on: view==='new'}" ng-click="view='new'">New scenario</button>
+      <button ng-class="{on: view==='topo'}" ng-click="view='topo'">Topology</button>
+    </nav>
+    <main class="main">
+      <section ng-show="view==='runs'">
+        <div class="head">
+          <div>
+            <h1>Active validations</h1>
+            <p class="sub">Filter, inspect, and watch progress — two-way binding, no page reload.</p>
+          </div>
+          <div class="filters">
+            <input ng-model="q" placeholder="Search scenario" aria-label="Search">
+            <select ng-model="proto" aria-label="Protocol">
+              <option>All</option>
+              <option>HTTP/3</option>
+              <option>QUIC</option>
+              <option>TLS 1.3</option>
+              <option>BGP</option>
+            </select>
+          </div>
+        </div>
+        <div class="stats">
+          <div class="stat"><b>{{ count('running') }}</b><span>Running</span></div>
+          <div class="stat"><b>{{ count('pass') }}</b><span>Passed</span></div>
+          <div class="stat"><b>{{ count('fail') }}</b><span>Failed</span></div>
+          <div class="stat"><b>{{ runs.length }}</b><span>In view model</span></div>
+        </div>
+        <div class="list">
+          <button class="run" ng-repeat="r in filtered()" ng-click="open(r)" ng-class="{on: selected.id===r.id}">
+            <div>
+              <div class="name">{{ r.name }}</div>
+              <div class="meta">{{ r.proto }} · {{ r.target }}</div>
+            </div>
+            <span class="pill {{ r.status }}">{{ r.status }}</span>
+            <div class="bar" aria-hidden="true"><i ng-style="{width: r.progress + '%'}"></i></div>
+            <div class="meta">{{ r.progress }}%</div>
+          </button>
+          <p class="empty" ng-if="filtered().length===0">No scenarios match that filter.</p>
+        </div>
+        <aside class="drawer" ng-if="selected">
+          <h2>{{ selected.name }}</h2>
+          <p class="sub">Selected from the list. Detail stays in the same AngularJS scope.</p>
+          <dl class="kvs">
+            <dt>Protocol</dt><dd>{{ selected.proto }}</dd>
+            <dt>Target</dt><dd>{{ selected.target }}</dd>
+            <dt>Status</dt><dd>{{ selected.status }}</dd>
+            <dt>Owner</dt><dd>{{ selected.owner }}</dd>
+            <dt>Notes</dt><dd>{{ selected.notes }}</dd>
+          </dl>
+        </aside>
+      </section>
+
+      <section ng-show="view==='new'">
+        <div class="head">
+          <div>
+            <h1>Queue a scenario</h1>
+            <p class="sub">Form state is the model. Submit pushes a new row into the run list.</p>
+          </div>
+        </div>
+        <form class="add" ng-submit="add()">
+          <input ng-model="draft.name" placeholder="Scenario name" required aria-label="Name">
+          <select ng-model="draft.proto" aria-label="Protocol">
+            <option>HTTP/3</option>
+            <option>QUIC</option>
+            <option>TLS 1.3</option>
+            <option>BGP</option>
+          </select>
+          <input ng-model="draft.target" placeholder="Target rate" aria-label="Target">
+          <button class="go" type="submit">Add run</button>
+        </form>
+        <p class="note">{{ notice }}</p>
+      </section>
+
+      <section ng-show="view==='topo'">
+        <div class="head">
+          <div>
+            <h1>Bench layout</h1>
+            <p class="sub">Static HTML5 sections driven by the same controller — ports, DUT, capture.</p>
+          </div>
+        </div>
+        <div class="topo">
+          <article class="node" ng-repeat="n in nodes">
+            <strong>{{ n.title }}</strong>
+            <p>{{ n.body }}</p>
+          </article>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script>
+    angular.module("labConsole", []).controller("ConsoleCtrl", function ($scope, $timeout) {
+      $scope.view = "runs";
+      $scope.q = "";
+      $scope.proto = "All";
+      $scope.notice = "";
+      $scope.selected = null;
+      $scope.draft = { name: "", proto: "HTTP/3", target: "40 Gbps" };
+      $scope.nodes = [
+        { title: "Traffic ports", body: "Logical 0,2 reserved. 100G fiber, clean optics." },
+        { title: "Device under test", body: "Firewall policy + TLS inspection path." },
+        { title: "Capture", body: "Client key log + port pcap for decrypt review." }
+      ];
+      $scope.runs = [
+        { id: 1, name: "HTTP/3 CPS ramp", proto: "HTTP/3", target: "1.2M cps", status: "running", progress: 62, owner: "lab", notes: "Ramp holds; watch TX drops after minute 30." },
+        { id: 2, name: "QUIC 0-RTT reuse", proto: "QUIC", target: "800k sess", status: "pass", progress: 100, owner: "lab", notes: "Session reuse within budget." },
+        { id: 3, name: "TLS 1.3 inspect", proto: "TLS 1.3", target: "40 Gbps", status: "fail", progress: 100, owner: "sec", notes: "Handshake retry spike on policy 14." },
+        { id: 4, name: "BGP converge", proto: "BGP", target: "full table", status: "queued", progress: 0, owner: "route", notes: "Waiting on port pair." }
+      ];
+      $scope.filtered = function () {
+        var q = ($scope.q || "").toLowerCase();
+        return $scope.runs.filter(function (r) {
+          var hit = !q || r.name.toLowerCase().indexOf(q) >= 0 || r.proto.toLowerCase().indexOf(q) >= 0;
+          var proto = $scope.proto === "All" || r.proto === $scope.proto;
+          return hit && proto;
+        });
+      };
+      $scope.count = function (status) {
+        return $scope.runs.filter(function (r) { return r.status === status; }).length;
+      };
+      $scope.open = function (r) { $scope.selected = r; };
+      $scope.add = function () {
+        var id = $scope.runs.reduce(function (m, r) { return Math.max(m, r.id); }, 0) + 1;
+        $scope.runs.unshift({
+          id: id,
+          name: $scope.draft.name,
+          proto: $scope.draft.proto,
+          target: $scope.draft.target || "unspecified",
+          status: "queued",
+          progress: 0,
+          owner: "you",
+          notes: "Queued from the demo form."
+        });
+        $scope.notice = "Added “" + $scope.draft.name + "”. Switch to Runs to see it.";
+        $scope.draft.name = "";
+        $scope.view = "runs";
+      };
+      function tick() {
+        $scope.runs.forEach(function (r) {
+          if (r.status === "running" && r.progress < 100) r.progress = Math.min(100, r.progress + 1);
+        });
+        $timeout(tick, 900);
+      }
+      tick();
+    });
+  </script>
+</body>
+</html>
