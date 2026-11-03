@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <base href="/portfolio/"/>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Rakesh Kumar · Principal Network Test Engineer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <style>
+    /* ── Anthropic Design Tokens ──────────────────────────── */
+    :root {
+      --ivory:    #faf9f5;
+      --parchment:#f2efe4;
+      --light-rule:#dedad0;
+      --mid-gray: #9e9b93;
+      --text:     #0e0e0c;
+      --text-sub: #3f3d3a;
+      --orange:   #c96442;
+      --orange-lt:#faeae3;
+      --blue:     #4a85b8;
+      --olive:    #6a7d50;
+      --font-serif:'Lora', Georgia, serif;
+      --font-sans: 'Inter', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    html { -webkit-text-size-adjust: 100%; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--parchment);
+      color: var(--text);
+      font-size: 13px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+      font-feature-settings: 'liga' 1, 'kern' 1, 'tnum' 1;
+    }
+
+    /* ── Two-column shell ─────────────────────────────────── */
+    .resume {
+      max-width: 1080px;
+      margin: 2rem auto;
+      background: var(--ivory);
+      box-shadow: 0 1px 3px rgba(14,14,12,.06), 0 8px 32px rgba(14,14,12,.07);
+      display: grid;
+      grid-template-columns: 270px 1fr;
+    }
+
+    /* ── LEFT SIDEBAR ─────────────────────────────────────── */
+    .sidebar {
+      background: #0e0e0c;
+      color: #e8e4da;
+      padding: 2rem 1.4rem;
+      position: relative;
+    }
+
+    .sidebar-accent {
+      position: absolute; top:0; left:0; right:0;
+      height: 3px;
+      background: var(--orange);
+    }
+
+    /* Profile / QR block */
+    .avatar-wrap {
+      display: flex; flex-direction: column; align-items: center;
+      margin: 0 auto 1.4rem; gap: .6rem;
+    }
+    .avatar {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      background: #1c1c1a;
+      border: 2px solid var(--orange);
+      display: flex; align-items:center; justify-content:center;
+      overflow: hidden; flex-shrink: 0;
+    }
+    .avatar img { width:100%; height:100%; object-fit:cover; }
+    .avatar-placeholder {
+      font-size: 2rem; color: var(--mid-gray);
+      display:flex; align-items:center; justify-content:center;
+      width:100%; height:100%;
+    }
+    /* QR code badge — match portfolio hero (~188px modules) for consistency */
+    .qr-badge {
+      width: 188px; height: 188px;
+      background: #fff; border-radius: 8px;
+      padding: 8px;
+      border: 2px solid #3a3a38;
+      box-sizing: content-box;
+    }
+    .qr-badge img {
+      width: 188px; height: 188px;
+      display: block;
+      object-fit: contain;
+    }
+    .qr-badge a { display: block; line-height: 0; }
+    .qr-label {
+      font-size: .68rem; color: #9a9690; text-align: center;
+      letter-spacing: .06em; text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .s-name {
+      font-family: var(--font-serif);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #f5f1e8;
+      text-align: center;
+      letter-spacing: -.01em;
+      margin-bottom: .2rem;
+    }
+    .s-title {
+      font-size: .67rem;
+      font-weight: 600;
+      color: var(--orange);
+      text-align: center;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      line-height: 1.45;
+    }
+
+    .s-section {
+      margin-bottom: 1.4rem;
+    }
+    .s-label {
+      font-size: .62rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .14em;
+      color: var(--orange);
+      border-bottom: 1px solid #202020;
+      padding-bottom: .3rem;
+      margin-bottom: .75rem;
+    }
+
+    /* Contact items */
+    .c-row {
+      display: flex; align-items: flex-start; gap: .55rem;
+      margin-bottom: .5rem;
+      font-size: .75rem;
+      color: #a8a49c;
+      font-weight: 400;
+    }
+    .c-row svg { width:12px; height:12px; fill:var(--orange); flex-shrink:0; margin-top:.18rem; }
+    .c-row a { color:#a8a49c; text-decoration:none; }
+    .c-row a:hover { color:var(--orange); }
+
+    /* ── TIMELINE (sidebar) ───────────────────────────────── */
+    .tl { position:relative; padding-left:1.1rem; }
+    .tl::before {
+      content:''; position:absolute; left:0; top:.35rem; bottom:.35rem;
+      width:1px; background:linear-gradient(180deg,var(--orange) 0%,#222 100%);
+    }
+    .tl-item { position:relative; margin-bottom:.9rem; }
+    .tl-dot {
+      position:absolute; left:-1.42rem; top:.3rem;
+      width:6px; height:6px; border-radius:50%;
+      background:var(--orange); border:1.5px solid #0e0e0c;
+    }
+    .tl-year {
+      font-size:.65rem; color:var(--orange);
+      font-family:var(--font-mono); font-weight:500;
+      letter-spacing:.03em;
+      margin-bottom:.12rem;
+    }
+    .tl-role { font-size:.78rem; font-weight:700; color:#f0ece2; line-height:1.3; }
+    .tl-co   { font-size:.7rem; color:#7a7770; font-weight:400; }
+
+    /* ── SKILL TREE (sidebar) ─────────────────────────────── */
+    .tree { font-size:.7rem; color:#a8a49c; line-height:1.5; }
+    .tree ul { list-style:none; padding-left:.9rem; }
+    .tree li { position:relative; padding:.08rem 0; }
+    .tree li::before {
+      content:'├─'; color:#3a3a38;
+      font-family:var(--font-mono); font-size:.63rem;
+      margin-right:.3rem;
+    }
+    .tree li:last-child::before { content:'└─'; }
+    .tree > ul > li::before { content:''; margin:0; }
+    .tree-root {
+      font-weight:700; color:#e8e4da; font-size:.72rem;
+      margin:.55rem 0 .18rem;
+      letter-spacing:.02em;
+    }
+    .tree-root::before { content:'◆ '; color:var(--orange); font-size:.6rem; }
+
+    /* Protocol badges (sidebar) */
+    .proto-badges { display:flex; flex-wrap:wrap; gap:.3rem; }
+    .pb {
+      font-size:.62rem; font-family:var(--font-mono); font-weight:500;
+      background:#161614; color:var(--orange);
+      padding:.18rem .45rem; border-radius:2px;
+      border:1px solid #282826; letter-spacing:.02em;
+    }
+
+    /* Cert pills */
+    .cert-pill {
+      font-size:.65rem; background:#181816; font-weight:500;
+      color:#9e9a92; padding:.2rem .55rem;
+      border-radius:20px; display:inline-block;
+      margin:.2rem .2rem 0 0;
+      border:1px solid #242422;
+    }
+
+    /* ── RIGHT CONTENT AREA ───────────────────────────────── */
+    .content {
+      padding: 2rem 2.2rem;
+    }
+
+    /* Header */
+    .hdr-name {
+      font-family: var(--font-serif);
+      font-size: 2.1rem;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.1;
+      letter-spacing: -.02em;
+      margin-bottom: .25rem;
+    }
+    .hdr-title {
+      font-size: .78rem;
+      font-weight: 600;
+      color: var(--orange);
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      margin-bottom: 1.3rem;
+    }
+
+    /* Page-load telemetry banner */
+    .telemetry {
+      background: #0e0e0c;
+      border-radius: 6px;
+      padding: .8rem 1.1rem;
+      margin-bottom: 1.5rem;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: .5rem;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid #1e1e1c;
+    }
+    .telemetry::before {
+      content: 'LIVE PAGE TELEMETRY';
+      position: absolute; top: .32rem; right: .8rem;
+      font-size: .56rem; font-family: var(--font-mono); font-weight: 500;
+      color: var(--orange); letter-spacing: .14em; opacity: .6;
+    }
+    .tlm-cell { text-align:center; }
+    .tlm-val {
+      font-family: var(--font-mono);
+      font-size: .95rem; font-weight: 700;
+      color: var(--orange);
+      display: block;
+      letter-spacing: -.01em;
+    }
+    .tlm-lbl {
+      font-size: .57rem; color: #4a4a48; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .09em;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+    .cursor-blink::after {
+      content:'█'; font-size:.65rem;
+      animation: blink 1.2s step-end infinite;
+      color: var(--orange);
+    }
+
+    /* Section titles */
+    .sec-title {
+      font-size: .62rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .18em;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: .55rem;
+      margin: 1.5rem 0 .9rem;
+    }
+    .sec-title::after {
+      content:''; flex:1; height:1px; background:var(--light-rule);
+    }
+    .sec-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--orange); flex-shrink:0;
+    }
+
+    /* About / Summary */
+    .summary {
+      background: var(--orange-lt);
+      border-left: 2px solid var(--orange);
+      padding: .85rem 1.1rem;
+      border-radius: 0 5px 5px 0;
+      font-size: .83rem;
+      color: var(--text-sub);
+      line-height: 1.7;
+      margin-bottom: .9rem;
+    }
+    .summary strong { color: var(--text); font-weight: 700; }
+
+    /* About 2-col */
+    .about-cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .8rem;
+      margin-bottom: .5rem;
+    }
+    .trait { display:flex; gap:.45rem; align-items:flex-start; margin-bottom:.38rem; }
+    .trait-dot {
+      width:5px; height:5px; border-radius:50%;
+      background:var(--orange); flex-shrink:0; margin-top:.42rem;
+    }
+    .trait-txt { font-size:.78rem; color:var(--text-sub); line-height:1.5; }
+    .trait-txt strong { color:var(--text); font-weight:700; }
+    /* Skills Tree */
+    .skill-tree {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: .6rem;
+    }
+    .sk-cat {
+      background: var(--parchment);
+      border-radius: 5px;
+      padding: .75rem .85rem;
+      border-top: 2px solid var(--orange);
+    }
+    .sk-cat-name {
+      font-size: .63rem; font-weight: 800; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--text); margin-bottom: .45rem;
+    }
+    .sk-item {
+      font-size: .71rem; color: var(--text-sub);
+      display: flex; align-items: center; gap: .35rem;
+      padding: .09rem 0; line-height: 1.45;
+      font-weight: 400;
+    }
+    .sk-item::before { content:'▸'; color:var(--orange); font-size:.6rem; flex-shrink:0; }
+
+    /* Projects */
+    .proj-list { display:grid; gap:.6rem; }
+    .proj {
+      background: #fff;
+      border-radius: 5px;
+      padding: .85rem 1rem;
+      border-left: 2px solid var(--light-rule);
+      transition: border-color .15s;
+      box-shadow: 0 1px 3px rgba(14,14,12,.04);
+    }
+    .proj:hover { border-left-color: var(--orange); }
+    .proj-hdr { display:flex; justify-content:space-between; align-items:flex-start; gap:.5rem; margin-bottom:.35rem; }
+    .proj-name { font-weight:700; font-size:.85rem; color:var(--text); letter-spacing:-.01em; }
+    .proj-badge {
+      font-size:.58rem; font-weight:700; text-transform:uppercase;
+      letter-spacing:.08em; padding:.18rem .55rem; border-radius:20px;
+      flex-shrink:0;
+    }
+    .badge-live   { background:#d4edda; color:#155724; }
+    .badge-active { background:#fff3cd; color:#856404; }
+    .proj-desc { font-size:.76rem; color:var(--text-sub); line-height:1.6; margin-bottom:.45rem; }
+    .proj-metrics {
+      display:flex; gap:.45rem; flex-wrap:wrap;
+      font-size:.65rem; font-family:var(--font-mono); color:var(--text-sub);
+    }
+    .pm { background:var(--parchment); padding:.1rem .45rem; border-radius:2px; }
+    .proj-link { font-size:.7rem; color:var(--orange); text-decoration:none; font-weight:600; }
+    .proj-link:hover { text-decoration:underline; }
+
+    /* Experience (compact) */
+    .exp-item { margin-bottom: 1rem; padding-bottom:1rem; border-bottom:1px solid var(--light-rule); }
+    .exp-item:last-child { border-bottom:none; margin-bottom:0; }
+    .exp-hdr { display:flex; justify-content:space-between; gap:.5rem; margin-bottom:.3rem; }
+    .exp-role { font-weight:700; font-size:.86rem; color:var(--text); letter-spacing:-.01em; }
+    .exp-co   { font-size:.76rem; color:var(--orange); font-weight:600; }
+    .exp-date { font-family:var(--font-mono); font-size:.65rem; color:var(--mid-gray); white-space:nowrap; font-weight:500; }
+    .exp-bullets { list-style:none; }
+    .exp-bullets li {
+      font-size:.76rem; color:var(--text-sub); padding:.16rem 0 .16rem .95rem;
+      position:relative; line-height:1.55;
+    }
+    .exp-bullets li::before { content:'▸'; position:absolute; left:0; color:var(--orange); font-size:.62rem; top:.22rem; }
+
+    /* Education / Certs */
+    .edu-row { display:flex; justify-content:space-between; gap:1rem; margin-bottom:.5rem; }
+    .edu-deg { font-weight:600; font-size:.8rem; color:var(--text); }
+    .edu-sch { font-size:.73rem; color:var(--text-sub); }
+    .edu-yr  { font-family:var(--font-mono); font-size:.65rem; color:var(--mid-gray); white-space:nowrap; font-weight:500; }
+
+    /* Radar canvas */
+    .radar-wrap { position:relative; }
+    #skillsRadar { display:block; margin:0 auto; }
+
+    /* Download bar */
+    .dl-bar {
+      display: flex; align-items: center; gap: .75rem;
+      margin-bottom: 1.2rem; flex-wrap: wrap;
+    }
+    .dl-btn {
+      display: inline-flex; align-items: center; gap: .45rem;
+      padding: .45rem .95rem;
+      font-size: .73rem; font-weight: 700;
+      letter-spacing: .04em; text-transform: uppercase;
+      border-radius: 4px; text-decoration: none;
+      transition: opacity .15s;
+      border: 1.5px solid transparent;
+    }
+    .dl-btn:hover { opacity: .82; }
+    .dl-btn-primary {
+      background: var(--orange); color: #fff;
+      border-color: var(--orange);
+    }
+    .dl-btn-ghost {
+      background: transparent; color: var(--orange);
+      border-color: var(--orange);
+    }
+    .dl-btn svg { width:13px; height:13px; fill:currentColor; flex-shrink:0; }
+
+    /* Live services */
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: .55rem;
+      margin-bottom: .25rem;
+    }
+    .svc-card {
+      background: #fff;
+      border: 1px solid var(--light-rule);
+      border-radius: 5px;
+      padding: .7rem .8rem;
+      text-decoration: none;
+      transition: border-color .15s, box-shadow .15s;
+      display: block;
+    }
+    .svc-card:hover { border-color: var(--orange); box-shadow: 0 2px 8px rgba(201,100,66,.12); }
+    .svc-status {
+      display: flex; align-items: center; gap: .4rem;
+      margin-bottom: .3rem;
+    }
+    .svc-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #22c55e; flex-shrink: 0;
+      box-shadow: 0 0 0 2px rgba(34,197,94,.25);
+      animation: pulse-green 2s ease-in-out infinite;
+    }
+    .svc-dot.offline { background: #9e9b93; box-shadow: none; animation: none; }
+    @keyframes pulse-green {
+      0%,100% { box-shadow: 0 0 0 2px rgba(34,197,94,.25); }
+      50%      { box-shadow: 0 0 0 4px rgba(34,197,94,.1); }
+    }
+    .svc-label {
+      font-size: .6rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .09em; color: #22c55e;
+    }
+    .svc-label.offline { color: var(--mid-gray); }
+    .svc-name { font-size: .8rem; font-weight: 700; color: var(--text); line-height: 1.3; margin-bottom: .15rem; }
+    .svc-desc { font-size: .68rem; color: var(--text-sub); line-height: 1.4; }
+    .svc-port {
+      font-family: var(--font-mono); font-size: .62rem;
+      color: var(--mid-gray); margin-top: .3rem; font-weight: 500;
+    }
+
+    /* Print / PDF — keep layout aligned with screen (Chromium print-to-PDF uses this) */
+    @media print {
+      @page {
+        size: letter;
+        margin: 0.45in;
+      }
+      html {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      body {
+        background: var(--parchment) !important;
+        margin: 0 !important;
+      }
+      .resume-print-hide {
+        display: none !important;
+      }
+      .resume {
+        box-shadow: none !important;
+        margin: 0 auto !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        display: grid !important;
+        grid-template-columns: 270px 1fr !important;
+        align-items: start !important;
+      }
+      .sidebar {
+        background: #0e0e0c !important;
+        color: #e8e4da !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .sidebar-accent,
+      .tl-dot,
+      .pb {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .content {
+        background: var(--ivory) !important;
+      }
+      a {
+        color: inherit !important;
+        text-decoration: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="resume">
+
+  <!-- ── SIDEBAR ───────────────────────────────────────── -->
+  <aside class="sidebar">
+    <div class="sidebar-accent"></div>
+
+    <!-- Photo + QR Code -->
+    <div class="avatar-wrap">
+      <div class="qr-badge">
+        <a href="https://rakeshbitsindri.github.io/portfolio/" target="_blank">
+          <img src="assets/qrcode.png" alt="Scan to view portfolio">
+        </a>
+      </div>
+      <div class="qr-label">Scan · Portfolio</div>
+    </div>
+    <div class="s-name">Rakesh Kumar</div>
+    <div class="s-title">Principal System Test Engineer<br>Network Validation &amp; Automation</div>
+
+    <!-- Contact -->
+    <div class="s-section">
+      <div class="s-label">Contact</div>
+      <div class="c-row">
+        <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+        <a href="mailto:rakesh.kumar@keysight.com">rakesh.kumar@keysight.com</a>
+      </div>
+      <div class="c-row">
+        <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+        <span>818-450-4820</span>
+      </div>
+      <div class="c-row">
+        <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+        <span>Moorpark, CA</span>
+      </div>
+      <div class="c-row">
+        <svg viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
+        <a href="https://www.linkedin.com/in/rakeshbitsindri/" target="_blank">linkedin.com/in/rakeshbitsindri</a>
+      </div>
+      <div class="c-row">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+        <a href="https://rakeshbitsindri.github.io/portfolio/" target="_blank">rakeshbitsindri.github.io/portfolio</a>
+      </div>
+    </div>
+
+    <!-- Career Timeline -->
+    <div class="s-section">
+      <div class="s-label">Career Timeline</div>
+      <div class="tl">
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-year">2018 – Present</div>
+          <div class="tl-role">Principal System Test Engineer</div>
+          <div class="tl-co">Keysight Technologies · Calabasas, CA</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-year">2010 – 2018</div>
+          <div class="tl-role">Senior QA Engineer II</div>
+          <div class="tl-co">Ixia Communications · Calabasas, CA</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-year">2007 – 2010</div>
+          <div class="tl-role">QA Engineer I</div>
+          <div class="tl-co">Ixia Technology Pvt Ltd · Kolkata, India</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Protocol Tree -->
+    <div class="s-section">
+      <div class="s-label">Protocol Expertise Tree</div>
+      <div class="tree">
+        <div class="tree-root">L2 — Data Link</div>
+        <ul>
+          <li>Ethernet · VLAN 802.1q</li>
+          <li>STP 802.1d/w · LAG/LACP</li>
+        </ul>
+        <div class="tree-root">L3 — Network</div>
+        <ul>
+          <li>TCP/IP · ARP · ICMP</li>
+          <li>OSPF · BGP · NAT/PAT</li>
+          <li>NAT64 / NAT46</li>
+        </ul>
+        <div class="tree-root">L4–L7 — Application</div>
+        <ul>
+          <li>HTTP/1.1 · HTTP/2 · HTTP/3</li>
+          <li>QUIC · TLS 1.3 · SSL Proxy</li>
+          <li>SIP/H.323 · VoIP · FTP</li>
+          <li>DHCP · DNS · Multicast</li>
+        </ul>
+        <div class="tree-root">Security</div>
+        <ul>
+          <li>DDoS · IPS/IDS · ATI</li>
+          <li>802.1x · Firewall Policy</li>
+          <li>SSL Inspection · DLP</li>
+        </ul>
+        <div class="tree-root">WAN / Wireless</div>
+        <ul>
+          <li>LTE 3GPP · GTPv2</li>
+          <li>PPP · L2TP · MIPv4/v6</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Certifications -->
+    <div class="s-section">
+      <div class="s-label">Certifications</div>
+      <span class="cert-pill">Network Management in Linux (XLRI)</span>
+      <span class="cert-pill">Cryptography (IIT Kharagpur)</span>
+      <span class="cert-pill">Cloud Computing (Texas Univ)</span>
+      <span class="cert-pill">Kubernetes &amp; Containers</span>
+      <span class="cert-pill">AWS / GCP / Azure</span>
+    </div>
+  </aside>
+
+  <!-- ── MAIN CONTENT ──────────────────────────────────── -->
+  <main class="content">
+
+    <!-- Name / Header -->
+    <div class="hdr-name">Rakesh Kumar</div>
+    <div class="hdr-title">Principal System Test Engineer · Network Validation &amp; AI Automation Specialist · 19 years @ Keysight/Ixia</div>
+
+    <!-- PDF Download bar -->
+    <div class="dl-bar resume-print-hide">
+      <a class="dl-btn dl-btn-primary" href="Rakesh_Kumar_Resume_2026.pdf" download="Rakesh_Kumar_Resume_2026.pdf">
+        <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zm-8 2V5h2v6h1.17L12 13.17 9.83 11H11zm-6 7h14v2H5z"/></svg>
+        Download PDF Resume
+      </a>
+      <a class="dl-btn dl-btn-ghost" href="https://rakeshbitsindri.github.io/portfolio/" target="_blank">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+        View Portfolio
+      </a>
+      <a class="dl-btn dl-btn-ghost" href="awards.html" target="_blank">
+        <svg viewBox="0 0 24 24"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2z"/></svg>
+        Awards
+      </a>
+      <span style="font-size:.68rem;color:var(--mid-gray);font-family:var(--font-mono);">
+        rakesh.kumar@keysight.com · 818-450-4820
+      </span>
+    </div>
+
+    <!-- LIVE PAGE TELEMETRY (real values set by JS) -->
+    <div class="telemetry resume-print-hide" id="telemetry">
+      <div class="tlm-cell">
+        <span class="tlm-val cursor-blink" id="t-ttfb">—</span>
+        <span class="tlm-lbl">TTFB (server: 1.6 ms)</span>
+      </div>
+      <div class="tlm-cell">
+        <span class="tlm-val" id="t-load">—</span>
+        <span class="tlm-lbl">DOM Load</span>
+      </div>
+      <div class="tlm-cell">
+        <span class="tlm-val" id="t-size">33 KB</span>
+        <span class="tlm-lbl">Transfer · gzip</span>
+      </div>
+      <div class="tlm-cell">
+        <span class="tlm-val" id="t-proto">HTTP/1.1</span>
+        <span class="tlm-lbl">Protocol · Uvicorn</span>
+      </div>
+    </div>
+
+    <!-- Live Production Services -->
+    <div class="sec-title resume-print-hide"><span class="sec-dot"></span>Live Production Services</div>
+    <div class="services-grid resume-print-hide">
+      <a class="svc-card" href="review.html" target="_blank">
+        <div class="svc-status"><div class="svc-dot"></div><div class="svc-label">Live</div></div>
+        <div class="svc-name">LabVault</div>
+        <div class="svc-desc">Lab asset mgmt · 50+ chassis</div>
+        <div class="svc-port">:8000 · Gunicorn + Django</div>
+      </a>
+      <a class="svc-card" href="review.html" target="_blank">
+        <div class="svc-status"><div class="svc-dot"></div><div class="svc-label">Live</div></div>
+        <div class="svc-name">BPS Operator</div>
+        <div class="svc-desc">Pythar V2 · BPS regression</div>
+        <div class="svc-port">:8088 · Daphne + Django ASGI</div>
+      </a>
+      <a class="svc-card" href="review.html" target="_blank">
+        <div class="svc-status"><div class="svc-dot"></div><div class="svc-label">Live</div></div>
+        <div class="svc-name">Launchpad</div>
+        <div class="svc-desc">Lab server control plane</div>
+        <div class="svc-port">:7777 · Uvicorn + FastAPI</div>
+      </a>
+      <a class="svc-card" href="review.html" target="_blank">
+        <div class="svc-status"><div class="svc-dot offline"></div><div class="svc-label offline">Internal</div></div>
+        <div class="svc-name">Keysight Strikes</div>
+        <div class="svc-desc">ATI threat intelligence feed</div>
+        <div class="svc-port">:30000 · BreakingPoint ATI</div>
+      </a>
+    </div>
+
+    <!-- Summary -->
+    <div class="sec-title"><span class="sec-dot"></span>About</div>
+    <div class="summary">
+      <strong>19 years</strong> at Keysight/Ixia (May 2007 – May 2026) specialising in high-performance network validation, L4–L7 traffic generation, and Python automation. Architected <strong>BPS-MCP / AppSec MCP</strong> (agent control of BreakingPoint &amp; CyPerf), <strong>LabVault</strong> (inventory, CapEx, DCIM), and <strong>OCS Lab UI</strong> (optical topology ops). Deep expertise in DDoS, SSL/TLS proxy, ADC, and security testing with Palo Alto, Fortinet, and F5 BIG-IP Viprion.
+    </div>
+
+    <!-- Soft skills from original resume (Profile section) -->
+    <div class="about-cols">
+      <div>
+        <div class="trait"><div class="trait-dot"></div><div class="trait-txt"><strong>Results-driven</strong> — logical and broad in scope; delivers under time-crunch schedules</div></div>
+        <div class="trait"><div class="trait-dot"></div><div class="trait-txt"><strong>Builder</strong> — full-stack Python, Django, FastAPI deployed to production</div></div>
+        <div class="trait"><div class="trait-dot"></div><div class="trait-txt"><strong>Customer-facing</strong> — WebEx sessions with enterprise clients; translates field issues into engineering fixes</div></div>
+        <div class="trait"><div class="trait-dot"></div><div class="trait-txt"><strong>Self-motivated</strong> — willingly assumes responsibilities and leads features end-to-end</div></div>
+      </div>
+      <div>
+        <div class="trait"><div class="trait-dot"></div><div class="trait-txt"><strong>Team-oriented</strong> — strong co-ordination across QA, Dev, and PM with high sense of ownership</div></div>
+        <div class="trait"><div class="trait-dot"></div><div class="trait-txt"><strong>Mentor</strong> — feature lead role; guides junior engineers through test design and debugging</div></div>
+        <div class="trait"><div class="trait-dot"></div><div class="trait-txt"><strong>Convergence belief</strong> — integrates networking, security, AI, and automation into unified frameworks</div></div>
+        <div class="trait"><div class="trait-dot"></div><div class="trait-txt"><strong>Clear communicator</strong> — thorough bug descriptions with high-level debug context; oral and written</div></div>
+      </div>
+    </div>
+
+    <!-- Skills Tree -->
+    <div class="sec-title"><span class="sec-dot"></span>Technical Skills</div>
+    <div class="skill-tree">
+      <div class="sk-cat">
+        <div class="sk-cat-name">Keysight Platforms</div>
+        <div class="sk-item">IxLoad · IxNetwork · IxOS</div>
+        <div class="sk-item">BreakingPoint (BPS) · BPS-QT</div>
+        <div class="sk-item">Xcellon-Ultra-NP · XT80</div>
+        <div class="sk-item">CloudStorm 10G/40G/100G</div>
+        <div class="sk-item">APS M8400 / M1010</div>
+        <div class="sk-item">ThreatArmor · Perfect Storm</div>
+      </div>
+      <div class="sk-cat">
+        <div class="sk-cat-name">Programming</div>
+        <div class="sk-item">Python · TCL · Bash</div>
+        <div class="sk-item">FastAPI · Pydantic · SQLAlchemy</div>
+        <div class="sk-item">Django · REST APIs · MCP</div>
+        <div class="sk-item">PyPDF2 · Pandas · Regex</div>
+        <div class="sk-item">ChromaDB · Qdrant · RAG</div>
+        <div class="sk-item">LLM Fine-tuning · QLoRA</div>
+      </div>
+      <div class="sk-cat">
+        <div class="sk-cat-name">Network Hardware</div>
+        <div class="sk-item">Cisco 6500 L3 · 7200 Router</div>
+        <div class="sk-item">Arista L2/L3/L4–L7</div>
+        <div class="sk-item">F5 BIG-IP Viprion (B4100/4200/4300)</div>
+        <div class="sk-item">Palo Alto 7060 · Fortinet 3700D/2600F</div>
+        <div class="sk-item">Cisco ASA · Shunra Impairment</div>
+        <div class="sk-item">Juniper · SONiC / Dell ONIE</div>
+      </div>
+      <div class="sk-cat">
+        <div class="sk-cat-name">DevOps &amp; Cloud</div>
+        <div class="sk-item">Docker · Kubernetes · Ansible</div>
+        <div class="sk-item">Jenkins · GitLab CI/CD</div>
+        <div class="sk-item">AWS · GCP · Azure</div>
+        <div class="sk-item">nginx · systemd · PXE/TFTP</div>
+        <div class="sk-item">Perforce · Bitbucket · Git</div>
+      </div>
+      <div class="sk-cat">
+        <div class="sk-cat-name">Security &amp; Monitoring</div>
+        <div class="sk-item">DDoS · IPS/IDS · ATI</div>
+        <div class="sk-item">SSL/TLS Proxy · DLP</div>
+        <div class="sk-item">802.1x · RADIUS (Cisco ACS)</div>
+        <div class="sk-item">Wireshark · NetMon</div>
+        <div class="sk-item">Exploit/Malware replay (ATI)</div>
+      </div>
+      <div class="sk-cat">
+        <div class="sk-cat-name">Traffic &amp; WAN</div>
+        <div class="sk-item">L4–L7 Load Balancing / ADC</div>
+        <div class="sk-item">NetSecOpen standard algorithms</div>
+        <div class="sk-item">LTE 3GPP · GTPv2 · PMIP</div>
+        <div class="sk-item">PPP · L2TP · MIPv4/MIPv6</div>
+        <div class="sk-item">P2P · Application Replay</div>
+      </div>
+    </div>
+
+    <!-- Experience -->
+    <div class="sec-title"><span class="sec-dot"></span>Professional Experience</div>
+
+    <div class="exp-item">
+      <div class="exp-hdr">
+        <div>
+          <div class="exp-role">Principal System Test Engineer (QA Engineer-5)</div>
+          <div class="exp-co">Keysight Technologies — Ixia Solutions Group</div>
+        </div>
+        <div class="exp-date">Feb 2018 – Present · Calabasas, CA</div>
+      </div>
+      <ul class="exp-bullets">
+        <li>Lead validation for high-speed load modules (Xcellon-Ultra-NP, XT80, CloudStorm 10G/40G/100G/400G) for data-centre and carrier-grade networks</li>
+        <li>Architected BPS-MCP / AppSec MCP — agent gateways for BreakingPoint and CyPerf (55+ tools, RAG, Cursor skills, operator console)</li>
+        <li>Built LabVault: chassis inventory, CapEx workflow, DCIM/Hyperview polling, reservations, and BPS deployment jobs across 50+ multi-vendor devices</li>
+        <li>Delivered OCS Lab UI / ocsctl for Calient optical circuit-switch topology plan/commit and lab fiber operations</li>
+        <li>Developed Pythar V2: Python regression framework orchestrating 154 BPT scenarios across HTTP/3, QUIC, TLS 1.3, DDoS, and application-layer protocols</li>
+        <li>Collaborate with Product Management on customer requirements; technical input influences test platform roadmaps and feature prioritisation</li>
+        <li>Work with Docker, Kubernetes, AWS/GCP/Azure for test-environment deployment; mentor junior engineers on automation and debugging</li>
+      </ul>
+    </div>
+
+    <div class="exp-item">
+      <div class="exp-hdr">
+        <div>
+          <div class="exp-role">Senior QA Engineer II — L4–L7 Application &amp; Security Testing</div>
+          <div class="exp-co">Ixia Communications (HQ)</div>
+        </div>
+        <div class="exp-date">July 2010 – Jan 2018 · Calabasas, CA</div>
+      </div>
+      <ul class="exp-bullets">
+        <li>Architected test scenarios for L4–L7 traffic management, ADC load-balancing, and application delivery (F5 BIG-IP Viprion, Cisco ACE)</li>
+        <li>Reduced regression cycle time 40% with Python/TCL automation frameworks; spearheaded performance calibration for hyperscale data-centre customers</li>
+        <li>Validated SSL proxy, NAT/PAT/NAT64/NAT46, enterprise firewalls (Palo Alto, Fortinet, Cisco ASA); implemented NetSecOpen standard algorithms (published internal IP)</li>
+        <li>Conducted IPS/IDS validation with Advanced Threat Intelligence (ATI) on BreakingPoint Security platform</li>
+      </ul>
+    </div>
+
+    <div class="exp-item">
+      <div class="exp-hdr">
+        <div>
+          <div class="exp-role">QA Engineer I — Network Testing &amp; Automation</div>
+          <div class="exp-co">Ixia Technology Pvt Ltd</div>
+        </div>
+        <div class="exp-date">May 2007 – July 2010 · Kolkata, India</div>
+      </div>
+      <ul class="exp-bullets">
+        <li>Built foundational expertise in L2–L7 protocol testing using Ixia IxLoad and IxNetwork</li>
+        <li>Automated OS deployment and configuration management via TCL scripting in PXE environments</li>
+        <li>Validated switching, routing, and VLAN implementations on Cisco, Arista, and Juniper platforms</li>
+      </ul>
+    </div>
+
+    <!-- Key Projects -->
+    <div class="sec-title"><span class="sec-dot"></span>Published Projects</div>
+    <div class="proj-list">
+
+      <div class="proj">
+        <div class="proj-hdr">
+          <div class="proj-name">BPS-MCP — Autonomous Test Controller</div>
+          <div class="proj-badge badge-live">Production</div>
+        </div>
+        <div class="proj-desc">MCP server exposing 55+ tools enabling AI agents (Cursor/Claude) to control BreakingPoint chassis via natural language. Features 7 Cursor skills, ChromaDB RAG knowledge base, and autonomous test-orchestration capabilities.</div>
+        <div class="proj-metrics">
+          <span class="pm">55+ tools</span><span class="pm">7 Cursor skills</span><span class="pm">ChromaDB RAG</span><span class="pm">15 k+ LOC</span>
+        </div>
+        <a class="proj-link" href="https://rakeshbitsindri.github.io/portfolio/" target="_blank">View project →</a>
+      </div>
+
+      <div class="proj">
+        <div class="proj-hdr">
+          <div class="proj-name">LabVault — Network Lab Asset Management</div>
+          <div class="proj-badge badge-live">Production</div>
+        </div>
+        <div class="proj-desc">Django system of record for 50+ multi-vendor chassis (Arista, FortiGate, PaloAlto, SONiC): IxOS/KCOS health, reservations, Hyperview-style DCIM, CapEx request→finance→procurement→asset linking, and BPS deployment jobs.</div>
+        <div class="proj-metrics">
+          <span class="pm">50+ devices</span><span class="pm">CapEx workflow</span><span class="pm">DCIM</span><span class="pm">Django + PostgreSQL</span>
+        </div>
+        <a class="proj-link" href="review.html" target="_blank">Live demo →</a>
+      </div>
+
+      <div class="proj">
+        <div class="proj-hdr">
+          <div class="proj-name">AppSec MCP — BPS + CyPerf Operator Gateway</div>
+          <div class="proj-badge badge-live">Production</div>
+        </div>
+        <div class="proj-desc">Unified MCP gateway and web console so AI agents operate BreakingPoint and CyPerf application-security test stacks from one surface — hardware sessions, RAG knowledge, chatter telemetry.</div>
+        <div class="proj-metrics">
+          <span class="pm">BPS + CyPerf</span><span class="pm">MCP gateway</span><span class="pm">Console UI</span>
+        </div>
+      </div>
+
+      <div class="proj">
+        <div class="proj-hdr">
+          <div class="proj-name">OCS Lab UI — Optical Circuit Switch Tooling</div>
+          <div class="proj-badge badge-live">Production</div>
+        </div>
+        <div class="proj-desc">Calient OCS lab UI and ocsctl: topology plan/commit, fiber inventory, AresONE mappings, guided optical cross-connect operations for multi-chassis labs.</div>
+        <div class="proj-metrics">
+          <span class="pm">OCS</span><span class="pm">Topology compiler</span><span class="pm">FastAPI + UI</span>
+        </div>
+      </div>
+
+      <div class="proj">
+        <div class="proj-hdr">
+          <div class="proj-name">BPS Operator — Live Regression Portal</div>
+          <div class="proj-badge badge-live">Production</div>
+        </div>
+        <div class="proj-desc">Django ASGI web portal for Pythar V2 regression execution — browse BPT catalog, kick off test runs, stream live logs, and download reports. Integrated with LabVault for resource reservation.</div>
+        <div class="proj-metrics">
+          <span class="pm">154 BPTs</span><span class="pm">Daphne ASGI</span><span class="pm">Live log streaming</span>
+        </div>
+        <a class="proj-link" href="review.html" target="_blank">Live portal →</a>
+      </div>
+
+      <div class="proj">
+        <div class="proj-hdr">
+          <div class="proj-name">Pythar V2 — BPS Regression Framework</div>
+          <div class="proj-badge badge-active">Active</div>
+        </div>
+        <div class="proj-desc">Python framework orchestrating 154 BPT scenarios across HTTP/3, QUIC, TLS 1.3, DDoS, and application-layer protocols. Provides BPT catalog management, test-execution orchestration, and HTML performance reporting.</div>
+        <div class="proj-metrics">
+          <span class="pm">154 BPTs</span><span class="pm">200+ tests</span><span class="pm">HTML reports</span>
+        </div>
+      </div>
+
+      <div class="proj">
+        <div class="proj-hdr">
+          <div class="proj-name">AI-Patents Super Engine — RAG + LLM Research Platform</div>
+          <div class="proj-badge badge-active">Active</div>
+        </div>
+        <div class="proj-desc">Full-stack AI patent research platform. RAG chatbot on fine-tuned Llama 3.2 3B (QLoRA/Unsloth), Qdrant vector database with hybrid dense + BM25 search, prior-art detection, UMAP clustering. FastAPI backend + Next.js frontend.</div>
+        <div class="proj-metrics">
+          <span class="pm">Llama 3.2 3B QLoRA</span><span class="pm">Qdrant</span><span class="pm">BM25 + Dense hybrid</span>
+        </div>
+      </div>
+
+      <div class="proj">
+        <div class="proj-hdr">
+          <div class="proj-name">Cogni — Persistent Autonomous Task Agent</div>
+          <div class="proj-badge badge-active">Active</div>
+        </div>
+        <div class="proj-desc">Autonomous task agent with encrypted distributed storage (Fernet AES-128 over file/HTTP/IPFS), knowledge base with confidence scoring, learning-from-experience, and pattern extraction. Demonstrates secure AI agent architecture.</div>
+        <div class="proj-metrics">
+          <span class="pm">Fernet AES-128</span><span class="pm">IPFS backend</span><span class="pm">Confidence scoring</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Education -->
+    <div class="sec-title"><span class="sec-dot"></span>Education</div>
+    <div class="edu-row">
+      <div>
+        <div class="edu-deg">Post Graduate Diploma — Cloud Computing</div>
+        <div class="edu-sch">Texas University · Great Learning</div>
+      </div>
+    </div>
+    <div class="edu-row">
+      <div>
+        <div class="edu-deg">B.E. Computer Science — 73% Aggregate</div>
+        <div class="edu-sch">BIT Sindri, Dhanbad (Four-Year Full-Time) · Jharkhand, India</div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+/* ── Real Page Telemetry via Navigation Timing API ─────── */
+function setTelemetry() {
+  try {
+    const nav = performance.getEntriesByType('navigation')[0];
+    if (!nav) return;
+
+    const ttfb   = nav.responseStart - nav.requestStart;
+    const domLoad = nav.domContentLoadedEventEnd - nav.startTime;
+    const total   = nav.loadEventEnd - nav.startTime;
+    const xfer    = nav.transferSize;
+    const proto   = nav.nextHopProtocol || 'http/1.1';
+
+    document.getElementById('t-ttfb').textContent =
+      ttfb > 0 ? ttfb.toFixed(1) + ' ms' : '< 1 ms';
+    document.getElementById('t-load').textContent =
+      domLoad > 0 ? domLoad.toFixed(0) + ' ms' : total.toFixed(0) + ' ms';
+    document.getElementById('t-size').textContent =
+      xfer > 0 ? (xfer / 1024).toFixed(1) + ' KB' : '~25 KB';
+    document.getElementById('t-proto').textContent =
+      proto.toUpperCase().replace('HTTP/', 'HTTP/');
+  } catch(e) {
+    /* fallback already in HTML */
+  }
+}
+
+/* Run after full load */
+if (document.readyState === 'complete') {
+  setTelemetry();
+} else {
+  window.addEventListener('load', () => setTimeout(setTelemetry, 120));
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <base href="/portfolio/"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rakesh Kumar — Resume &amp; Work Samples</title>
+  <meta name="description" content="Network validation, lab platforms, MCP/AI agents — résumé and selected work.">
+  <meta name="robots" content="noindex">
+  
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ivory:    #faf9f5;
+    --parchment:#f2efe4;
+    --rule:     #e8e4da;
+    --text:     #0e0e0c;
+    --sub:      #6b6b68;
+    --orange:   #c96442;
+    --orange-lt:#faeae3;
+    --mono:     'JetBrains Mono', monospace;
+    --serif:    'Lora', Georgia, serif;
+    --sans:     'Inter', system-ui, sans-serif;
+  }
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+  html { -webkit-text-size-adjust:100%; }
+  body {
+    font-family: var(--sans);
+    background: var(--ivory);
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  a { color: var(--orange); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  /* ── Nav ── */
+  .topnav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(250,249,245,.92);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--rule);
+    padding: .75rem 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .nav-brand {
+    font-family: var(--serif); font-size: 1.05rem; font-weight: 700;
+    color: var(--text); text-decoration: none;
+  }
+  .nav-brand:hover { text-decoration: none; }
+  .nav-links { display: flex; gap: .25rem; flex-wrap: wrap; }
+  .nav-link {
+    font-size: .8rem; font-weight: 500; color: var(--sub);
+    padding: .3rem .75rem; border-radius: 5px;
+    transition: color .15s, background .15s;
+    text-decoration: none;
+  }
+  .nav-link:hover { color: var(--orange); background: var(--orange-lt); text-decoration: none; }
+  .nav-link-primary {
+    color: #fff; background: var(--orange);
+    font-size: .8rem; font-weight: 600;
+    padding: .3rem .9rem; border-radius: 5px;
+    text-decoration: none; transition: opacity .15s;
+  }
+  .nav-link-primary:hover { opacity: .85; text-decoration: none; }
+  /* ── Badges ── */
+  .badge {
+    display: inline-block; font-size: .67rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .07em;
+    padding: .18rem .55rem; border-radius: 3px;
+  }
+  .badge-production { background: #d1fae5; color: #065f46; }
+  .badge-active      { background: #dbeafe; color: #1e40af; }
+  .badge-demo        { background: #ede9fe; color: #5b21b6; }
+  .badge-beta        { background: #fef3c7; color: #92400e; }
+  /* ── Footer ── */
+  .footer {
+    text-align: center; padding: 3rem 1rem;
+    border-top: 1px solid var(--rule);
+    font-size: .8rem; color: var(--sub);
+    margin-top: 4rem;
+  }
+</style>
+
+  <style>
+    .wrap { max-width: 960px; margin: 0 auto; padding: 2.5rem 1.5rem 1rem; }
+    .eyebrow {
+      font-size: .68rem; font-weight: 700; letter-spacing: .16em;
+      text-transform: uppercase; color: var(--orange); margin-bottom: .6rem;
+    }
+    h1 {
+      font-family: var(--serif); font-size: 2.15rem; font-weight: 700;
+      letter-spacing: -.02em; line-height: 1.2; margin-bottom: .6rem;
+    }
+    .lede {
+      font-size: 1rem; color: var(--sub); max-width: 44rem; line-height: 1.7;
+      margin-bottom: 1.5rem;
+    }
+    .actions { display: flex; flex-wrap: wrap; gap: .65rem; margin-bottom: 2rem; }
+    .btn {
+      display: inline-flex; align-items: center; gap: .35rem;
+      font-size: .82rem; font-weight: 600; padding: .55rem 1.15rem;
+      border-radius: 6px; text-decoration: none; border: 1.5px solid transparent;
+    }
+    .btn:hover { text-decoration: none; opacity: .9; }
+    .btn-primary { background: var(--orange); color: #fff; }
+    .btn-ghost {
+      background: #fff; color: var(--text); border-color: var(--rule);
+    }
+    .btn-ghost:hover { border-color: var(--orange); color: var(--orange); }
+    .panel {
+      background: #fff; border: 1px solid var(--rule); border-radius: 10px;
+      padding: 1.25rem 1.4rem; margin-bottom: 1.75rem;
+    }
+    .panel h2 {
+      font-family: var(--serif); font-size: 1.15rem; margin-bottom: .45rem;
+    }
+    .panel > p { font-size: .88rem; color: var(--sub); line-height: 1.65; }
+    .contact {
+      display: flex; flex-wrap: wrap; gap: .75rem 1.5rem;
+      margin-top: .9rem; font-size: .84rem; color: var(--sub);
+    }
+    .contact a { font-weight: 600; }
+    .dgrid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: .85rem; margin-top: 1rem;
+    }
+    .domain {
+      background: var(--parchment); border-radius: 8px; padding: .9rem 1rem;
+    }
+    .domain h3 {
+      font-size: .78rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .05em; color: var(--orange); margin-bottom: .35rem;
+    }
+    .domain p { font-size: .78rem; color: var(--sub); line-height: 1.55; }
+    .section-title {
+      font-family: var(--serif); font-size: 1.35rem; font-weight: 700;
+      margin: 0 0 .35rem;
+    }
+    .section-sub { font-size: .85rem; color: var(--sub); margin-bottom: 1.25rem; }
+    .grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      gap: 1rem;
+    }
+    .sample {
+      background: #fff; border: 1px solid var(--rule); border-radius: 8px;
+      padding: 1.2rem 1.25rem; display: flex; flex-direction: column; gap: .45rem;
+    }
+    .sample-tag {
+      font-size: .65rem; font-weight: 700; letter-spacing: .06em;
+      text-transform: uppercase; color: var(--orange);
+    }
+    .sample-title { font-size: .98rem; font-weight: 700; color: var(--text); }
+    .sample-blurb { font-size: .82rem; color: var(--sub); line-height: 1.6; flex: 1; }
+    .sample-note { font-size: .75rem; color: var(--sub); font-style: italic; }
+    .tech-row { display: flex; flex-wrap: wrap; gap: .35rem; }
+    .tech {
+      font-family: var(--mono); font-size: .62rem; font-weight: 500;
+      background: var(--parchment); color: var(--sub);
+      padding: .18rem .45rem; border-radius: 3px;
+    }
+    .sample-cta {
+      font-size: .8rem; font-weight: 600; color: var(--orange);
+      margin-top: .35rem; text-decoration: none;
+    }
+    .sample-cta:hover { text-decoration: underline; }
+    .share-box {
+      margin-top: 2.5rem; padding: 1.25rem 1.4rem;
+      background: var(--orange-lt); border-radius: 10px;
+    }
+    .share-box h2 { font-family: var(--serif); font-size: 1.1rem; margin-bottom: .4rem; }
+    .share-box p, .share-box li { font-size: .85rem; color: var(--text); line-height: 1.6; }
+    .share-box code {
+      font-family: var(--mono); font-size: .78rem;
+      background: #fff; padding: .1rem .35rem; border-radius: 3px;
+    }
+    .share-box ol { margin: .55rem 0 0 1.15rem; }
+    @media (max-width: 640px) {
+      h1 { font-size: 1.7rem; }
+    }
+  </style>
+</head>
+<body>
+<nav class="topnav">
+  <a class="nav-brand" href="/portfolio/">Rakesh Kumar</a>
+  <div class="nav-links">
+    <a class="nav-link" href="/portfolio/">Portfolio</a>
+    <a class="nav-link" href="/portfolio/resume.html">Resume</a>
+    <a class="nav-link" href="/portfolio/awards.html">Awards</a>
+    <a class="nav-link" href="https://www.linkedin.com/in/rakeshbitsindri/" target="_blank" rel="noopener">LinkedIn</a>
+    <a class="nav-link-primary" href="/portfolio/Rakesh_Kumar_Resume_2026.pdf" download="Rakesh_Kumar_Resume_2026.pdf">Download PDF</a>
+  </div>
+</nav>
+
+<div class="wrap">
+  <div class="eyebrow">Résumé · selected work</div>
+  <h1>Work that speaks for itself</h1>
+  <p class="lede">
+    Principal system test engineer — network validation, lab platforms, and AI-assisted automation.
+    This page is a broad snapshot; the samples are the proof. Open them, download the résumé, judge the delivery.
+  </p>
+  <div class="actions">
+    <a class="btn btn-primary" href="/portfolio/Rakesh_Kumar_Resume_2026.pdf" download="Rakesh_Kumar_Resume_2026.pdf">Download résumé PDF</a>
+    <a class="btn btn-ghost" href="/portfolio/resume.html" target="_blank" rel="noopener">Interactive résumé</a>
+    <a class="btn btn-ghost" href="/portfolio/" target="_blank" rel="noopener">Full portfolio</a>
+    <a class="btn btn-ghost" href="/portfolio/awards.html" target="_blank" rel="noopener">Awards</a>
+    <a class="btn btn-ghost" href="mailto:rakesh.kumar@keysight.com">Email</a>
+  </div>
+
+  <div class="panel">
+    <h2>Profile</h2>
+    <p>
+      <strong>19 years</strong> at Keysight/Ixia building and validating high-performance network systems,
+      then packaging that expertise into production lab software and agent tooling.
+      Open to freelance and contract work where this experience applies — stack and domain negotiated per engagement.
+    </p>
+    <div class="dgrid">
+      
+        <div class="domain">
+          <h3>Network validation & security</h3>
+          <p>19 years at Keysight/Ixia — L2–L7 traffic generation, HTTP/2/3 & QUIC, TLS/SSL proxy, DDoS, IPS/IDS, ADC. Hands-on with Palo Alto, Fortinet, F5, Cisco, Arista, Juniper, SONiC.</p>
+        </div>
+        <div class="domain">
+          <h3>Lab platforms & operations</h3>
+          <p>LabVault (inventory, CapEx workflow, DCIM/Hyperview, reservations), OCS Lab UI (optical circuit switching, topology commit), Launchpad (service control plane), LAAS.</p>
+        </div>
+        <div class="domain">
+          <h3>AI agents & MCP tooling</h3>
+          <p>BPS-MCP / AppSec MCP (BreakingPoint + CyPerf operator gateway), RAG knowledge bases, Cursor skills, second-brain wiki for lab knowledge — agents that drive real chassis and lab workflows.</p>
+        </div>
+        <div class="domain">
+          <h3>Automation & full-stack delivery</h3>
+          <p>Python, Django, FastAPI, Ansible, Docker; regression frameworks (Pythar, sonic-mgmt); web UIs and APIs shipped to production lab users.</p>
+        </div>
+    </div>
+    <div class="contact">
+      <span><a href="mailto:rakesh.kumar@keysight.com">rakesh.kumar@keysight.com</a></span>
+      <span>818-450-4820</span>
+      <span><a href="https://www.linkedin.com/in/rakeshbitsindri/" target="_blank" rel="noopener">LinkedIn</a></span>
+    </div>
+  </div>
+
+  <h2 class="section-title">Selected work</h2>
+  <p class="section-sub">Networking · lab platforms · MCP/AI · automation — not limited to front-end alone.</p>
+  <div class="grid">
+    
+        <article class="sample">
+          <div class="sample-tag">Networking · AI agents</div>
+          <h3 class="sample-title">BPS-MCP — autonomous BreakingPoint control</h3>
+          <p class="sample-blurb">MCP server with 55+ tools so AI agents drive BPS chassis in natural language — RAG docs, Cursor skills, live lab workflows for HTTP/3, QUIC, TLS, and security tests.</p>
+          
+          <div class="tech-row"><span class="tech">MCP</span><span class="tech">FastAPI</span><span class="tech">BPS</span><span class="tech">RAG</span><span class="tech">Python</span></div>
+          <a class="sample-cta" href="/portfolio/" target="_blank" rel="noopener">Portfolio →</a>
+        </article>
+        <article class="sample">
+          <div class="sample-tag">AppSec · multi-product</div>
+          <h3 class="sample-title">AppSec MCP — BPS + CyPerf gateway</h3>
+          <p class="sample-blurb">Unified operator product: hardware/RAG MCP for BreakingPoint and CyPerf, AppSec console and chatter UI — one agent surface across application-security test stacks.</p>
+          
+          <div class="tech-row"><span class="tech">MCP</span><span class="tech">CyPerf</span><span class="tech">BPS</span><span class="tech">Console UI</span></div>
+          <a class="sample-cta" href="/portfolio/" target="_blank" rel="noopener">Portfolio →</a>
+        </article>
+        <article class="sample">
+          <div class="sample-tag">Lab platform</div>
+          <h3 class="sample-title">LabVault + CapEx</h3>
+          <p class="sample-blurb">Django system of record for 50+ multi-vendor chassis: health polling, reservations, Hyperview-style DCIM, and CapEx request → finance → procurement → asset linking.</p>
+          <p class="sample-note">Production lab app; CapEx RBAC and quarter workflows included.</p>
+          <div class="tech-row"><span class="tech">Django</span><span class="tech">CapEx</span><span class="tech">DCIM</span><span class="tech">IxOS/KCOS</span></div>
+          <a class="sample-cta" href="/portfolio/" target="_blank" rel="noopener">Portfolio →</a>
+        </article>
+        <article class="sample">
+          <div class="sample-tag">Optical · topology</div>
+          <h3 class="sample-title">OCS Lab UI & ocsctl</h3>
+          <p class="sample-blurb">Calient OCS tooling: lab UI, topology plan/commit, fiber inventory, AresONE mappings — turns optical cross-connect operations into guided, auditable workflows.</p>
+          
+          <div class="tech-row"><span class="tech">OCS</span><span class="tech">FastAPI</span><span class="tech">Topology</span><span class="tech">Arista</span></div>
+          <a class="sample-cta" href="/portfolio/" target="_blank" rel="noopener">Portfolio →</a>
+        </article>
+        <article class="sample">
+          <div class="sample-tag">Regression</div>
+          <h3 class="sample-title">Pythar / BPS Operator</h3>
+          <p class="sample-blurb">BPS regression orchestration and live portal — BPT catalog, run control, log streaming, reports; hundreds of automated L4–L7 scenarios.</p>
+          
+          <div class="tech-row"><span class="tech">Python</span><span class="tech">Django ASGI</span><span class="tech">BPS REST</span></div>
+          <a class="sample-cta" href="/portfolio/" target="_blank" rel="noopener">Portfolio →</a>
+        </article>
+        <article class="sample">
+          <div class="sample-tag">SONiC · switching</div>
+          <h3 class="sample-title">SONiC-mgmt & regression UI</h3>
+          <p class="sample-blurb">SONiC testbed automation and a job UI over snappi/pytest — switch validation alongside traffic-generator workflows.</p>
+          
+          <div class="tech-row"><span class="tech">SONiC</span><span class="tech">Ansible</span><span class="tech">pytest</span><span class="tech">snappi</span></div>
+          <a class="sample-cta" href="/portfolio/" target="_blank" rel="noopener">Portfolio →</a>
+        </article>
+        <article class="sample">
+          <div class="sample-tag">Ops</div>
+          <h3 class="sample-title">Launchpad — lab control plane</h3>
+          <p class="sample-blurb">Single dashboard for 50+ lab services: status, metrics, start/stop — the operational map of the host fleet.</p>
+          
+          <div class="tech-row"><span class="tech">FastAPI</span><span class="tech">systemd</span><span class="tech">Ops UI</span></div>
+          <a class="sample-cta" href="/portfolio/" target="_blank" rel="noopener">Portfolio →</a>
+        </article>
+        <article class="sample">
+          <div class="sample-tag">Knowledge</div>
+          <h3 class="sample-title">Second brain · agent knowledge</h3>
+          <p class="sample-blurb">Structured wiki of projects, entities, playbooks, and decisions — durable memory for agents and humans across the lab software factory.</p>
+          
+          <div class="tech-row"><span class="tech">Wiki</span><span class="tech">RAG</span><span class="tech">Agents</span></div>
+          <a class="sample-cta" href="/portfolio/" target="_blank" rel="noopener">Portfolio →</a>
+        </article>
+        <article class="sample">
+          <div class="sample-tag">Front-end craft</div>
+          <h3 class="sample-title">Interactive résumé & portfolio</h3>
+          <p class="sample-blurb">This site and the print-ready résumé — HTML5/CSS delivery with PDF export; one example of UI craft among larger systems work.</p>
+          
+          <div class="tech-row"><span class="tech">HTML5</span><span class="tech">CSS</span><span class="tech">FastAPI</span></div>
+          <a class="sample-cta" href="/portfolio/resume.html" target="_blank" rel="noopener">Open résumé →</a>
+        </article>
+        <article class="sample">
+          <div class="sample-tag">Recognition</div>
+          <h3 class="sample-title">Awards & IP</h3>
+          <p class="sample-blurb">Engineering Star awards and Keysight IP recognitions across the career.</p>
+          
+          <div class="tech-row"><span class="tech">2011</span><span class="tech">2016</span><span class="tech">2019</span><span class="tech">2023</span></div>
+          <a class="sample-cta" href="/portfolio/awards.html" target="_blank" rel="noopener">View awards →</a>
+        </article>
+  </div>
+
+  <div class="share-box">
+    <h2>Share this site</h2>
+    <p>Public HTTPS (works anywhere): <code>https://rakeshbitsindri.github.io/portfolio/review.html</code></p>
+    <p style="margin-top:.65rem">Full portfolio: <code>https://rakeshbitsindri.github.io/portfolio/</code> · PDF: <code>https://rakeshbitsindri.github.io/portfolio/Rakesh_Kumar_Resume_2026.pdf</code></p>
+  </div>
+</div>
+
+<div class="footer">
+  © 2026 Rakesh Kumar ·
+  <a href="https://rakeshbitsindri.github.io/portfolio/">https://rakeshbitsindri.github.io/portfolio/</a>
+</div>
+</body>
+</html>

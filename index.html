@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rakesh Kumar — Portfolio</title>
+  <base href="/portfolio/">
+  
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ivory:    #faf9f5;
+    --parchment:#f2efe4;
+    --rule:     #e8e4da;
+    --text:     #0e0e0c;
+    --sub:      #6b6b68;
+    --orange:   #c96442;
+    --orange-lt:#faeae3;
+    --mono:     'JetBrains Mono', monospace;
+    --serif:    'Lora', Georgia, serif;
+    --sans:     'Inter', system-ui, sans-serif;
+  }
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+  html { -webkit-text-size-adjust:100%; }
+  body {
+    font-family: var(--sans);
+    background: var(--ivory);
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  a { color: var(--orange); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  /* ── Nav ── */
+  .topnav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(250,249,245,.92);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--rule);
+    padding: .75rem 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .nav-brand {
+    font-family: var(--serif); font-size: 1.05rem; font-weight: 700;
+    color: var(--text); text-decoration: none;
+  }
+  .nav-brand:hover { text-decoration: none; }
+  .nav-links { display: flex; gap: .25rem; flex-wrap: wrap; }
+  .nav-link {
+    font-size: .8rem; font-weight: 500; color: var(--sub);
+    padding: .3rem .75rem; border-radius: 5px;
+    transition: color .15s, background .15s;
+    text-decoration: none;
+  }
+  .nav-link:hover { color: var(--orange); background: var(--orange-lt); text-decoration: none; }
+  .nav-link-primary {
+    color: #fff; background: var(--orange);
+    font-size: .8rem; font-weight: 600;
+    padding: .3rem .9rem; border-radius: 5px;
+    text-decoration: none; transition: opacity .15s;
+  }
+  .nav-link-primary:hover { opacity: .85; text-decoration: none; }
+  /* ── Badges ── */
+  .badge {
+    display: inline-block; font-size: .67rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .07em;
+    padding: .18rem .55rem; border-radius: 3px;
+  }
+  .badge-production { background: #d1fae5; color: #065f46; }
+  .badge-active      { background: #dbeafe; color: #1e40af; }
+  .badge-demo        { background: #ede9fe; color: #5b21b6; }
+  .badge-beta        { background: #fef3c7; color: #92400e; }
+  /* ── Footer ── */
+  .footer {
+    text-align: center; padding: 3rem 1rem;
+    border-top: 1px solid var(--rule);
+    font-size: .8rem; color: var(--sub);
+    margin-top: 4rem;
+  }
+</style>
+
+  <style>
+    .hero {
+      max-width: 960px; margin: 0 auto; padding: 4rem 2rem 3rem;
+    }
+    .hero-label {
+      font-size: .68rem; font-weight: 700; letter-spacing: .18em;
+      text-transform: uppercase; color: var(--orange); margin-bottom: .75rem;
+    }
+    .hero h1 {
+      font-family: var(--serif); font-size: 2.6rem; font-weight: 700;
+      letter-spacing: -.02em; margin-bottom: .5rem; line-height: 1.15;
+    }
+    .hero-sub {
+      font-size: 1rem; color: var(--sub); max-width: 36rem; margin-bottom: 1.5rem; line-height: 1.7;
+    }
+    .hero-btns { display: flex; gap: .75rem; flex-wrap: wrap; }
+    .btn-primary {
+      display: inline-flex; background: var(--orange); color: #fff;
+      font-size: .82rem; font-weight: 600; padding: .55rem 1.2rem; border-radius: 6px;
+      text-decoration: none;
+    }
+    .btn-outline {
+      display: inline-flex; border: 1.5px solid var(--rule); color: var(--sub);
+      font-size: .82rem; font-weight: 500; padding: .5rem 1.1rem; border-radius: 6px;
+      text-decoration: none;
+    }
+    .btn-outline:hover { border-color: var(--orange); color: var(--orange); text-decoration: none; }
+    .section-wrap { max-width: 960px; margin: 0 auto; padding: 2rem 2rem 3rem; }
+    .section-title { font-family: var(--serif); font-size: 1.5rem; font-weight: 700; margin-bottom: .3rem; }
+    .section-sub { font-size: .85rem; color: var(--sub); margin-bottom: 1.5rem; }
+    .pgrid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.1rem;
+    }
+    .pcard {
+      background: #fff; border: 1px solid var(--rule); border-radius: 8px; padding: 1.35rem;
+    }
+    .pcard-top { display: flex; justify-content: space-between; gap: .5rem; margin-bottom: .6rem; }
+    .pname { font-size: 1.05rem; font-weight: 700; }
+    .pfull { font-size: .75rem; color: var(--sub); margin-top: .15rem; }
+    .pdesc { font-size: .82rem; color: var(--sub); line-height: 1.65; margin: .6rem 0; }
+    .tech-row { display: flex; flex-wrap: wrap; gap: .35rem; margin-bottom: .6rem; }
+    .tech {
+      font-family: var(--mono); font-size: .65rem; background: var(--parchment); color: var(--sub);
+      padding: .18rem .45rem; border-radius: 3px;
+    }
+    .pcard-foot { border-top: 1px solid var(--rule); padding-top: .65rem; }
+    .pstats { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .pstat-v { font-family: var(--mono); font-size: .85rem; font-weight: 700; color: var(--orange); display: block; }
+    .pstat-l { font-size: .6rem; color: var(--sub); text-transform: uppercase; letter-spacing: .05em; }
+    @media(max-width:640px){ .hero h1{font-size:2rem;} }
+  </style>
+</head>
+<body>
+<nav class="topnav">
+  <a class="nav-brand" href="./">Rakesh Kumar</a>
+  <div class="nav-links">
+    <a class="nav-link" href="resume.html">Resume</a>
+    <a class="nav-link" href="review.html">Review pack</a>
+    <a class="nav-link" href="awards.html">Awards</a>
+    <a class="nav-link" href="https://www.linkedin.com/in/rakeshbitsindri/" target="_blank" rel="noopener">LinkedIn</a>
+    <a class="nav-link-primary" href="Rakesh_Kumar_Resume_2026.pdf" download>Download PDF</a>
+  </div>
+</nav>
+<div class="hero">
+  <div class="hero-label">Principal System Test Engineer · 19 Years Experience</div>
+  <h1>Rakesh Kumar</h1>
+  <p class="hero-sub">Network validation, lab platforms, and AI-agent tooling —
+    BreakingPoint/CyPerf automation, LabVault/CapEx/OCS ops, and MCP systems that drive real lab hardware.</p>
+  <div class="hero-btns">
+    <a class="btn-primary" href="resume.html">View Resume</a>
+    <a class="btn-outline" href="Rakesh_Kumar_Resume_2026.pdf" download>Download PDF</a>
+    <a class="btn-outline" href="review.html">Review pack</a>
+    <a class="btn-outline" href="awards.html">Awards</a>
+  </div>
+</div>
+<div class="section-wrap">
+  <div class="section-title">Projects</div>
+  <div class="section-sub">Networking · lab platforms · MCP/AI agents · automation</div>
+  <div class="pgrid">
+        <div class="pcard">
+          <div class="pcard-top">
+            <div>
+              <div class="pname">BPS-MCP</div>
+              <div class="pfull">BreakingPoint Model Context Protocol Server</div>
+            </div>
+            <span class="badge badge-production">Production</span>
+          </div>
+          <div class="pdesc">MCP server with 55+ tools for autonomous BreakingPoint / network test automation (HTTP/3, QUIC, TLS, security)</div>
+          <div class="tech-row"><span class="tech">Python</span><span class="tech">FastAPI</span><span class="tech">MCP</span><span class="tech">ChromaDB</span><span class="tech">RAG</span></div>
+          <div class="pcard-foot"><div class="pstats"><div class="pstat"><span class="pstat-v">55</span><span class="pstat-l">tools</span></div><div class="pstat"><span class="pstat-v">7</span><span class="pstat-l">skills</span></div><div class="pstat"><span class="pstat-v">15k+</span><span class="pstat-l">loc</span></div></div></div>
+        </div>
+        <div class="pcard">
+          <div class="pcard-top">
+            <div>
+              <div class="pname">AppSec MCP</div>
+              <div class="pfull">BPS + CyPerf AppSec Operator Gateway</div>
+            </div>
+            <span class="badge badge-production">Production</span>
+          </div>
+          <div class="pdesc">Unified MCP gateway and console for BreakingPoint and CyPerf — agent-driven application-security test operations</div>
+          <div class="tech-row"><span class="tech">MCP</span><span class="tech">BPS</span><span class="tech">CyPerf</span><span class="tech">FastAPI</span><span class="tech">Console UI</span></div>
+          <div class="pcard-foot"><div class="pstats"><div class="pstat"><span class="pstat-v">2</span><span class="pstat-l">products</span></div><div class="pstat"><span class="pstat-v">:8890</span><span class="pstat-l">console</span></div><div class="pstat"><span class="pstat-v">:8895</span><span class="pstat-l">gateway</span></div></div></div>
+        </div>
+        <div class="pcard">
+          <div class="pcard-top">
+            <div>
+              <div class="pname">LabVault</div>
+              <div class="pfull">Lab Asset Management + CapEx + DCIM</div>
+            </div>
+            <span class="badge badge-production">Production</span>
+          </div>
+          <div class="pdesc">Django system of record: multi-vendor chassis inventory, CapEx workflow, Hyperview-style DCIM, reservations, BPS jobs</div>
+          <div class="tech-row"><span class="tech">Python</span><span class="tech">Django</span><span class="tech">PostgreSQL</span><span class="tech">CapEx</span><span class="tech">DCIM</span></div>
+          <div class="pcard-foot"><div class="pstats"><div class="pstat"><span class="pstat-v">50+</span><span class="pstat-l">devices</span></div><div class="pstat"><span class="pstat-v">20+</span><span class="pstat-l">users</span></div><div class="pstat"><span class="pstat-v">99.5%</span><span class="pstat-l">uptime</span></div></div></div>
+        </div>
+        <div class="pcard">
+          <div class="pcard-top">
+            <div>
+              <div class="pname">OCS Lab UI</div>
+              <div class="pfull">Optical Circuit Switch Lab Tooling</div>
+            </div>
+            <span class="badge badge-production">Production</span>
+          </div>
+          <div class="pdesc">Calient OCS control: lab UI, ocsctl, topology plan/commit, fiber inventory, AresONE mappings</div>
+          <div class="tech-row"><span class="tech">Python</span><span class="tech">FastAPI</span><span class="tech">OCS</span><span class="tech">Topology</span><span class="tech">Arista</span></div>
+          <div class="pcard-foot"><div class="pstats"><div class="pstat"><span class="pstat-v">Lab UI</span><span class="pstat-l">ui</span></div><div class="pstat"><span class="pstat-v">ocsctl</span><span class="pstat-l">cli</span></div><div class="pstat"><span class="pstat-v">Calient</span><span class="pstat-l">optics</span></div></div></div>
+        </div>
+        <div class="pcard">
+          <div class="pcard-top">
+            <div>
+              <div class="pname">LAAS</div>
+              <div class="pfull">Lab-as-a-Service Platform</div>
+            </div>
+            <span class="badge badge-production">Production</span>
+          </div>
+          <div class="pdesc">Multi-user test reservation with lab topology visualization</div>
+          <div class="tech-row"><span class="tech">Python</span><span class="tech">FastAPI</span><span class="tech">Docker</span><span class="tech">SONiC</span></div>
+          <div class="pcard-foot"><div class="pstats"><div class="pstat"><span class="pstat-v">5</span><span class="pstat-l">labs</span></div><div class="pstat"><span class="pstat-v">100+</span><span class="pstat-l">reservations</span></div><div class="pstat"><span class="pstat-v">98%</span><span class="pstat-l">uptime</span></div></div></div>
+        </div>
+        <div class="pcard">
+          <div class="pcard-top">
+            <div>
+              <div class="pname">Pythar</div>
+              <div class="pfull">BPS Test Automation Framework</div>
+            </div>
+            <span class="badge badge-active">Active</span>
+          </div>
+          <div class="pdesc">Python framework for BPS regression — HTTP/3, QUIC, TLS, DDoS, L4–L7 scenarios</div>
+          <div class="tech-row"><span class="tech">Python</span><span class="tech">TCL</span><span class="tech">BPS REST API</span></div>
+          <div class="pcard-foot"><div class="pstats"><div class="pstat"><span class="pstat-v">200+</span><span class="pstat-l">tests</span></div><div class="pstat"><span class="pstat-v">154</span><span class="pstat-l">bpts</span></div><div class="pstat"><span class="pstat-v">85%</span><span class="pstat-l">coverage</span></div></div></div>
+        </div>
+        <div class="pcard">
+          <div class="pcard-top">
+            <div>
+              <div class="pname">SONiC-Mgmt</div>
+              <div class="pfull">SONiC Management & Regression UI</div>
+            </div>
+            <span class="badge badge-production">Production</span>
+          </div>
+          <div class="pdesc">SONiC switch testbed automation plus snappi/pytest regression job UI</div>
+          <div class="tech-row"><span class="tech">Python</span><span class="tech">Ansible</span><span class="tech">SONiC</span><span class="tech">pytest</span><span class="tech">snappi</span></div>
+          <div class="pcard-foot"><div class="pstats"><div class="pstat"><span class="pstat-v">10+</span><span class="pstat-l">switches</span></div><div class="pstat"><span class="pstat-v">300+</span><span class="pstat-l">tests</span></div><div class="pstat"><span class="pstat-v">3</span><span class="pstat-l">vendors</span></div></div></div>
+        </div>
+        <div class="pcard">
+          <div class="pcard-top">
+            <div>
+              <div class="pname">Second Brain</div>
+              <div class="pfull">Lab Knowledge Wiki for Agents</div>
+            </div>
+            <span class="badge badge-active">Active</span>
+          </div>
+          <div class="pdesc">Structured wiki of projects, entities, playbooks — durable memory for Cursor agents and operators</div>
+          <div class="tech-row"><span class="tech">Wiki</span><span class="tech">RAG</span><span class="tech">MCP</span><span class="tech">Python</span></div>
+          <div class="pcard-foot"><div class="pstats"><div class="pstat"><span class="pstat-v">80+</span><span class="pstat-l">projects</span></div><div class="pstat"><span class="pstat-v">yes</span><span class="pstat-l">playbooks</span></div><div class="pstat"><span class="pstat-v">yes</span><span class="pstat-l">agents</span></div></div></div>
+        </div>
+        <div class="pcard">
+          <div class="pcard-top">
+            <div>
+              <div class="pname">AI-Patents</div>
+              <div class="pfull">AI Patent Research Platform</div>
+            </div>
+            <span class="badge badge-demo">Demo</span>
+          </div>
+          <div class="pdesc">RAG chatbot with fine-tuned Llama 3.2 3B LLM</div>
+          <div class="tech-row"><span class="tech">Python</span><span class="tech">FastAPI</span><span class="tech">Qdrant</span><span class="tech">LLM</span><span class="tech">Next.js</span></div>
+          <div class="pcard-foot"><div class="pstats"><div class="pstat"><span class="pstat-v">2000+</span><span class="pstat-l">patents</span></div><div class="pstat"><span class="pstat-v">Llama 3.2 3B</span><span class="pstat-l">llm</span></div><div class="pstat"><span class="pstat-v">Qdrant</span><span class="pstat-l">vector_db</span></div></div></div>
+        </div>
+        <div class="pcard">
+          <div class="pcard-top">
+            <div>
+              <div class="pname">Cogni</div>
+              <div class="pfull">Persistent Task Agent</div>
+            </div>
+            <span class="badge badge-beta">Beta</span>
+          </div>
+          <div class="pdesc">Autonomous agent with secure distributed storage</div>
+          <div class="tech-row"><span class="tech">Python</span><span class="tech">Fernet AES-128</span><span class="tech">IPFS</span></div>
+          <div class="pcard-foot"><div class="pstats"><div class="pstat"><span class="pstat-v">3</span><span class="pstat-l">backends</span></div><div class="pstat"><span class="pstat-v">AES-128</span><span class="pstat-l">encryption</span></div><div class="pstat"><span class="pstat-v">Distributed</span><span class="pstat-l">storage</span></div></div></div>
+        </div></div>
+</div>
+<div class="footer">
+  © 2026 Rakesh Kumar ·
+  <a href="mailto:rakesh.kumar@keysight.com">rakesh.kumar@keysight.com</a> ·
+  <a href="https://www.linkedin.com/in/rakeshbitsindri/">LinkedIn</a>
+</div>
+</body>
+</html>

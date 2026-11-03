@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rakesh Kumar — Awards</title>
+  <base href="/portfolio/">
+  
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ivory:    #faf9f5;
+    --parchment:#f2efe4;
+    --rule:     #e8e4da;
+    --text:     #0e0e0c;
+    --sub:      #6b6b68;
+    --orange:   #c96442;
+    --orange-lt:#faeae3;
+    --mono:     'JetBrains Mono', monospace;
+    --serif:    'Lora', Georgia, serif;
+    --sans:     'Inter', system-ui, sans-serif;
+  }
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+  html { -webkit-text-size-adjust:100%; }
+  body {
+    font-family: var(--sans);
+    background: var(--ivory);
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  a { color: var(--orange); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  /* ── Nav ── */
+  .topnav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(250,249,245,.92);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--rule);
+    padding: .75rem 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .nav-brand {
+    font-family: var(--serif); font-size: 1.05rem; font-weight: 700;
+    color: var(--text); text-decoration: none;
+  }
+  .nav-brand:hover { text-decoration: none; }
+  .nav-links { display: flex; gap: .25rem; flex-wrap: wrap; }
+  .nav-link {
+    font-size: .8rem; font-weight: 500; color: var(--sub);
+    padding: .3rem .75rem; border-radius: 5px;
+    transition: color .15s, background .15s;
+    text-decoration: none;
+  }
+  .nav-link:hover { color: var(--orange); background: var(--orange-lt); text-decoration: none; }
+  .nav-link-primary {
+    color: #fff; background: var(--orange);
+    font-size: .8rem; font-weight: 600;
+    padding: .3rem .9rem; border-radius: 5px;
+    text-decoration: none; transition: opacity .15s;
+  }
+  .nav-link-primary:hover { opacity: .85; text-decoration: none; }
+  /* ── Badges ── */
+  .badge {
+    display: inline-block; font-size: .67rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .07em;
+    padding: .18rem .55rem; border-radius: 3px;
+  }
+  .badge-production { background: #d1fae5; color: #065f46; }
+  .badge-active      { background: #dbeafe; color: #1e40af; }
+  .badge-demo        { background: #ede9fe; color: #5b21b6; }
+  .badge-beta        { background: #fef3c7; color: #92400e; }
+  /* ── Footer ── */
+  .footer {
+    text-align: center; padding: 3rem 1rem;
+    border-top: 1px solid var(--rule);
+    font-size: .8rem; color: var(--sub);
+    margin-top: 4rem;
+  }
+</style>
+
+  <style>
+    .wrap { max-width: 960px; margin: 0 auto; padding: 2.5rem 1.5rem; }
+    h1 { font-family: var(--serif); font-size: 2rem; margin-bottom: .5rem; }
+    .sub { color: var(--sub); margin-bottom: 1.75rem; }
+    .agrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.1rem; }
+    .acard { background:#fff; border:1px solid var(--rule); border-radius:8px; overflow:hidden; }
+    .acard img { width:100%; display:block; aspect-ratio: 4/3; object-fit: cover; }
+    .ayear { font-family: var(--mono); font-size: .75rem; color: var(--orange); padding: .75rem 1rem 0; font-weight:700; }
+    .atitle { font-weight:700; padding: .25rem 1rem 0; }
+    .asub { font-size: .8rem; color: var(--sub); padding: .25rem 1rem 1rem; }
+  </style>
+</head>
+<body>
+<nav class="topnav">
+  <a class="nav-brand" href="./">Rakesh Kumar</a>
+  <div class="nav-links">
+    <a class="nav-link" href="./">Portfolio</a>
+    <a class="nav-link" href="resume.html">Resume</a>
+    <a class="nav-link" href="review.html">Review pack</a>
+    <a class="nav-link-primary" href="Rakesh_Kumar_Resume_2026.pdf" download>Download PDF</a>
+  </div>
+</nav>
+<div class="wrap">
+  <h1>Awards &amp; achievements</h1>
+  <p class="sub">Engineering excellence and IP contributions across 19 years at Keysight/Ixia</p>
+  <div class="agrid">
+        <article class="acard">
+          <img src="awards/award_2011_engineering_star.jpg" alt="Engineering Star 2011" loading="lazy">
+          <div class="ayear">2011</div>
+          <div class="atitle">Engineering Star</div>
+          <div class="asub">IXIA</div>
+        </article>
+        <article class="acard">
+          <img src="awards/award_2016_engineering_star.jpg" alt="Engineering Star 2016" loading="lazy">
+          <div class="ayear">2016</div>
+          <div class="atitle">Engineering Star</div>
+          <div class="asub">Ixia</div>
+        </article>
+        <article class="acard">
+          <img src="awards/award_ip_discovery_mode.jpg" alt="IP Award 2019" loading="lazy">
+          <div class="ayear">2019</div>
+          <div class="atitle">IP Award</div>
+          <div class="asub">Inv. 20190288</div>
+        </article>
+        <article class="acard">
+          <img src="awards/award_ip_performance_testing.jpg" alt="IP Award 2023" loading="lazy">
+          <div class="ayear">2023</div>
+          <div class="atitle">IP Award</div>
+          <div class="asub">Inv. 20230150</div>
+        </article></div>
+</div>
+<div class="footer">© 2026 Rakesh Kumar</div>
+</body>
+</html>
