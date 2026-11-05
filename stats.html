@@ -90,50 +90,29 @@
   <div class="card" id="detail" style="margin-top:1rem" hidden></div>
 </div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="/portfolio/demos/assets/track.js?v=6"></script>
+<script src="/portfolio/demos/assets/track.js?v=7"></script>
 <script>
-const API = "https://crudcrud.com/api/346cdbd003a44766829592311a142b6f/visits";
 let remote = [];
-let days = "all", q = "", sortK = "t", sortD = -1, picked = null, timer = null;
-function localRows() {
-  try { return JSON.parse(localStorage.getItem("rk_log_v1")) || []; }
-  catch (e) { return []; }
-}
-function mergeRows(a, b) {
-  var map = {};
-  a.concat(b).forEach(function (r) {
-    var id = r.id || r.uid;
-    if (!id) return;
-    r.uid = r.uid || r._id || id;
-    var prev = map[id];
-    if (!prev || (r.views || 1) >= (prev.views || 1)) map[id] = r;
-  });
-  return Object.keys(map).map(function (k) { return map[k]; });
-}
-function say(list, extra) {
+let days = "all", q = "", sortK = "t", sortD = -1, picked = null;
+function say(list) {
   var views = list.reduce(function (s, v) { return s + (v.views || 1); }, 0);
-  var base = list.length
-    ? views + " page view" + (views === 1 ? "" : "s") + " from " + list.length + " visitor" + (list.length === 1 ? "" : "s") + ". The same browser stays one visitor."
-    : "No visits yet. Open any portfolio page, then press Refresh.";
-  document.getElementById("status").textContent = extra ? base + " " + extra : base;
+  document.getElementById("status").textContent = list.length
+    ? views + " page view" + (views === 1 ? "" : "s") + " from " + list.length + " visitor" + (list.length === 1 ? "" : "s") + ". This is the shared log, so every place shows these same numbers."
+    : "No visits in the shared log yet. Open any portfolio page, then press Refresh.";
 }
 async function refresh() {
-  remote = mergeRows(localRows(), remote);
-  say(remote);
-  draw();
-  var ctrl = typeof AbortController !== "undefined" ? new AbortController() : null;
-  var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, 2500);
+  document.getElementById("status").textContent = "Loading the shared log…";
   try {
-    const res = await fetch(API, { cache: "no-store", signal: ctrl ? ctrl.signal : undefined });
-    clearTimeout(timer);
-    if (!res.ok) throw new Error("HTTP " + res.status);
-    const data = await res.json();
-    remote = mergeRows(localRows(), data.map(function (v) { v.uid = v._id || v.id; return v; }));
-    try { localStorage.setItem("rk_log_v1", JSON.stringify(remote)); } catch (e) {}
+    if (!window.RKVisits) throw new Error("tracker");
+    await Promise.race([
+      RKVisits.settled,
+      new Promise(function (resolve) { setTimeout(resolve, 6000); })
+    ]);
+    remote = await RKVisits.readAll();
     say(remote);
   } catch (e) {
-    clearTimeout(timer);
-    say(remote, "The shared log is slow right now, so this is what is already saved.");
+    remote = [];
+    document.getElementById("status").textContent = "The shared log did not load, so no numbers are shown. Press Refresh.";
   }
   draw();
 }
