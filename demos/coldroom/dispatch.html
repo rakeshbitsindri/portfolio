@@ -1,0 +1,31 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Harbour · dispatch</title><link rel="stylesheet" href="site.css"></head><body>
+<main style="max-width:640px">
+  <div class="kicker">Dispatch</div><h1>Send part of a lot</h1>
+  <form class="card" id="f">
+    <label>Lot<select name="lot" id="lot"></select></label>
+    <label>Kg out<input name="kg" type="number" min="1" value="200" required></label>
+    <button class="btn">Issue delivery</button>
+  </form>
+  <p id="msg" style="margin-top:.8rem"></p>
+</main>
+<script src="site.js"></script>
+<script>
+C.chrome("out");
+const open = C.lots().filter((l) => l.left > 0);
+document.getElementById("lot").innerHTML = open.map((l) => `<option value="${l.id}">${l.id} · ${l.goods} · ${l.left} kg</option>`).join("");
+document.getElementById("f").onsubmit = (e) => {
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const lots = C.lots();
+  const lot = lots.find((l) => l.id === fd.get("lot"));
+  const kg = +fd.get("kg");
+  const msg = document.getElementById("msg");
+  if (!lot) { msg.textContent = "No open lot."; return; }
+  if (kg > lot.left) { msg.textContent = "Only " + lot.left + " kg left."; return; }
+  lot.left -= kg; lot.moved += kg;
+  C.save(lots);
+  msg.innerHTML = `Dispatched ${kg} kg from ${lot.id}. ${lot.left ? lot.left + " kg remain." : "Lot closed."} <a href="stock.html">Stock</a>`;
+};
+</script></body></html>

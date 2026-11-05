@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atelier · piece</title>
+<link rel="stylesheet" href="site.css">
+</head><body>
+<main>
+  <p class="muted"><a href="shop.html">Collection</a> / <span id="crumb"></span></p>
+  <div class="hero" id="view"></div>
+</main>
+<script src="site.js"></script>
+<script>
+A.chrome("shop");
+const p = A.product(new URLSearchParams(location.search).get("id")) || A.products[0];
+document.title = "Atelier · " + p.name;
+document.getElementById("crumb").textContent = p.name;
+let metal = p.metal, size = "M", qty = 1;
+function draw() {
+  document.getElementById("view").innerHTML = `
+    <div class="sw" style="height:420px;background:${p.color}"></div>
+    <div>
+      <div class="kicker">${p.cat}</div>
+      <h1 style="font-size:3rem">${p.name}</h1>
+      <p class="muted">${p.note}</p>
+      <div style="margin:.8rem 0">Metal</div>
+      <div class="row" id="metals">${Object.keys(A.metals).map((m) => `<span class="opt ${m === metal ? "on" : ""}" data-m="${m}">${m}</span>`).join("")}</div>
+      <div style="margin:.8rem 0">Size</div>
+      <div class="row" id="sizes">${Object.keys(A.sizes).map((s) => `<span class="opt ${s === size ? "on" : ""}" data-s="${s}">${s}</span>`).join("")}</div>
+      <div style="font-family:Fraunces,serif;font-size:2.2rem;margin:.8rem 0">${A.inr(A.price(p, metal, size))}</div>
+      <div class="row">
+        <button class="btn ghost" id="minus">−</button><span>${qty}</span><button class="btn ghost" id="plus">+</button>
+        <button class="btn" id="add">Add to bag</button>
+      </div>
+    </div>`;
+  document.getElementById("metals").onclick = (e) => { const m = e.target.dataset.m; if (m) { metal = m; draw(); } };
+  document.getElementById("sizes").onclick = (e) => { const s = e.target.dataset.s; if (s) { size = s; draw(); } };
+  document.getElementById("minus").onclick = () => { qty = Math.max(1, qty - 1); draw(); };
+  document.getElementById("plus").onclick = () => { qty += 1; draw(); };
+  document.getElementById("add").onclick = () => {
+    A.add({ id: p.id, name: p.name, metal, size, qty, price: A.price(p, metal, size) });
+    location.href = "bag.html";
+  };
+}
+draw();
+</script>
+</body></html>

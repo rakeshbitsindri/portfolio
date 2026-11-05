@@ -1,0 +1,34 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Harbour · billing</title><link rel="stylesheet" href="site.css"></head><body>
+<main>
+  <div class="kicker">Billing</div><h1>Rental for the month</h1>
+  <div class="row" style="margin-bottom:1rem">
+    <select id="party" style="max-width:240px"></select>
+    <input id="asof" type="date" value="2026-11-30" style="max-width:180px">
+    <button class="btn" id="go">Calculate</button>
+  </div>
+  <div class="card">
+    <table><thead><tr><th>Lot</th><th>Basis</th><th class="num">Days</th><th class="num">Rent</th><th class="num">Hamali</th></tr></thead>
+      <tbody id="rows"></tbody></table>
+    <div class="spread" style="max-width:280px;margin-left:auto;font-weight:600;padding-top:.6rem"><span>Total</span><span id="total">—</span></div>
+  </div>
+</main>
+<script src="site.js"></script>
+<script>
+C.chrome("bill");
+document.getElementById("party").innerHTML = C.parties().map((p) => `<option>${p}</option>`).join("");
+document.getElementById("go").onclick = () => {
+  const party = document.getElementById("party").value;
+  const asof = document.getElementById("asof").value;
+  let total = 0;
+  document.getElementById("rows").innerHTML = C.lots().filter((l) => l.party === party).map((l) => {
+    const d = C.days(l.inn, asof);
+    const rent = l.mode === "kg" ? l.left * d * C.KG : l.pallets * Math.ceil(d / 30) * C.PALLET;
+    const ham = l.moved * C.HAM;
+    total += rent + ham;
+    return `<tr><td>${l.id}</td><td>${l.mode === "kg" ? "kg-day" : "pallet-month"}</td><td class="num">${d}</td><td class="num">${C.inr(rent)}</td><td class="num">${C.inr(ham)}</td></tr>`;
+  }).join("");
+  document.getElementById("total").textContent = C.inr(total);
+};
+</script></body></html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atelier · bag</title>
+<link rel="stylesheet" href="site.css">
+</head><body>
+<main>
+  <div class="kicker">Bag</div>
+  <h1 style="font-size:2.6rem;margin-bottom:1rem">What you are taking</h1>
+  <div id="list"></div>
+  <p id="empty" class="muted" hidden>The bag is empty. <a href="shop.html">See the collection.</a></p>
+</main>
+<script src="site.js"></script>
+<script>
+A.chrome("bag");
+const b = A.bag();
+if (!b.length) document.getElementById("empty").hidden = false;
+document.getElementById("list").innerHTML = b.map((l, i) => `
+  <div class="spread card" style="margin-bottom:.6rem">
+    <div><strong>${l.name}</strong><div class="muted">${l.metal} · ${l.size} · × ${l.qty}</div></div>
+    <div>${A.inr(l.price * l.qty)} <button class="btn ghost" data-i="${i}">Remove</button></div>
+  </div>`).join("") + (b.length ? `<div class="spread" style="margin-top:1rem"><strong>${A.inr(A.total())}</strong><a class="btn" href="checkout.html">Checkout</a></div>` : "");
+document.getElementById("list").onclick = (e) => {
+  const i = e.target.dataset.i; if (i == null) return;
+  const next = A.bag(); next.splice(+i, 1); A.save(next); location.reload();
+};
+</script>
+</body></html>

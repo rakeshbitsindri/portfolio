@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atelier · collection</title>
+<link rel="stylesheet" href="site.css">
+</head><body>
+<main>
+  <div class="spread" style="margin-bottom:1rem">
+    <div><div class="kicker">Collection</div><h1 style="font-size:2.4rem">Every piece in the house</h1></div>
+  </div>
+  <div class="row" style="margin-bottom:1rem">
+    <input id="q" placeholder="Search" style="max-width:220px">
+    <select id="cat"><option value="">All categories</option><option>Necklace</option><option>Earrings</option><option>Bangles</option><option>Set</option></select>
+    <select id="metal"><option value="">Any metal</option><option>Gold-tone</option><option>Silver-tone</option><option>Kundan</option></select>
+  </div>
+  <div class="grid" id="grid"></div>
+  <p class="muted" id="empty" hidden>Nothing in this filter.</p>
+</main>
+<script src="site.js"></script>
+<script>
+A.chrome("shop");
+function draw() {
+  const q = document.getElementById("q").value.toLowerCase();
+  const cat = document.getElementById("cat").value;
+  const metal = document.getElementById("metal").value;
+  const rows = A.products.filter((p) => (!q || p.name.toLowerCase().includes(q)) && (!cat || p.cat === cat) && (!metal || p.metal === metal));
+  document.getElementById("empty").hidden = rows.length > 0;
+  document.getElementById("grid").innerHTML = rows.map((p) => `
+    <a class="card" href="piece.html?id=${p.id}">
+      <div class="sw" style="background:${p.color}"></div>
+      <strong>${p.name}</strong>
+      <div class="muted">${p.cat} · ${p.metal}</div>
+      <div>${A.inr(A.price(p, p.metal, "M"))}</div>
+    </a>`).join("");
+}
+["q", "cat", "metal"].forEach((id) => document.getElementById(id).addEventListener("input", draw));
+draw();
+</script>
+</body></html>

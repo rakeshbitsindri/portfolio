@@ -1,0 +1,30 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prakriti · today</title><link rel="stylesheet" href="site.css"></head><body>
+<main>
+  <div class="kicker">Today · 5 Nov 2026</div><h1>The book</h1>
+  <div class="grid" id="slots" style="margin-top:1rem"></div>
+  <form class="card" id="f" style="margin-top:1rem;max-width:480px">
+    <h2 style="font-family:Literata,serif;font-size:1.2rem">Hold an open hour</h2>
+    <label>Patient<select name="who" id="who"></select></label>
+    <label>Time<select name="time" id="time"></select></label>
+    <button class="btn">Book</button>
+  </form>
+</main>
+<script src="site.js"></script>
+<script>
+K.chrome("day");
+const s = K.state();
+document.getElementById("slots").innerHTML = s.slots.map((sl) => `<div class="slot"><div class="muted">${sl.time}</div>${sl.patient ? `<a href="chart.html?id=${s.patients.find(p=>p.name===sl.patient).id}">${sl.patient}</a>` : "Open"}</div>`).join("");
+document.getElementById("who").innerHTML = s.patients.map((p) => `<option value="${p.id}">${p.name}</option>`).join("");
+document.getElementById("time").innerHTML = s.slots.filter((sl) => !sl.patient).map((sl) => `<option>${sl.time}</option>`).join("");
+document.getElementById("f").onsubmit = (e) => {
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const st = K.state();
+  const p = st.patients.find((x) => x.id === +fd.get("who"));
+  const slot = st.slots.find((x) => x.time === fd.get("time"));
+  if (slot && p) slot.patient = p.name;
+  K.save(st); location.reload();
+};
+</script></body></html>

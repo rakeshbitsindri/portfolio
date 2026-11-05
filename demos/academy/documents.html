@@ -1,0 +1,29 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Northline · documents</title><link rel="stylesheet" href="site.css"></head><body>
+<main>
+  <div class="spread"><div><div class="kicker">Documents</div><h1 id="folder">Policies</h1></div>
+    <div id="folders"></div></div>
+  <div class="card" style="margin-top:1rem"><table><thead><tr><th>Name</th><th>Owner</th><th>State</th><th></th></tr></thead><tbody id="rows"></tbody></table></div>
+</main>
+<script src="site.js"></script>
+<script>
+H.chrome("docs");
+let folder = "Policies";
+function draw() {
+  const s = H.state();
+  document.getElementById("folder").textContent = folder;
+  document.getElementById("folders").innerHTML = Object.keys(s.docs).map((f) => `<button class="btn" data-f="${f}" style="${f === folder ? "" : "background:#fff;color:var(--sea);border:1px solid var(--line)"}">${f}</button>`).join(" ");
+  document.getElementById("rows").innerHTML = s.docs[folder].map((d, i) => `<tr><td>${d.name}</td><td>${d.who}</td><td>${d.out ? "Checked out" + (d.by ? " · " + d.by : "") : "Available"}</td><td><button class="btn" data-i="${i}">${d.out ? "Check in" : "Check out"}</button></td></tr>`).join("");
+}
+document.body.addEventListener("click", (e) => {
+  if (e.target.dataset.f) { folder = e.target.dataset.f; draw(); }
+  if (e.target.dataset.i != null && e.target.tagName === "BUTTON") {
+    const s = H.state();
+    const d = s.docs[folder][+e.target.dataset.i];
+    d.out = !d.out; d.by = d.out ? "You" : "";
+    H.save(s); draw();
+  }
+});
+draw();
+</script></body></html>

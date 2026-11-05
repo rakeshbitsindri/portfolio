@@ -1,0 +1,20 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Northline Books</title><link rel="stylesheet" href="site.css"></head><body>
+<main>
+  <div class="kicker">Telangana · GSTIN 36AABCU9603R1ZM</div>
+  <h1>The books of the firm.</h1>
+  <p class="muted" style="max-width:36rem;margin:.7rem 0 1rem">Raise a tax invoice, watch CGST and SGST split when the party is in the state and IGST when they are not, then find it on the ledger.</p>
+  <div class="spread" style="max-width:520px">
+    <div class="card"><b id="n">0</b><div class="muted">Issued here</div></div>
+    <div class="card"><b id="v">₹0</b><div class="muted">Value</div></div>
+    <a class="btn" href="invoice.html">New invoice</a>
+  </div>
+</main>
+<script src="site.js"></script>
+<script>
+B.chrome("home");
+const s = B.state();
+document.getElementById("n").textContent = s.invoices.length;
+document.getElementById("v").textContent = B.inr(s.invoices.reduce((t, i) => t + i.total, 0));
+</script></body></html>

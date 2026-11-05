@@ -1,0 +1,21 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Harbour · floor</title><link rel="stylesheet" href="site.css"></head><body>
+<main>
+  <div class="kicker">Floor</div><h1>Chambers tonight</h1>
+  <div id="rooms"></div>
+  <div class="kpis" id="kpis"></div>
+  <div class="card"><p>Receive goods on <a href="receive.html">Inward</a>, see every lot on <a href="stock.html">Stock</a>, send part of a lot out on <a href="dispatch.html">Dispatch</a>, then price the month on <a href="billing.html">Billing</a>. The lots stay in this browser as you move between pages.</p></div>
+</main>
+<script src="site.js"></script>
+<script>
+C.chrome("floor");
+const lots = C.lots();
+const open = lots.filter((l) => l.left > 0);
+document.getElementById("rooms").innerHTML = C.roomsHtml();
+document.getElementById("kpis").innerHTML = `
+  <div class="kpi"><b>${open.length}</b><span>Open lots</span></div>
+  <div class="kpi"><b>${open.reduce((s,l)=>s+l.left,0).toLocaleString("en-IN")}</b><span>Kg on hand</span></div>
+  <div class="kpi"><b>${C.parties().length}</b><span>Depositors</span></div>
+  <div class="kpi"><b>${C.inr(lots.reduce((s,l)=>s+l.moved*C.HAM,0))}</b><span>Hamali so far</span></div>`;
+</script></body></html>

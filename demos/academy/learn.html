@@ -1,0 +1,32 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Northline · learning</title><link rel="stylesheet" href="site.css"></head><body>
+<main>
+  <div class="spread"><div><div class="kicker">Learning</div><h1>SharePoint, practically</h1></div><span id="score" class="muted"></span></div>
+  <div class="grid" style="margin-top:1rem">
+    <div id="list"></div>
+    <div class="card" id="body"></div>
+  </div>
+</main>
+<script src="site.js"></script>
+<script>
+H.chrome("learn");
+let cur = 0;
+function draw() {
+  const s = H.state();
+  document.getElementById("score").textContent = Object.keys(s.done).length + " / 4 done";
+  document.getElementById("list").innerHTML = H.lessons.map((l, i) => `<a class="lesson ${i === cur ? "on" : ""}" data-i="${i}" href="#">${s.done[i] ? "✓ " : ""}${l.t}</a>`).join("");
+  const L = H.lessons[cur];
+  const quiz = cur === 3 ? `<p style="margin-top:.7rem"><strong>A hub’s navigation is mainly…</strong></p>
+    ${["A place for ads", "The contract for where content lives", "Optional decoration"].map((o, i) => `<div class="q" data-q="${i}">${o}</div>`).join("")}
+    ${s.done[3] ? `<p class="muted">${s.done[3] === "ok" ? "Correct." : "The navigation is the contract."}</p>` : ""}` : `<button class="btn" id="mark" style="margin-top:.8rem">${s.done[cur] ? "Completed" : "Mark complete"}</button>`;
+  document.getElementById("body").innerHTML = `<h2 style="font-family:Fraunces,serif;font-size:1.4rem">${L.t}</h2><p style="margin-top:.4rem">${L.body}</p>${quiz}`;
+}
+document.getElementById("list").onclick = (e) => { const a = e.target.closest("[data-i]"); if (!a) return; e.preventDefault(); cur = +a.dataset.i; draw(); };
+document.getElementById("body").onclick = (e) => {
+  const s = H.state();
+  if (e.target.id === "mark") { s.done[cur] = true; H.save(s); cur = Math.min(3, cur + 1); draw(); }
+  if (e.target.dataset.q != null) { s.done[3] = e.target.dataset.q === "1" ? "ok" : "no"; H.save(s); draw(); }
+};
+draw();
+</script></body></html>

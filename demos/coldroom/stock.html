@@ -1,0 +1,20 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Harbour · stock</title><link rel="stylesheet" href="site.css"></head><body>
+<main>
+  <div class="spread"><div><div class="kicker">Stock</div><h1>Lots on hand</h1></div>
+    <select id="f" style="max-width:220px"></select></div>
+  <div class="card"><table><thead><tr><th>Lot</th><th>Depositor</th><th>Goods</th><th>Loc</th><th class="num">Kg left</th><th>In</th><th>Basis</th></tr></thead><tbody id="rows"></tbody></table></div>
+</main>
+<script src="site.js"></script>
+<script>
+C.chrome("stock");
+const sel = document.getElementById("f");
+sel.innerHTML = `<option value="">All depositors</option>` + C.parties().map((p) => `<option>${p}</option>`).join("");
+function draw() {
+  const f = sel.value;
+  document.getElementById("rows").innerHTML = C.lots().filter((l) => !f || l.party === f).map((l) =>
+    `<tr><td>${l.id}</td><td>${l.party}</td><td>${l.goods}</td><td>${l.loc}</td><td class="num">${l.left}</td><td>${l.inn}</td><td>${l.mode}</td></tr>`).join("");
+}
+sel.onchange = draw; draw();
+</script></body></html>

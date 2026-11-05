@@ -1,0 +1,38 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prakriti · chart</title><link rel="stylesheet" href="site.css"></head><body>
+<main>
+  <p class="muted"><a href="patients.html">Patients</a> / <span id="crumb"></span></p>
+  <h1 id="name"></h1>
+  <p class="muted" id="note"></p>
+  <div id="visits" style="margin:1rem 0"></div>
+  <form class="card" id="f" style="max-width:560px">
+    <h2 style="font-family:Literata,serif;font-size:1.2rem">New visit · 5 Nov 2026</h2>
+    <label>Complaint<textarea name="complaint" required></textarea></label>
+    <label>Remedy<input name="remedy" placeholder="Bryonia 30" required></label>
+    <label>Days<input name="days" type="number" min="1" value="4"></label>
+    <label>Follow-up<input name="follow" type="date" value="2026-11-19" required></label>
+    <button class="btn">Save on the chart</button>
+  </form>
+</main>
+<script src="site.js"></script>
+<script>
+K.chrome("people");
+const id = new URLSearchParams(location.search).get("id") || 1;
+function draw() {
+  const p = K.patient(id);
+  document.getElementById("crumb").textContent = p.name;
+  document.getElementById("name").textContent = p.name + ", " + p.age;
+  document.getElementById("note").textContent = p.note;
+  document.getElementById("visits").innerHTML = p.visits.map((v) => `<div class="card" style="margin-bottom:.5rem"><strong>${v.date}</strong> · follow ${v.follow}<div>${v.complaint}</div><div class="muted">${v.rx}</div></div>`).join("") || `<p class="muted">No visits yet.</p>`;
+}
+document.getElementById("f").onsubmit = (e) => {
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const st = K.state();
+  const p = st.patients.find((x) => x.id === +id);
+  p.visits.unshift({ date: K.today, complaint: fd.get("complaint"), rx: fd.get("remedy") + " × " + fd.get("days") + " days", follow: fd.get("follow") });
+  K.save(st); e.target.reset(); draw();
+};
+draw();
+</script></body></html>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atelier · visit</title>
+<link rel="stylesheet" href="site.css">
+</head><body>
+<main style="max-width:640px">
+  <div class="kicker">Visit</div>
+  <h1 style="font-size:2.8rem">Come to the floor</h1>
+  <p class="muted">Park Lane, Secunderabad · 11:00–19:00 · by appointment on Sunday.</p>
+  <form class="card" id="f" style="margin-top:1rem">
+    <label>Name<input name="name" required></label>
+    <label>Day<input type="date" name="day" required></label>
+    <label>What you want to see<input name="note" placeholder="Bridal set, kadas…"></label>
+    <button class="btn">Request the hour</button>
+  </form>
+  <p id="ok" hidden style="margin-top:1rem">Held. We would confirm by message. In this demonstration the request stays on the page.</p>
+</main>
+<script src="site.js"></script>
+<script>
+A.chrome("visit");
+document.getElementById("f").onsubmit = (e) => { e.preventDefault(); e.target.hidden = true; document.getElementById("ok").hidden = false; };
+</script>
+</body></html>

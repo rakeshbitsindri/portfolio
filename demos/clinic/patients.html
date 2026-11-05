@@ -1,0 +1,18 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prakriti · patients</title><link rel="stylesheet" href="site.css"></head><body>
+<main>
+  <div class="kicker">Patients</div><h1>Everyone on the books</h1>
+  <input id="q" placeholder="Search by name" style="max-width:280px;margin:1rem 0">
+  <div class="card" id="list"></div>
+</main>
+<script src="site.js"></script>
+<script>
+K.chrome("people");
+function draw() {
+  const q = document.getElementById("q").value.toLowerCase();
+  document.getElementById("list").innerHTML = K.state().patients.filter((p) => p.name.toLowerCase().includes(q)).map((p) =>
+    `<a class="person" href="chart.html?id=${p.id}"><span>${p.name}</span><span class="muted">${p.phone} · ${p.visits.length} visits</span></a>`).join("");
+}
+document.getElementById("q").oninput = draw; draw();
+</script></body></html>

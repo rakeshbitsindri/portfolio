@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atelier · checkout</title>
+<link rel="stylesheet" href="site.css">
+</head><body>
+<main style="max-width:640px">
+  <div class="kicker">Checkout</div>
+  <h1 style="font-size:2.6rem" id="title">Where it should arrive</h1>
+  <form id="f" class="card" style="margin-top:1rem"></form>
+</main>
+<script src="site.js"></script>
+<script>
+A.chrome("bag");
+const bag = A.bag();
+if (!bag.length && !location.hash) location.href = "bag.html";
+let step = 0;
+const ship = { name: "", city: "Hyderabad", pin: "", pay: "UPI" };
+function draw() {
+  const f = document.getElementById("f");
+  if (location.hash === "#done") {
+    document.getElementById("title").textContent = "It is placed.";
+    f.innerHTML = `<p>Order <strong>${location.hash.slice(1) === "done" ? (sessionStorage.getItem("atelier_order") || "AT-2400") : ""}</strong> · ${A.inr(+sessionStorage.getItem("atelier_paid") || 0)} by ${sessionStorage.getItem("atelier_pay") || "UPI"}.</p><p class="muted">A real house would email this. Here the receipt stays in this browser.</p><a class="btn" href="index.html">Back to the house</a>`;
+    return;
+  }
+  if (step === 0) f.innerHTML = `<label>Name<input name="name" value="${ship.name}" required></label><label>City<input name="city" value="${ship.city}"></label><label>PIN<input name="pin" value="${ship.pin}" required pattern="\\d{6}"></label><button class="btn">Continue</button>`;
+  if (step === 1) f.innerHTML = `<label><input type="radio" name="pay" value="UPI" checked> UPI</label><label><input type="radio" name="pay" value="Card"> Card</label><label><input type="radio" name="pay" value="Cash on delivery"> Cash on delivery</label><button class="btn">Continue</button>`;
+  if (step === 2) f.innerHTML = `<p>${ship.name}, ${ship.city} ${ship.pin}</p><p>${ship.pay} · ${bag.length} line${bag.length > 1 ? "s" : ""}</p><p style="font-size:1.6rem">${A.inr(A.total())}</p><button class="btn">Place order</button>`;
+}
+document.getElementById("f").onsubmit = (e) => {
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  if (step === 0) { ship.name = fd.get("name"); ship.city = fd.get("city"); ship.pin = fd.get("pin"); if (!/^\d{6}$/.test(ship.pin || "")) return; }
+  if (step === 1) ship.pay = fd.get("pay");
+  if (step === 2) {
+    sessionStorage.setItem("atelier_order", "AT-" + (2400 + bag.length * 17));
+    sessionStorage.setItem("atelier_paid", String(A.total()));
+    sessionStorage.setItem("atelier_pay", ship.pay);
+    A.save([]);
+    location.hash = "done";
+  }
+  step = Math.min(2, step + 1);
+  document.getElementById("title").textContent = ["Where it should arrive", "How you will pay", "Review"][step] || "It is placed.";
+  draw();
+};
+draw();
+</script>
+</body></html>

@@ -1,0 +1,28 @@
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap");
+:root { --ink:#10211f; --bg:#f3f7f6; --card:#fff; --line:#d5e4e1; --teal:#0b6e6a; --muted:#5d7370; }
+* { box-sizing:border-box; margin:0; }
+body { font-family:"IBM Plex Sans",sans-serif; background:var(--bg); color:var(--ink); }
+a { color:inherit; text-decoration:none; }
+header { background:#0b3d3b; color:#fff; display:flex; justify-content:space-between; align-items:center; padding:.75rem 4vw; }
+header nav a { color:#d5ece9; margin-left:.9rem; font-size:.88rem; }
+header nav a.on { color:#fff; border-bottom:2px solid #9ddecb; }
+main { max-width:1080px; margin:0 auto; padding:1.6rem 1rem 3rem; }
+h1 { font-size:1.8rem; margin:.2rem 0 .8rem; }
+.kicker { font-family:"IBM Plex Mono",monospace; font-size:.68rem; letter-spacing:.12em; text-transform:uppercase; color:var(--teal); }
+.grid { display:grid; grid-template-columns:repeat(6,1fr); gap:.45rem; }
+.card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:1rem; }
+.room { border:1px solid var(--line); border-radius:10px; padding:.45rem; background:#fff; font-size:.75rem; }
+.room b { font-family:"IBM Plex Mono",monospace; display:block; }
+table { width:100%; border-collapse:collapse; font-size:.88rem; }
+th, td { text-align:left; padding:.45rem .35rem; border-bottom:1px solid var(--line); }
+.num { text-align:right; font-family:"IBM Plex Mono",monospace; }
+.kpis { display:grid; grid-template-columns:repeat(4,1fr); gap:.6rem; margin:1rem 0; }
+.kpi { background:#fff; border:1px solid var(--line); border-radius:12px; padding:.7rem .8rem; }
+.kpi b { display:block; font-size:1.3rem; color:var(--teal); }
+.kpi span, .muted { color:var(--muted); font-size:.78rem; }
+input, select { font:inherit; border:1px solid var(--line); border-radius:8px; padding:.45rem .6rem; width:100%; }
+label { display:block; font-size:.75rem; color:var(--muted); margin:.35rem 0; }
+.btn { background:var(--teal); color:#fff; border:0; border-radius:8px; padding:.5rem .9rem; font:inherit; cursor:pointer; }
+.row { display:flex; gap:.5rem; flex-wrap:wrap; }
+footer { padding:1rem 4vw; color:var(--muted); font-size:.78rem; display:flex; justify-content:space-between; }
+@media(max-width:800px){ .grid,.kpis{grid-template-columns:repeat(2,1fr);} header{flex-wrap:wrap; gap:.4rem;} }

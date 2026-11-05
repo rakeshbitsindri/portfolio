@@ -1,0 +1,21 @@
+@import url("https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,560&family=Source+Sans+3:wght@400;600&display=swap");
+:root { --ink:#172033; --bg:#f4f6f8; --line:#d9e0e8; --navy:#1d4e89; --muted:#5c6b7a; }
+* { box-sizing:border-box; margin:0; }
+body { font-family:"Source Sans 3",sans-serif; background:var(--bg); color:var(--ink); }
+a { color:inherit; text-decoration:none; }
+header { background:#13283f; color:#fff; display:flex; justify-content:space-between; align-items:center; padding:.8rem 4vw; }
+header a { color:#d5e2f0; margin-left:1rem; }
+header a.on { color:#fff; }
+.logo { font-family:"Source Serif 4",serif; color:#fff !important; margin-left:0 !important; font-size:1.2rem; }
+main { max-width:1000px; margin:0 auto; padding:1.6rem 1rem 3rem; }
+h1 { font-family:"Source Serif 4",serif; font-size:2.2rem; }
+.kicker { font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; color:var(--navy); }
+.card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:1rem; }
+table { width:100%; border-collapse:collapse; font-size:.88rem; }
+th, td { text-align:left; padding:.4rem; border-bottom:1px solid var(--line); }
+.num { text-align:right; font-variant-numeric:tabular-nums; }
+input, select { font:inherit; border:1px solid var(--line); border-radius:8px; padding:.4rem .5rem; }
+.btn { background:var(--navy); color:#fff; border:0; border-radius:8px; padding:.5rem .85rem; font:inherit; cursor:pointer; }
+.muted { color:var(--muted); }
+.spread { display:flex; justify-content:space-between; gap:.6rem; }
+footer { padding:1rem 4vw; color:var(--muted); font-size:.78rem; display:flex; justify-content:space-between; }

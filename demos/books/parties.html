@@ -1,0 +1,12 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Northline · parties</title><link rel="stylesheet" href="site.css"></head><body>
+<main>
+  <div class="kicker">Parties</div><h1>Who we bill</h1>
+  <div class="card" style="margin-top:1rem"><table><thead><tr><th>Name</th><th>GSTIN</th><th>State</th><th>How tax falls</th></tr></thead><tbody id="rows"></tbody></table></div>
+</main>
+<script src="site.js"></script>
+<script>
+B.chrome("parties");
+document.getElementById("rows").innerHTML = B.parties.map((p) => `<tr><td>${p.name}</td><td>${p.gstin}</td><td>${p.state}</td><td>${p.state === B.home ? "CGST + SGST" : "IGST"}</td></tr>`).join("");
+</script></body></html>
