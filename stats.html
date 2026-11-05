@@ -45,7 +45,7 @@
     <button class="btn btn-sm" data-d="7">7 days</button>
     <button class="btn btn-sm" data-d="30">30 days</button>
     <input id="q" placeholder="Filter path, city, browser" style="min-width:200px">
-    <button class="btn btn-sm" id="liveBtn">Live</button>
+    <button class="btn btn-sm" id="liveBtn" type="button">Refresh</button>
   </div>
   <div class="kpis" id="kpis" style="margin-bottom:1rem"></div>
   <div class="card" style="margin-bottom:1rem">
@@ -79,16 +79,20 @@
   <div class="card" id="detail" style="margin-top:1rem" hidden></div>
 </div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="/portfolio/demos/assets/track.js?v=4"></script>
+<script src="/portfolio/demos/assets/track.js?v=5"></script>
 <script>
-const API = "https://crudcrud.com/api/cc582e3d13ca4c75aca609dbe9da43cb/visits";
+const API = "https://crudcrud.com/api/346cdbd003a44766829592311a142b6f/visits";
 let remote = [];
 let days = "all", q = "", sortK = "t", sortD = -1, picked = null, timer = null;
 async function refresh() {
   const status = document.getElementById("status");
   try {
-    const res = await fetch(API);
-    if (!res.ok) throw new Error("HTTP " + res.status);
+    const res = await fetch(API, { cache: "no-store" });
+    if (!res.ok) {
+      var detail = "";
+      try { detail = await res.text(); } catch (e) {}
+      throw new Error(detail || ("HTTP " + res.status));
+    }
     const data = await res.json();
     remote = data.map(function (v) { v.uid = v._id; return v; });
     var pageViews = remote.reduce(function (s, v) { return s + (v.views || 1); }, 0);
@@ -209,12 +213,7 @@ document.getElementById("rows").onclick = function (e) {
   var tr = e.target.closest("tr"); if (!tr) return;
   picked = tr.dataset.uid; draw();
 };
-document.getElementById("liveBtn").onclick = function (e) {
-  var on = e.target.classList.toggle("on");
-  e.target.textContent = on ? "Pause" : "Live";
-  clearInterval(timer);
-  if (on) timer = setInterval(refresh, 4000);
-};
+document.getElementById("liveBtn").onclick = function () { refresh(); };
 var map, markers, mapKey = "";
 function drawMap(list) {
   if (!window.L) {
@@ -257,9 +256,6 @@ function drawMap(list) {
   }
   setTimeout(function () { map.invalidateSize(); }, 60);
 }
-document.getElementById("liveBtn").classList.add("on");
-document.getElementById("liveBtn").textContent = "Pause";
-timer = setInterval(refresh, 4000);
 refresh();
 </script>
 </body>

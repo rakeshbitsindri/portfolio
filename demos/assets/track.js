@@ -1,8 +1,8 @@
 /* One record per browser. Every page load, including refresh, adds 1 to that visitor's count. */
 (function () {
-  var API = "https://crudcrud.com/api/cc582e3d13ca4c75aca609dbe9da43cb/visits";
+  var API = "https://crudcrud.com/api/346cdbd003a44766829592311a142b6f/visits";
   var VID = "rk_vid";
-  var RID = "rk_remote_id";
+  var RID = "rk_remote_id_v2";
   var GEO = "rk_geo_v1";
   var vid = localStorage.getItem(VID);
   if (!vid) {
@@ -114,7 +114,6 @@
   }
   document.addEventListener("visibilitychange", function () { if (document.visibilityState === "hidden") flush(); });
   window.addEventListener("pagehide", flush);
-  setInterval(flush, 8000);
   function apply(g) {
     record.city = g.city || "";
     record.region = g.region || "";
