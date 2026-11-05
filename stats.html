@@ -69,8 +69,8 @@
   <div class="card" style="margin-top:1rem">
     <table class="table">
       <thead><tr>
-        <th data-k="t">When</th><th data-k="city">Where</th><th data-k="browser">Browser</th>
-        <th data-k="path">Page</th><th data-k="depth">How far</th><th data-k="ms">Time</th>
+        <th data-k="t">Last seen</th><th data-k="views">Views</th><th data-k="city">Where</th><th data-k="browser">Browser</th>
+        <th data-k="path">Last page</th><th data-k="depth">How far</th><th data-k="ms">Time</th>
       </tr></thead>
       <tbody id="rows"></tbody>
     </table>
@@ -79,7 +79,7 @@
   <div class="card" id="detail" style="margin-top:1rem" hidden></div>
 </div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="demos/assets/track.js"></script>
+<script src="/portfolio/demos/assets/track.js?v=4"></script>
 <script>
 const API = "https://crudcrud.com/api/cc582e3d13ca4c75aca609dbe9da43cb/visits";
 let remote = [];
@@ -91,9 +91,10 @@ async function refresh() {
     if (!res.ok) throw new Error("HTTP " + res.status);
     const data = await res.json();
     remote = data.map(function (v) { v.uid = v._id; return v; });
+    var pageViews = remote.reduce(function (s, v) { return s + (v.views || 1); }, 0);
     status.textContent = remote.length
-      ? "Live log. " + remote.length + " real page view" + (remote.length === 1 ? "" : "s") + " so far. No IP address is stored."
-      : "Live log is empty. Open any portfolio page and it will show up here within a few seconds.";
+      ? pageViews + " page view" + (pageViews === 1 ? "" : "s") + " from " + remote.length + " visitor" + (remote.length === 1 ? "" : "s") + ". Refreshing counts again. The same browser stays one visitor."
+      : "No visits yet. Open any portfolio page, then come back. A refresh adds to the count.";
   } catch (e) {
     status.textContent = "The visit log could not be loaded (" + e.message + ").";
   }
@@ -127,13 +128,14 @@ function fmtMs(ms) {
 function draw() {
   var list = rows();
   var sessions = {};
-  list.forEach(function (r) { sessions[r.id] = 1; });
+  var pageViews = 0;
+  list.forEach(function (r) { sessions[r.id || r.uid] = 1; pageViews += (r.views || 1); });
   var avgD = list.length ? Math.round(list.reduce(function (s, r) { return s + (r.depth || 0); }, 0) / list.length) : 0;
   var avgT = list.length ? list.reduce(function (s, r) { return s + (r.ms || 0); }, 0) / list.length : 0;
   var countries = {};
   list.forEach(function (r) { if (r.country) countries[r.country] = 1; });
   document.getElementById("kpis").innerHTML = [
-    [list.length, "Page views"],
+    [pageViews, "Page views"],
     [Object.keys(sessions).length, "Visitors"],
     [Object.keys(countries).length, "Countries"],
     [avgD + "%", "Avg scroll"],
@@ -175,17 +177,17 @@ function draw() {
   document.getElementById("none").hidden = list.length > 0;
   document.getElementById("rows").innerHTML = list.slice(0, 80).map(function (r) {
     var where = (r.city || "Locating…") + (r.country ? ", " + r.country : "");
-    return '<tr class="pick' + (picked === r.uid ? " on" : "") + '" data-uid="' + r.uid + '"><td>' + fmtWhen(r.t) + '</td><td>' + where + '</td><td>' + r.browser + " · " + r.os + '</td><td class="mono">' + r.path + '</td><td>' + (r.depth || 0) + '%</td><td>' + fmtMs(r.ms) + '</td></tr>';
+    return '<tr class="pick' + (picked === r.uid ? " on" : "") + '" data-uid="' + r.uid + '"><td>' + fmtWhen(r.t) + '</td><td class="mono">' + (r.views || 1) + '</td><td>' + where + '</td><td>' + r.browser + " · " + r.os + '</td><td class="mono">' + r.path + '</td><td>' + (r.depth || 0) + '%</td><td>' + fmtMs(r.ms) + '</td></tr>';
   }).join("");
   var found = list.find(function (r) { return r.uid === picked; });
   var box = document.getElementById("detail");
   if (!found) { box.hidden = true; return; }
   box.hidden = false;
-  var pagesInSession = list.filter(function (r) { return r.id === found.id; }).length;
-  box.innerHTML = '<h3>' + (found.city || "This visit") + '</h3><div class="grid grid-3" style="margin-top:.6rem">' +
-    [["When", fmtWhen(found.t)], ["Page", found.path], ["Referrer", found.ref], ["Browser", found.browser + " on " + found.os],
+  var hits = (found.hits || []).slice().reverse().map(function (h) { return h.path + " · " + fmtWhen(h.t); }).join("<br>") || found.path;
+  box.innerHTML = '<h3>' + (found.city || "This visitor") + '</h3><div class="grid grid-3" style="margin-top:.6rem">' +
+    [["Last seen", fmtWhen(found.t)], ["Views", found.views || 1], ["Last page", found.path], ["Referrer", found.ref], ["Browser", found.browser + " on " + found.os],
      ["Screen", found.sw + "×" + found.sh], ["Language", found.lang || "—"], ["Timezone", found.tz || "—"],
-     ["Scroll", (found.depth || 0) + "%"], ["Time on page", fmtMs(found.ms)], ["Pages in this visit", pagesInSession],
+     ["Scroll", (found.depth || 0) + "%"], ["Time on last page", fmtMs(found.ms)], ["Recent pages", hits],
      ["Place", [found.city, found.region, found.country].filter(Boolean).join(", ") || "Not resolved yet"],
      ["Visitor", found.id || "—"]
     ].map(function (p) { return '<div><div class="muted" style="font-size:.72rem">' + p[0] + '</div><strong>' + p[1] + '</strong></div>'; }).join("") +

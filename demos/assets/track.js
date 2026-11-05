@@ -1,17 +1,19 @@
-/* Sends each page view to the shared visit log. No IP address is stored. */
+/* One record per browser. Every page load, including refresh, adds 1 to that visitor's count. */
 (function () {
   var API = "https://crudcrud.com/api/cc582e3d13ca4c75aca609dbe9da43cb/visits";
+  var VID = "rk_vid";
+  var RID = "rk_remote_id";
   var GEO = "rk_geo_v1";
-  var SID = "rk_sid";
-  var sid = sessionStorage.getItem(SID);
-  if (!sid) {
-    sid = Math.random().toString(36).slice(2, 8);
-    sessionStorage.setItem(SID, sid);
+  var vid = localStorage.getItem(VID);
+  if (!vid) {
+    vid = Math.random().toString(36).slice(2, 10);
+    localStorage.setItem(VID, vid);
   }
-  var uid = sid + "-" + Date.now().toString(36);
+  var views = (parseInt(localStorage.getItem("rk_views") || "0", 10) || 0) + 1;
+  localStorage.setItem("rk_views", String(views));
+  var remoteId = localStorage.getItem(RID) || null;
   var t0 = Date.now();
   var depth = 0;
-  var remoteId = null;
   var sending = null;
   var dirty = false;
   function pct() {
@@ -39,10 +41,15 @@
   var path = (location.pathname || "/").replace(/^\/portfolio/, "") || "/";
   var ref = "direct";
   try { if (document.referrer) ref = new URL(document.referrer).host || "direct"; } catch (e) {}
+  var history = [];
+  try { history = JSON.parse(localStorage.getItem("rk_hits") || "[]"); } catch (e) {}
+  history.push({ t: new Date().toISOString(), path: path, depth: 0, ms: 0 });
+  history = history.slice(-12);
+  localStorage.setItem("rk_hits", JSON.stringify(history));
   var record = {
-    uid: uid,
-    id: sid,
-    t: new Date().toISOString(),
+    id: vid,
+    t: history[history.length - 1].t,
+    first: localStorage.getItem("rk_first") || history[history.length - 1].t,
     path: path,
     ref: ref,
     lang: navigator.language || "",
@@ -57,14 +64,18 @@
     lat: null,
     lon: null,
     depth: 0,
-    ms: 0
+    ms: 0,
+    views: views,
+    hits: history
   };
+  if (!localStorage.getItem("rk_first")) localStorage.setItem("rk_first", record.first);
   function payload() {
     return {
-      uid: record.uid, id: record.id, t: record.t, path: record.path, ref: record.ref,
+      id: record.id, t: record.t, first: record.first, path: record.path, ref: record.ref,
       lang: record.lang, tz: record.tz, sw: record.sw, sh: record.sh,
       browser: record.browser, os: record.os, city: record.city, region: record.region,
-      country: record.country, lat: record.lat, lon: record.lon, depth: record.depth, ms: record.ms
+      country: record.country, lat: record.lat, lon: record.lon,
+      depth: record.depth, ms: record.ms, views: record.views, hits: record.hits
     };
   }
   function write() {
@@ -75,19 +86,30 @@
         .then(function (r) { return r.json(); })
         .then(function (j) {
           remoteId = j && j._id;
+          if (remoteId) localStorage.setItem(RID, remoteId);
           sending = null;
           if (dirty) { dirty = false; write(); }
         })
         .catch(function () { sending = null; });
       return sending;
     }
-    return fetch(API + "/" + remoteId, { method: "PUT", headers: { "Content-Type": "application/json" }, body: body }).catch(function () {});
+    return fetch(API + "/" + remoteId, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: body
+    }).catch(function () { remoteId = null; localStorage.removeItem(RID); });
   }
   write();
   window.addEventListener("scroll", function () { depth = Math.max(depth, pct()); }, { passive: true });
   function flush() {
     record.depth = Math.max(depth, pct());
     record.ms = Date.now() - t0;
+    if (record.hits.length) {
+      var last = record.hits[record.hits.length - 1];
+      last.depth = record.depth;
+      last.ms = record.ms;
+      localStorage.setItem("rk_hits", JSON.stringify(record.hits));
+    }
     write();
   }
   document.addEventListener("visibilitychange", function () { if (document.visibilityState === "hidden") flush(); });

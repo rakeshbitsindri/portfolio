@@ -25,5 +25,5 @@ document.getElementById("list").innerHTML = (rows.length ? rows.map((o) => `
   + `<h2 style="font-family:Fraunces,serif;margin:1.4rem 0 .6rem">Saved pieces</h2>`
   + (saved.length ? `<div class="grid">${saved.map((p) => `<a class="card" href="piece.html?id=${p.id}"><img class="photo" src="${p.img}" alt=""><strong>${p.name}</strong></a>`).join("")}</div>` : `<p class="muted">Nothing saved. Use Save on a piece page.</p>`);
 </script>
-<script src="/portfolio/demos/assets/track.js" defer></script>
+<script src="/portfolio/demos/assets/track.js?v=4" defer></script>
 </body></html>
