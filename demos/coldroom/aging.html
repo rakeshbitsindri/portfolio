@@ -27,4 +27,5 @@ document.getElementById("rows").innerHTML = C.lots().filter((l) => l.left > 0).m
 const log = C.log();
 document.getElementById("log").innerHTML = log.length ? log.map((e) => `<div class="spread" style="padding:.35rem 0;border-bottom:1px solid var(--line)"><span class="muted">${e.t}</span><span>${e.line}</span></div>`).join("") : `<p class="muted">No movements yet. Receive or dispatch and come back.</p>`;
 </script>
+<script src="/portfolio/demos/assets/track.js" defer></script>
 </body></html>

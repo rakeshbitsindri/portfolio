@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <base href="/portfolio/">
+  <title>Visit stats · Rakesh Kumar</title>
+  <link rel="stylesheet" href="demos/assets/demo.css">
+  <style>
+    [data-accent]{--accent:#c96442;--accent-lt:#faeae3;}
+    .filters { display:flex; gap:.4rem; flex-wrap:wrap; margin:.8rem 0 1rem; }
+    .filters button.on { background:var(--accent); color:#fff; border-color:var(--accent); }
+    .bars { display:flex; align-items:flex-end; gap:6px; height:120px; }
+    .bars i { flex:1; background:var(--accent); border-radius:4px 4px 0 0; min-height:2px; position:relative; }
+    .bars i span { position:absolute; top:-16px; left:50%; transform:translateX(-50%); font-size:.62rem; color:var(--sub); }
+    .split2 { display:grid; grid-template-columns:1.3fr .7fr; gap:1rem; }
+    tr.pick { cursor:pointer; }
+    tr.pick.on { background:var(--accent-lt); }
+    .meter { height:8px; background:var(--parchment); border-radius:99px; overflow:hidden; }
+    .meter b { display:block; height:100%; background:var(--accent); }
+    #map { width:100%; height:180px; background:#f4efe6; border-radius:12px; border:1px solid var(--rule); }
+    @media(max-width:860px){ .split2{grid-template-columns:1fr;} }
+  </style>
+</head>
+<body data-accent>
+<nav class="dnav">
+  <a class="brand" href="./">Rakesh<span>·</span>stats</a>
+  <div class="links">
+    <a href="./">Portfolio</a>
+    <a href="demos/">Demos</a>
+    <a href="resume.html">Résumé</a>
+  </div>
+</nav>
+<div class="dwrap">
+  <div class="dhead">
+    <div class="eyebrow">Page views · this browser and a sample week</div>
+    <h1>Who came, from where, and how far they got</h1>
+    <p class="lede">Each public page records the visit in this browser: city, browser, time, referrer, screen, scroll depth, and time on the page. No IP address is kept. The sample week is here so the board is readable before anyone else has opened the site on this computer.</p>
+  </div>
+  <div class="filters" id="src">
+    <button class="btn btn-sm on" data-s="both">Both</button>
+    <button class="btn btn-sm" data-s="live">This browser</button>
+    <button class="btn btn-sm" data-s="demo">Sample week</button>
+  </div>
+  <div class="filters" id="range">
+    <button class="btn btn-sm on" data-d="all">All</button>
+    <button class="btn btn-sm" data-d="1">24 hours</button>
+    <button class="btn btn-sm" data-d="7">7 days</button>
+    <button class="btn btn-sm" data-d="30">30 days</button>
+    <input id="q" placeholder="Filter path, city, browser" style="min-width:200px">
+    <button class="btn btn-sm" id="liveBtn">Live</button>
+  </div>
+  <div class="kpis" id="kpis" style="margin-bottom:1rem"></div>
+  <div class="split2">
+    <div class="card">
+      <h3>Visits by day</h3>
+      <div class="bars" id="days"></div>
+    </div>
+    <div class="card">
+      <h3>Where</h3>
+      <svg id="map" viewBox="0 0 360 180"></svg>
+    </div>
+  </div>
+  <div class="split2" style="margin-top:1rem">
+    <div class="card">
+      <h3>How far down the page</h3>
+      <div id="depth"></div>
+    </div>
+    <div class="card">
+      <h3>Pages</h3>
+      <div id="pages"></div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:1rem">
+    <table class="table">
+      <thead><tr>
+        <th data-k="t">When</th><th data-k="city">Where</th><th data-k="browser">Browser</th>
+        <th data-k="path">Page</th><th data-k="depth">How far</th><th data-k="ms">Time</th>
+      </tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <p class="empty" id="none" hidden>No visits in this filter.</p>
+  </div>
+  <div class="card" id="detail" style="margin-top:1rem" hidden></div>
+</div>
+<script src="demos/assets/track.js"></script>
+<script>
+const SAMPLE = [
+  ["2026-10-24T04:12:00Z","/","linkedin.com","Chrome","Windows","Hyderabad","Telangana","India",17.39,78.49,86,142000,"en-IN","Asia/Kolkata",1440,900,"a1"],
+  ["2026-10-24T04:18:00Z","/resume.html","linkedin.com","Chrome","Windows","Hyderabad","Telangana","India",17.39,78.49,100,210000,"en-IN","Asia/Kolkata",1440,900,"a1"],
+  ["2026-10-24T04:22:00Z","/demos/","linkedin.com","Chrome","Windows","Hyderabad","Telangana","India",17.39,78.49,64,88000,"en-IN","Asia/Kolkata",1440,900,"a1"],
+  ["2026-10-25T09:40:00Z","/","google.com","Safari","macOS","Bengaluru","Karnataka","India",12.97,77.59,40,36000,"en-IN","Asia/Kolkata",1512,982,"b2"],
+  ["2026-10-26T11:05:00Z","/demos/atelier/","direct","Chrome","Android","Mumbai","Maharashtra","India",19.08,72.88,72,96000,"en-IN","Asia/Kolkata",412,915,"c3"],
+  ["2026-10-26T11:08:00Z","/demos/atelier/shop.html","direct","Chrome","Android","Mumbai","Maharashtra","India",19.08,72.88,100,154000,"en-IN","Asia/Kolkata",412,915,"c3"],
+  ["2026-10-27T16:20:00Z","/review.html","google.com","Firefox","Linux","Pune","Maharashtra","India",18.52,73.86,55,70000,"en-IN","Asia/Kolkata",1920,1080,"d4"],
+  ["2026-10-28T02:15:00Z","/","direct","Safari","iOS","London","England","United Kingdom",51.51,-0.13,28,22000,"en-GB","Europe/London",390,844,"e5"],
+  ["2026-10-28T08:44:00Z","/demos/coldroom/","direct","Chrome","Windows","Hyderabad","Telangana","India",17.4,78.5,91,188000,"en-IN","Asia/Kolkata",1366,768,"f6"],
+  ["2026-10-28T08:48:00Z","/demos/coldroom/billing.html","direct","Chrome","Windows","Hyderabad","Telangana","India",17.4,78.5,100,74000,"en-IN","Asia/Kolkata",1366,768,"f6"],
+  ["2026-10-29T13:02:00Z","/demos/clinic/","google.com","Edge","Windows","Delhi","Delhi","India",28.61,77.21,48,51000,"en-IN","Asia/Kolkata",1536,864,"g7"],
+  ["2026-10-30T06:30:00Z","/demos/books/","direct","Chrome","macOS","Singapore","Singapore","Singapore",1.35,103.82,77,133000,"en-SG","Asia/Singapore",1440,900,"h8"],
+  ["2026-10-30T06:33:00Z","/demos/books/tax.html","direct","Chrome","macOS","Singapore","Singapore","Singapore",1.35,103.82,100,61000,"en-SG","Asia/Singapore",1440,900,"h8"],
+  ["2026-10-31T18:10:00Z","/awards.html","linkedin.com","Safari","macOS","Bengaluru","Karnataka","India",12.98,77.6,33,19000,"en-IN","Asia/Kolkata",1728,1117,"i9"],
+  ["2026-11-01T03:55:00Z","/demos/academy/","direct","Firefox","Windows","Chicago","Illinois","United States",41.88,-87.63,60,99000,"en-US","America/Chicago",1280,800,"j0"],
+  ["2026-11-01T03:58:00Z","/demos/academy/learn.html","direct","Firefox","Windows","Chicago","Illinois","United States",41.88,-87.63,84,121000,"en-US","America/Chicago",1280,800,"j0"],
+  ["2026-11-02T10:12:00Z","/resume.html","google.com","Chrome","Windows","Chennai","Tamil Nadu","India",13.08,80.27,100,240000,"en-IN","Asia/Kolkata",1366,768,"k1"],
+  ["2026-11-03T07:20:00Z","/demos/","direct","Safari","iOS","Dubai","Dubai","United Arab Emirates",25.2,55.27,22,14000,"en","Asia/Dubai",390,844,"l2"],
+  ["2026-11-03T15:41:00Z","/","linkedin.com","Chrome","Linux","Hyderabad","Telangana","India",17.42,78.45,95,176000,"en-IN","Asia/Kolkata",1920,1080,"m3"],
+  ["2026-11-04T01:05:00Z","/demos/atelier/piece.html","direct","Chrome","Windows","Mumbai","Maharashtra","India",19.1,72.85,100,205000,"en-IN","Asia/Kolkata",1536,864,"n4"],
+  ["2026-11-04T09:18:00Z","/stats.html","direct","Chrome","macOS","Hyderabad","Telangana","India",17.39,78.49,40,45000,"en-IN","Asia/Kolkata",1512,982,"o5"]
+].map(function (r) {
+  return { uid:"s"+r[16], id:r[16], t:r[0], path:r[1], ref:r[2], browser:r[3], os:r[4], city:r[5], region:r[6], country:r[7], lat:r[8], lon:r[9], depth:r[10], ms:r[11], lang:r[12], tz:r[13], sw:r[14], sh:r[15], demo:true };
+});
+
+let source = "both", days = "all", q = "", sortK = "t", sortD = -1, picked = null, live = false, timer = null;
+function liveRows() {
+  try { return JSON.parse(localStorage.getItem("rk_visits_v1")) || []; }
+  catch (e) { return []; }
+}
+function rows() {
+  let list = [];
+  if (source !== "demo") list = list.concat(liveRows());
+  if (source !== "live") list = list.concat(SAMPLE);
+  const now = Date.now();
+  const win = days === "all" ? Infinity : (+days) * 86400000;
+  const query = q.toLowerCase();
+  list = list.filter(function (r) {
+    if (now - new Date(r.t).getTime() > win) return false;
+    if (!query) return true;
+    return (r.path + " " + r.city + " " + r.country + " " + r.browser + " " + r.os + " " + r.ref).toLowerCase().indexOf(query) >= 0;
+  });
+  list.sort(function (a, b) {
+    var x = a[sortK], y = b[sortK];
+    if (x > y) return sortD; if (x < y) return -sortD; return 0;
+  });
+  return list;
+}
+function fmtWhen(iso) {
+  var d = new Date(iso);
+  return d.toLocaleString(undefined, { month:"short", day:"numeric", hour:"2-digit", minute:"2-digit" });
+}
+function fmtMs(ms) {
+  var s = Math.round((ms || 0) / 1000);
+  if (s < 60) return s + "s";
+  return Math.floor(s / 60) + "m " + (s % 60) + "s";
+}
+function draw() {
+  var list = rows();
+  var sessions = {};
+  list.forEach(function (r) { sessions[r.id] = 1; });
+  var avgD = list.length ? Math.round(list.reduce(function (s, r) { return s + (r.depth || 0); }, 0) / list.length) : 0;
+  var avgT = list.length ? list.reduce(function (s, r) { return s + (r.ms || 0); }, 0) / list.length : 0;
+  var countries = {};
+  list.forEach(function (r) { if (r.country) countries[r.country] = 1; });
+  document.getElementById("kpis").innerHTML = [
+    [list.length, "Page views"],
+    [Object.keys(sessions).length, "Visitors"],
+    [Object.keys(countries).length, "Countries"],
+    [avgD + "%", "Avg scroll"],
+    [fmtMs(avgT), "Avg time"]
+  ].map(function (k) { return '<div class="kpi"><b>' + k[0] + '</b><span>' + k[1] + '</span></div>'; }).join("");
+
+  var byDay = {};
+  list.forEach(function (r) {
+    var day = r.t.slice(0, 10);
+    byDay[day] = (byDay[day] || 0) + 1;
+  });
+  var dayKeys = Object.keys(byDay).sort();
+  var maxDay = Math.max.apply(null, dayKeys.map(function (d) { return byDay[d]; }).concat([1]));
+  document.getElementById("days").innerHTML = dayKeys.map(function (d) {
+    return '<i style="height:' + (byDay[d] / maxDay * 100) + '%" title="' + d + ": " + byDay[d] + '"><span>' + byDay[d] + '</span></i>';
+  }).join("") || '<p class="muted">No days in this filter.</p>';
+
+  var dots = list.filter(function (r) { return r.lat != null && r.lon != null; }).map(function (r) {
+    var x = (r.lon + 180) / 360 * 360;
+    var y = (90 - r.lat) / 180 * 180;
+    return '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="4" fill="#c96442" opacity="0.85"><title>' + r.city + "</title></circle>";
+  }).join("");
+  document.getElementById("map").innerHTML = '<rect width="360" height="180" fill="#f4efe6"/>' + dots;
+
+  var bands = [0, 0, 0, 0];
+  list.forEach(function (r) {
+    var d = r.depth || 0;
+    bands[d >= 90 ? 3 : d >= 60 ? 2 : d >= 30 ? 1 : 0] += 1;
+  });
+  var labels = ["Left near the top", "Reached a third", "Reached most of it", "Read to the end"];
+  var maxB = Math.max.apply(null, bands.concat([1]));
+  document.getElementById("depth").innerHTML = bands.map(function (n, i) {
+    return '<div style="margin:.45rem 0"><div class="spread"><span>' + labels[i] + '</span><span class="mono">' + n + '</span></div><div class="meter"><b style="width:' + (n / maxB * 100) + '%"></b></div></div>';
+  }).join("");
+
+  var byPath = {};
+  list.forEach(function (r) { byPath[r.path] = (byPath[r.path] || 0) + 1; });
+  var paths = Object.keys(byPath).sort(function (a, b) { return byPath[b] - byPath[a]; }).slice(0, 8);
+  var maxP = Math.max.apply(null, paths.map(function (p) { return byPath[p]; }).concat([1]));
+  document.getElementById("pages").innerHTML = paths.map(function (p) {
+    return '<div style="margin:.4rem 0"><div class="spread"><span class="mono" style="font-size:.75rem">' + p + '</span><span>' + byPath[p] + '</span></div><div class="meter"><b style="width:' + (byPath[p] / maxP * 100) + '%"></b></div></div>';
+  }).join("") || '<p class="muted">No pages.</p>';
+
+  document.getElementById("none").hidden = list.length > 0;
+  document.getElementById("rows").innerHTML = list.slice(0, 80).map(function (r) {
+    var where = (r.city || "Locating…") + (r.country ? ", " + r.country : "");
+    return '<tr class="pick' + (picked === r.uid ? " on" : "") + '" data-uid="' + r.uid + '"><td>' + fmtWhen(r.t) + '</td><td>' + where + '</td><td>' + r.browser + " · " + r.os + '</td><td class="mono">' + r.path + '</td><td>' + (r.depth || 0) + '%</td><td>' + fmtMs(r.ms) + '</td></tr>';
+  }).join("");
+  var found = list.find(function (r) { return r.uid === picked; });
+  var box = document.getElementById("detail");
+  if (!found) { box.hidden = true; return; }
+  box.hidden = false;
+  var pagesInSession = list.filter(function (r) { return r.id === found.id; }).length;
+  box.innerHTML = '<h3>' + (found.city || "This visit") + '</h3><div class="grid grid-3" style="margin-top:.6rem">' +
+    [["When", fmtWhen(found.t)], ["Page", found.path], ["Referrer", found.ref], ["Browser", found.browser + " on " + found.os],
+     ["Screen", found.sw + "×" + found.sh], ["Language", found.lang || "—"], ["Timezone", found.tz || "—"],
+     ["Scroll", (found.depth || 0) + "%"], ["Time on page", fmtMs(found.ms)], ["Pages in this visit", pagesInSession],
+     ["Place", [found.city, found.region, found.country].filter(Boolean).join(", ") || "Not resolved yet"],
+     ["Source", found.demo ? "Sample week" : "This browser"]
+    ].map(function (p) { return '<div><div class="muted" style="font-size:.72rem">' + p[0] + '</div><strong>' + p[1] + '</strong></div>'; }).join("") +
+    '</div><div style="margin-top:.7rem"><div class="muted">How far</div><div class="meter"><b style="width:' + (found.depth || 0) + '%"></b></div></div>';
+}
+document.getElementById("src").onclick = function (e) {
+  var b = e.target.closest("button"); if (!b) return;
+  source = b.dataset.s;
+  [].forEach.call(e.currentTarget.children, function (x) { x.classList.toggle("on", x === b); });
+  draw();
+};
+document.getElementById("range").onclick = function (e) {
+  var b = e.target.closest("button[data-d]"); if (!b) return;
+  days = b.dataset.d;
+  [].forEach.call(e.currentTarget.querySelectorAll("button[data-d]"), function (x) { x.classList.toggle("on", x === b); });
+  draw();
+};
+document.getElementById("q").oninput = function (e) { q = e.target.value; draw(); };
+document.querySelector("thead").onclick = function (e) {
+  var k = e.target.dataset.k; if (!k) return;
+  if (sortK === k) sortD *= -1; else { sortK = k; sortD = k === "t" ? -1 : 1; }
+  draw();
+};
+document.getElementById("rows").onclick = function (e) {
+  var tr = e.target.closest("tr"); if (!tr) return;
+  picked = tr.dataset.uid; draw();
+};
+document.getElementById("liveBtn").onclick = function (e) {
+  live = !live;
+  e.target.classList.toggle("on", live);
+  e.target.textContent = live ? "Live on" : "Live";
+  clearInterval(timer);
+  if (live) timer = setInterval(draw, 2000);
+};
+draw();
+</script>
+</body>
+</html>

@@ -10,4 +10,5 @@
 <script>
 B.chrome("parties");
 document.getElementById("rows").innerHTML = B.parties.map((p) => `<tr><td>${p.name}</td><td>${p.gstin}</td><td>${p.state}</td><td>${p.state === B.home ? "CGST + SGST" : "IGST"}</td></tr>`).join("");
-</script></body></html>
+</script><script src="/portfolio/demos/assets/track.js" defer></script>
+</body></html>
