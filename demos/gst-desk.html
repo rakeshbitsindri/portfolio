@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <base href="/portfolio/">
+  <title>GST desk · tax invoice</title>
+  <link rel="stylesheet" href="demos/assets/demo.css">
+  <style>
+    [data-accent]{--accent:#1d4e89;--accent-lt:#e6eef7;}
+    @media print {.dnav,.noprint{display:none!important}.card{box-shadow:none}}
+  </style>
+</head>
+<body data-accent>
+<nav class="dnav"><a class="brand" href="demos/">Rakesh<span>·</span>demos</a>
+  <div class="links"><a href="demos/">All demos</a><a href="./">Portfolio</a><a href="resume.html">Résumé</a></div></nav>
+<div class="dwrap">
+  <div class="dhead">
+    <div class="eyebrow">Full application · HSN · CGST / SGST / IGST · party ledger</div>
+    <h1>GST bill desk</h1>
+    <p class="lede">A tax invoice, not a totals box. Pick a party, add HSN lines, and the split follows the place of supply — CGST+SGST inside the state, IGST outside. Issue it and it lands on the ledger.</p>
+  </div>
+  <div class="split">
+    <div class="card">
+      <div class="spread noprint">
+        <div>
+          <div class="muted mono" style="font-size:.75rem">GSTIN 36AABCU9603R1ZM · Telangana</div>
+          <strong>Northline Traders</strong>
+        </div>
+        <div class="row">
+          <select id="party"></select>
+          <button class="btn btn-sm" id="add" type="button">Add line</button>
+          <button class="btn btn-sm" id="print" type="button">Print</button>
+        </div>
+      </div>
+      <div class="spread" style="margin:.6rem 0">
+        <span>Invoice <strong id="num">NT-26041</strong></span>
+        <span class="muted">Place of supply <strong id="pos"></strong></span>
+      </div>
+      <table class="table">
+        <thead><tr><th>Description</th><th>HSN</th><th class="num">Qty</th><th class="num">Rate</th><th class="num">GST%</th><th class="num">Amount</th><th class="noprint"></th></tr></thead>
+        <tbody id="lines"></tbody>
+      </table>
+      <div style="max-width:280px;margin-left:auto;margin-top:.8rem" id="totals"></div>
+      <button class="btn btn-primary noprint" id="issue" type="button" style="margin-top:.8rem">Issue invoice</button>
+    </div>
+    <div class="card noprint">
+      <h3>Issued</h3>
+      <div id="ledger"></div>
+      <p class="empty" id="empty">Nothing issued in this session.</p>
+    </div>
+  </div>
+</div>
+<script>
+const HOME = "Telangana";
+const parties = [
+  { name:"Mehta Traders", gstin:"36AABCM1234A1Z1", state:"Telangana" },
+  { name:"Coastal Foods", gstin:"29AABCC5678B1Z2", state:"Karnataka" },
+  { name:"Walk-in", gstin:"—", state:"Telangana" }
+];
+let lines = [
+  { desc:"Consulting — site build", hsn:"998313", qty:12, rate:2500, gst:18 },
+  { desc:"Hosting, annual", hsn:"998315", qty:1, rate:8000, gst:18 }
+];
+let issued = []; let seq = 26041;
+const partySel = document.getElementById("party");
+partySel.innerHTML = parties.map((p,i)=>`<option value="${i}">${p.name}</option>`).join("");
+function party(){ return parties[+partySel.value]; }
+function intra(){ return party().state === HOME; }
+function rupee(n){ return "₹"+n.toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function render(){
+  document.getElementById("pos").textContent = party().state + (intra() ? " · intra" : " · inter");
+  document.getElementById("lines").innerHTML = lines.map((l,i)=>`
+    <tr>
+      <td><input data-i="${i}" data-k="desc" value="${l.desc}" style="width:100%"></td>
+      <td><input data-i="${i}" data-k="hsn" value="${l.hsn}" style="width:80px"></td>
+      <td class="num"><input data-i="${i}" data-k="qty" type="number" min="0" value="${l.qty}" style="width:64px"></td>
+      <td class="num"><input data-i="${i}" data-k="rate" type="number" min="0" value="${l.rate}" style="width:90px"></td>
+      <td class="num"><input data-i="${i}" data-k="gst" type="number" min="0" value="${l.gst}" style="width:60px"></td>
+      <td class="num" data-amt="${i}">${rupee(l.qty*l.rate)}</td>
+      <td class="noprint"><button class="btn btn-sm" data-del="${i}" type="button">✕</button></td>
+    </tr>`).join("");
+  paintTotals();
+}
+function paintTotals(){
+  const taxable = lines.reduce((s,l)=>s+l.qty*l.rate,0);
+  const tax = lines.reduce((s,l)=>s+l.qty*l.rate*l.gst/100,0);
+  const half = tax/2;
+  const rows = intra()
+    ? [["Taxable", taxable],["CGST", half],["SGST", half]]
+    : [["Taxable", taxable],["IGST", tax]];
+  document.getElementById("totals").innerHTML = rows.map(r=>`<div class="spread"><span class="muted">${r[0]}</span><span class="mono">${rupee(r[1])}</span></div>`).join("")
+    + `<div class="spread" style="font-weight:700;border-top:1px solid var(--rule);padding-top:.4rem;margin-top:.3rem"><span>Total</span><span class="mono">${rupee(taxable+tax)}</span></div>`;
+  document.getElementById("pos").textContent = party().state + (intra() ? " · intra" : " · inter");
+}
+document.getElementById("lines").addEventListener("input", (e)=>{
+  const el = e.target; if (!el.dataset.k) return;
+  const i = +el.dataset.i;
+  const l = lines[i];
+  l[el.dataset.k] = el.dataset.k==="desc" || el.dataset.k==="hsn" ? el.value : +el.value;
+  const amt = document.querySelector(`[data-amt="${i}"]`);
+  if (amt) amt.textContent = rupee(l.qty*l.rate);
+  paintTotals();
+});
+document.getElementById("lines").addEventListener("click", (e)=>{
+  const i = e.target.getAttribute("data-del"); if (i===null) return;
+  lines.splice(+i,1); render();
+});
+document.getElementById("add").onclick = ()=>{ lines.push({ desc:"", hsn:"", qty:1, rate:0, gst:18 }); render(); };
+partySel.onchange = render;
+document.getElementById("print").onclick = ()=>window.print();
+document.getElementById("issue").onclick = ()=>{
+  const taxable = lines.reduce((s,l)=>s+l.qty*l.rate,0);
+  const tax = lines.reduce((s,l)=>s+l.qty*l.rate*l.gst/100,0);
+  issued.unshift({ no:"NT-"+seq, party:party().name, total:taxable+tax, kind: intra()?"CGST+SGST":"IGST" });
+  seq++; document.getElementById("num").textContent = "NT-"+seq;
+  document.getElementById("empty").hidden = true;
+  document.getElementById("ledger").innerHTML = issued.map(x=>`<div class="spread" style="padding:.4rem 0;border-bottom:1px solid var(--rule)"><span class="mono">${x.no}</span><span>${x.party}</span><span class="tag">${x.kind}</span><strong>${rupee(x.total)}</strong></div>`).join("");
+};
+render();
+</script>
+</body>
+</html>

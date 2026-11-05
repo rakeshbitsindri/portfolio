@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <base href="/portfolio/">
+  <title>Coldroom · storage ledger</title>
+  <link rel="stylesheet" href="demos/assets/demo.css">
+  <style>
+    [data-accent]{--accent:#0b6e6a;--accent-lt:#e1f3f2;}
+    .rooms{display:grid;grid-template-columns:repeat(6,1fr);gap:.45rem}
+    .room{border:1px solid var(--rule);border-radius:10px;padding:.45rem;background:#fff;font-size:.75rem}
+    .room b{display:block;font-family:var(--mono)}
+    .room.full{border-color:var(--bad)}
+    @media(max-width:800px){.rooms{grid-template-columns:repeat(3,1fr)}}
+  </style>
+</head>
+<body data-accent>
+<nav class="dnav"><a class="brand" href="demos/">Rakesh<span>·</span>demos</a>
+  <div class="links"><a href="demos/">All demos</a><a href="./">Portfolio</a><a href="resume.html">Résumé</a></div></nav>
+<div class="dwrap">
+  <div class="dhead">
+    <div class="eyebrow">Full application · inward · location · partial outward · rental bill</div>
+    <h1>Coldroom ledger</h1>
+    <p class="lede">One screen for a cold store: chamber occupancy, goods receipt, a location, a partial dispatch, and a rental bill that prices by kg-day or by pallet-month and adds hamali. No spreadsheet in the middle.</p>
+  </div>
+  <div class="rooms" id="rooms"></div>
+  <div class="kpis" style="margin:1rem 0">
+    <div class="kpi"><b id="kLots">0</b><span>Open lots</span></div>
+    <div class="kpi"><b id="kKg">0</b><span>Kg on hand</span></div>
+    <div class="kpi"><b id="kOcc">0%</b><span>Chambers used</span></div>
+    <div class="kpi"><b id="kHam">₹0</b><span>Hamali accrued</span></div>
+  </div>
+  <div class="split">
+    <div class="card">
+      <div class="spread"><h3>Lots</h3>
+        <select id="partyFilter"><option value="">All depositors</option></select>
+      </div>
+      <table class="table"><thead><tr><th>Lot</th><th>Depositor</th><th>Goods</th><th>Loc</th><th class="num">Kg left</th><th>In</th></tr></thead>
+        <tbody id="lots"></tbody></table>
+    </div>
+    <div class="stack">
+      <form class="card stack" id="inForm">
+        <h3>Goods receipt</h3>
+        <label class="field">Depositor<input name="party" required value="Mehta Traders"></label>
+        <label class="field">Commodity<input name="goods" required value="Alphonso pulp"></label>
+        <div class="row">
+          <label class="field">Kg<input name="kg" type="number" min="1" value="800" required></label>
+          <label class="field">Pallets<input name="pallets" type="number" min="1" value="2" required></label>
+        </div>
+        <label class="field">Billing
+          <select name="mode"><option value="kg">Per kg / day @ ₹0.45</option><option value="pallet">Per pallet / month @ ₹1,800</option></select>
+        </label>
+        <label class="field">In date<input name="inDate" type="date" required></label>
+        <button class="btn btn-primary" type="submit">Receive &amp; place</button>
+      </form>
+      <form class="card stack" id="outForm">
+        <h3>Dispatch</h3>
+        <label class="field">Lot
+          <select name="lot" id="lotPick"></select>
+        </label>
+        <label class="field">Kg out<input name="kg" type="number" min="1" value="200" required></label>
+        <button class="btn" type="submit">Issue delivery</button>
+        <p class="muted" id="msg" style="font-size:.8rem"></p>
+      </form>
+    </div>
+  </div>
+  <div class="card" style="margin-top:1rem">
+    <div class="spread">
+      <h3>Rental bill</h3>
+      <div class="row">
+        <select id="billParty"></select>
+        <input id="asOf" type="date">
+        <button class="btn btn-primary" id="billBtn" type="button">Calculate</button>
+      </div>
+    </div>
+    <table class="table"><thead><tr><th>Lot</th><th>Basis</th><th class="num">Days</th><th class="num">Rent</th><th class="num">Hamali</th></tr></thead>
+      <tbody id="billRows"></tbody></table>
+    <div class="spread" style="max-width:320px;margin-left:auto;font-weight:700"><span>Total</span><span id="billTotal">—</span></div>
+  </div>
+</div>
+<script>
+const rooms = ["A1","A2","A3","B1","B2","B3"];
+const KG_DAY = 0.45, PALLET_MONTH = 1800, HAMALI = 0.12;
+let seq = 3;
+let lots = [
+  { id:"L-1001", party:"Mehta Traders", goods:"Frozen peas", kg:1200, left:900, pallets:3, loc:"A1", inn:"2026-10-02", mode:"kg", moved:300 },
+  { id:"L-1002", party:"Coastal Foods", goods:"Shrimp block", kg:600, left:600, pallets:2, loc:"B1", inn:"2026-10-18", mode:"pallet", moved:0 },
+  { id:"L-1003", party:"Mehta Traders", goods:"Mango pulp", kg:400, left:400, pallets:1, loc:"A2", inn:"2026-11-01", mode:"kg", moved:0 }
+];
+const inDate = document.querySelector("[name=inDate]");
+inDate.value = "2026-11-01";
+document.getElementById("asOf").value = "2026-11-30";
+function daysBetween(a,b){ return Math.max(1, Math.round((new Date(b)-new Date(a))/86400000)); }
+function money(n){ return "₹"+Math.round(n).toLocaleString("en-IN"); }
+function parties(){ return [...new Set(lots.map(l=>l.party))].sort(); }
+function fillSelects(){
+  const opts = parties().map(p=>`<option>${p}</option>`).join("");
+  document.getElementById("partyFilter").innerHTML = `<option value="">All depositors</option>`+opts;
+  document.getElementById("billParty").innerHTML = opts;
+  const open = lots.filter(l=>l.left>0);
+  document.getElementById("lotPick").innerHTML = open.map(l=>`<option value="${l.id}">${l.id} · ${l.goods} · ${l.left}kg</option>`).join("");
+}
+function render(){
+  const used = {};
+  lots.forEach(l=>{ if(l.left>0) used[l.loc]=(used[l.loc]||0)+l.left; });
+  document.getElementById("rooms").innerHTML = rooms.map(r=>{
+    const kg = used[r]||0;
+    return `<div class="room ${kg>1500?"full":""}"><b>${r}</b>${kg?kg+" kg":"empty"}<div class="bar" style="margin-top:.3rem"><i style="width:${Math.min(100,kg/20)}%"></i></div></div>`;
+  }).join("");
+  const f = document.getElementById("partyFilter").value;
+  const rows = lots.filter(l=>!f || l.party===f);
+  document.getElementById("lots").innerHTML = rows.map(l=>`<tr><td class="mono">${l.id}</td><td>${l.party}</td><td>${l.goods}</td><td>${l.loc}</td><td class="num">${l.left}</td><td class="mono">${l.inn}</td></tr>`).join("");
+  const open = lots.filter(l=>l.left>0);
+  document.getElementById("kLots").textContent = open.length;
+  document.getElementById("kKg").textContent = open.reduce((s,l)=>s+l.left,0).toLocaleString("en-IN");
+  document.getElementById("kOcc").textContent = Math.round(rooms.filter(r=>used[r]).length/rooms.length*100)+"%";
+  document.getElementById("kHam").textContent = money(lots.reduce((s,l)=>s+l.moved*HAMALI,0));
+}
+function nextLoc(){
+  const load = {};
+  lots.forEach(l=>{ if(l.left>0) load[l.loc]=(load[l.loc]||0)+1; });
+  return rooms.slice().sort((a,b)=>(load[a]||0)-(load[b]||0))[0];
+}
+document.getElementById("inForm").onsubmit = (e)=>{
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const loc = nextLoc();
+  const kg = +fd.get("kg");
+  lots.unshift({ id:"L-"+(1000+(++seq)), party:fd.get("party").trim(), goods:fd.get("goods").trim(), kg, left:kg, pallets:+fd.get("pallets"), loc, inn:fd.get("inDate"), mode:fd.get("mode"), moved:kg });
+  document.getElementById("msg").textContent = "Received into "+loc+".";
+  fillSelects(); render();
+};
+document.getElementById("outForm").onsubmit = (e)=>{
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const lot = lots.find(l=>l.id===fd.get("lot"));
+  const kg = +fd.get("kg");
+  if(!lot){ document.getElementById("msg").textContent = "No open lot."; return; }
+  if(kg>lot.left){ document.getElementById("msg").textContent = "Only "+lot.left+" kg left in "+lot.id+"."; return; }
+  lot.left -= kg; lot.moved += kg;
+  document.getElementById("msg").textContent = "Dispatched "+kg+" kg from "+lot.id+"."+(lot.left? " "+lot.left+" kg remain." : " Lot closed.");
+  fillSelects(); render();
+};
+document.getElementById("partyFilter").onchange = render;
+document.getElementById("billBtn").onclick = ()=>{
+  const party = document.getElementById("billParty").value;
+  const asOf = document.getElementById("asOf").value;
+  const rows = lots.filter(l=>l.party===party);
+  let total = 0;
+  document.getElementById("billRows").innerHTML = rows.map(l=>{
+    const d = daysBetween(l.inn, asOf);
+    const rent = l.mode==="kg" ? l.left * d * KG_DAY : l.pallets * Math.ceil(d/30) * PALLET_MONTH;
+    const ham = l.moved * HAMALI;
+    total += rent + ham;
+    return `<tr><td class="mono">${l.id}</td><td>${l.mode==="kg"?"kg-day":"pallet-month"}</td><td class="num">${d}</td><td class="num">${money(rent)}</td><td class="num">${money(ham)}</td></tr>`;
+  }).join("") || `<tr><td colspan="5">No lots for this depositor.</td></tr>`;
+  document.getElementById("billTotal").textContent = money(total);
+};
+fillSelects(); render();
+</script>
+</body>
+</html>
