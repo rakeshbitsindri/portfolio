@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"><head>
+<base href="/portfolio/demos/atelier/">
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Atelier · bag</title>
 <link rel="stylesheet" href="site.css">
@@ -17,7 +18,7 @@ const b = A.bag();
 if (!b.length) document.getElementById("empty").hidden = false;
 document.getElementById("list").innerHTML = b.map((l, i) => `
   <div class="spread card" style="margin-bottom:.6rem">
-    <div class="row"><img src="${l.img || "piece-temple.jpg"}" alt="" style="width:64px;height:64px;object-fit:cover;border-radius:8px"><div><strong>${l.name}</strong><div class="muted">${l.metal} · ${l.size} · × ${l.qty}</div></div></div>
+    <div class="row"><img src="${l.img || "piece-temple.jpg?v=2"}" alt="" style="width:64px;height:64px;object-fit:cover;border-radius:8px"><div><strong>${l.name}</strong><div class="muted">${l.metal} · ${l.size} · × ${l.qty}</div></div></div>
     <div>${A.inr(l.price * l.qty)} <button class="btn ghost" data-i="${i}">Remove</button></div>
   </div>`).join("") + (b.length ? `<div class="spread" style="margin-top:1rem"><strong>${A.inr(A.total())}</strong><a class="btn" href="checkout.html">Checkout</a></div>` : "");
 document.getElementById("list").onclick = (e) => {

@@ -2,12 +2,12 @@ const A = {
   metals: { "Gold-tone": 1, "Silver-tone": 0.72, Kundan: 1.35 },
   sizes: { S: 0, M: 800, L: 1600 },
   products: [
-    { id: 1, name: "Temple necklace", cat: "Necklace", metal: "Gold-tone", base: 18600, img: "piece-temple.jpg", note: "Hand-set temple motifs on an adjustable dori." },
-    { id: 2, name: "Kundan choker", cat: "Necklace", metal: "Kundan", base: 32400, img: "piece-kundan.jpg", note: "Polki-style kundan with a pearl drop." },
-    { id: 3, name: "Jhumka pair", cat: "Earrings", metal: "Gold-tone", base: 4200, img: "piece-jhumka.jpg", note: "Light bell jhumkas for day wear." },
-    { id: 4, name: "Silver kadas", cat: "Bangles", metal: "Silver-tone", base: 3100, img: "piece-kadas.jpg", note: "A pair of carved openable kadas." },
-    { id: 5, name: "Bridal set", cat: "Set", metal: "Kundan", base: 46800, img: "piece-bridal.jpg", note: "Necklace, earrings, and a maang tikka." },
-    { id: 6, name: "Daily hoops", cat: "Earrings", metal: "Silver-tone", base: 1800, img: "piece-hoops.jpg", note: "Slim hoops with a matte finish." }
+    { id: 1, name: "Temple necklace", cat: "Necklace", metal: "Gold-tone", base: 18600, img: "piece-temple.jpg?v=2", note: "Hand-set temple motifs on an adjustable dori." },
+    { id: 2, name: "Kundan choker", cat: "Necklace", metal: "Kundan", base: 32400, img: "piece-kundan.jpg?v=2", note: "Polki-style kundan with a pearl drop." },
+    { id: 3, name: "Jhumka pair", cat: "Earrings", metal: "Gold-tone", base: 4200, img: "piece-jhumka.jpg?v=2", note: "Light bell jhumkas for day wear." },
+    { id: 4, name: "Silver kadas", cat: "Bangles", metal: "Silver-tone", base: 3100, img: "piece-kadas.jpg?v=2", note: "A pair of carved openable kadas." },
+    { id: 5, name: "Bridal set", cat: "Set", metal: "Kundan", base: 46800, img: "piece-bridal.jpg?v=2", note: "Necklace, earrings, and a maang tikka." },
+    { id: 6, name: "Daily hoops", cat: "Earrings", metal: "Silver-tone", base: 1800, img: "piece-hoops.jpg?v=2", note: "Slim hoops with a matte finish." }
   ],
   key: "atelier_bag_v1",
   bag() { try { return JSON.parse(localStorage.getItem(this.key)) || []; } catch (e) { return []; } },
