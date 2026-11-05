@@ -463,6 +463,19 @@
       color: var(--mid-gray); margin-top: .3rem; font-weight: 500;
     }
 
+    @media (max-width: 800px) {
+      body { font-size: 14px; }
+      .resume { grid-template-columns: 1fr; margin: 0; box-shadow: none; }
+      .content { padding: 1.2rem 1rem 2rem !important; }
+      .telemetry, .services-grid { grid-template-columns: 1fr 1fr; }
+      .about-cols, .skill-tree { grid-template-columns: 1fr; }
+      .dl-bar { flex-wrap: wrap; }
+      .hdr-name { font-size: 1.7rem !important; }
+    }
+    @media (min-width: 1100px) {
+      body { font-size: 14px; }
+      .resume { margin: 2.4rem auto; }
+    }
     /* Print / PDF — keep layout aligned with screen (Chromium print-to-PDF uses this) */
     @media print {
       @page {
