@@ -5,6 +5,8 @@
 <main>
   <div class="kicker">Today · 5 Nov 2026</div><h1>The book</h1>
   <div class="grid" id="slots" style="margin-top:1rem"></div>
+  <h2 style="font-family:Literata,serif;font-size:1.3rem;margin-top:1.2rem">Follow-ups due</h2>
+  <div id="due" class="card" style="margin:.5rem 0 1rem"></div>
   <form class="card" id="f" style="margin-top:1rem;max-width:480px">
     <h2 style="font-family:Literata,serif;font-size:1.2rem">Hold an open hour</h2>
     <label>Patient<select name="who" id="who"></select></label>
@@ -15,6 +17,7 @@
 <script src="site.js"></script>
 <script>
 K.chrome("day");
+document.getElementById("due").innerHTML = K.state().patients.flatMap((p) => p.visits.filter((v) => v.follow && v.follow <= K.today).map((v) => `<div class="spread"><a href="chart.html?id=${p.id}">${p.name}</a><span class="muted">${v.follow} · ${v.rx}</span></div>`)).join("") || `<p class="muted">No overdue follow-ups.</p>`;
 const s = K.state();
 document.getElementById("slots").innerHTML = s.slots.map((sl) => `<div class="slot"><div class="muted">${sl.time}</div>${sl.patient ? `<a href="chart.html?id=${s.patients.find(p=>p.name===sl.patient).id}">${sl.patient}</a>` : "Open"}</div>`).join("");
 document.getElementById("who").innerHTML = s.patients.map((p) => `<option value="${p.id}">${p.name}</option>`).join("");

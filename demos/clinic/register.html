@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<base href="/portfolio/demos/clinic/">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prakriti · register</title>
+<link rel="stylesheet" href="site.css">
+</head><body>
+<main style="max-width:560px">
+  <div class="kicker">Register</div>
+  <h1>A new chart</h1>
+  <form class="card" id="f" style="margin-top:1rem">
+    <label>Name<input name="name" required></label>
+    <label>Age<input name="age" type="number" min="0" required></label>
+    <label>Phone<input name="phone" required></label>
+    <label>What to remember<textarea name="note" placeholder="Allergies, who attends, ongoing treatment"></textarea></label>
+    <button class="btn">Open the chart</button>
+  </form>
+</main>
+<script src="site.js"></script>
+<script>
+K.chrome("reg");
+document.getElementById("f").onsubmit = (e) => {
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const st = K.state();
+  const id = Math.max(...st.patients.map((p) => p.id)) + 1;
+  st.patients.push({ id, name: fd.get("name").trim(), age: +fd.get("age"), phone: fd.get("phone").trim(), note: fd.get("note") || "New chart.", visits: [] });
+  K.save(st);
+  location.href = "chart.html?id=" + id;
+};
+</script>
+</body></html>

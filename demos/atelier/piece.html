@@ -31,12 +31,17 @@ function draw() {
       <div class="row">
         <button class="btn ghost" id="minus">−</button><span>${qty}</span><button class="btn ghost" id="plus">+</button>
         <button class="btn" id="add">Add to bag</button>
+        <button class="btn ghost" id="wish">${A.wished().includes(p.id) ? "Saved" : "Save"}</button>
       </div>
+      <div style="margin-top:1rem">${(A.reviews[p.id] || []).map((r) => `<p><strong>${r[0]}</strong> — ${r[1]}</p>`).join("") || "<p class='muted'>No notes from the floor yet.</p>"}</div>
+      <div class="kicker" style="margin-top:1rem">Also in the house</div>
+      <div class="row">${A.products.filter((x) => x.id !== p.id && x.cat === p.cat).concat(A.products.filter((x) => x.id !== p.id)).slice(0, 3).map((x) => `<a href="piece.html?id=${x.id}">${x.name}</a>`).join(" · ")}</div>
     </div>`;
   document.getElementById("metals").onclick = (e) => { const m = e.target.dataset.m; if (m) { metal = m; draw(); } };
   document.getElementById("sizes").onclick = (e) => { const s = e.target.dataset.s; if (s) { size = s; draw(); } };
   document.getElementById("minus").onclick = () => { qty = Math.max(1, qty - 1); draw(); };
   document.getElementById("plus").onclick = () => { qty += 1; draw(); };
+  document.getElementById("wish").onclick = () => { A.toggleWish(p.id); draw(); };
   document.getElementById("add").onclick = () => {
     A.add({ id: p.id, name: p.name, metal, size, qty, price: A.price(p, metal, size), img: p.img });
     location.href = "bag.html";

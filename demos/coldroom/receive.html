@@ -28,6 +28,7 @@ document.getElementById("f").onsubmit = (e) => {
   const kg = +fd.get("kg");
   lots.unshift({ id: "L-" + n, party: fd.get("party").trim(), goods: fd.get("goods").trim(), kg, left: kg, pallets: +fd.get("pallets"), loc, inn: fd.get("inn"), mode: fd.get("mode"), moved: kg });
   C.save(lots);
+  C.note("GRN " + ("L-" + n) + " · " + fd.get("goods") + " · " + kg + " kg into " + loc);
   document.getElementById("msg").innerHTML = `Placed in <strong>${loc}</strong> as L-${n}. <a href="stock.html">See stock</a>.`;
 };
 </script></body></html>

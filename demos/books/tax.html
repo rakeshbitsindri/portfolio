@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<base href="/portfolio/demos/books/">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Northline · tax</title>
+<link rel="stylesheet" href="site.css">
+</head><body>
+<main>
+  <div class="kicker">Returns working</div>
+  <h1>Tax sitting in the ledger</h1>
+  <p class="muted">Intra-state tax is split in half between CGST and SGST. Inter-state tax is all IGST. This is the number a filing starts from.</p>
+  <div class="spread" id="k" style="margin:1rem 0;max-width:640px"></div>
+  <div class="card" id="rows"></div>
+</main>
+<script src="site.js"></script>
+<script>
+B.chrome("tax");
+const rows = B.state().invoices;
+let cgst = 0, igst = 0, taxable = 0;
+rows.forEach((r) => {
+  const tax = r.tax != null ? r.tax : 0;
+  taxable += r.taxable || 0;
+  if (r.kind === "IGST") igst += tax; else cgst += tax;
+});
+document.getElementById("k").innerHTML = `
+  <div class="card"><b>${B.inr(taxable)}</b><div class="muted">Taxable</div></div>
+  <div class="card"><b>${B.inr(cgst / 2)}</b><div class="muted">CGST</div></div>
+  <div class="card"><b>${B.inr(cgst / 2)}</b><div class="muted">SGST</div></div>
+  <div class="card"><b>${B.inr(igst)}</b><div class="muted">IGST</div></div>`;
+document.getElementById("rows").innerHTML = `<table><thead><tr><th>Invoice</th><th>Party</th><th>Head</th><th class="num">Tax</th></tr></thead><tbody>${
+  rows.map((r) => `<tr><td>${r.no}</td><td>${r.party}</td><td>${r.kind}</td><td class="num">${r.tax != null ? B.inr(r.tax) : "—"}</td></tr>`).join("")
+}</tbody></table>`;
+</script>
+</body></html>

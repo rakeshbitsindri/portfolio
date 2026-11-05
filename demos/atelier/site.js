@@ -10,8 +10,24 @@ const A = {
     { id: 6, name: "Daily hoops", cat: "Earrings", metal: "Silver-tone", base: 1800, img: "piece-hoops.jpg?v=2", note: "Slim hoops with a matte finish." }
   ],
   key: "atelier_bag_v1",
+  ordersKey: "atelier_orders_v1",
+  wishKey: "atelier_wish_v1",
+  reviews: {
+    1: [["Asha", "The motifs sit flat. Wore it for a full wedding evening."], ["N. Rao", "Dori adjustment is honest, not decorative."]],
+    2: [["Meera", "Pearl drop length is right for a choker."]],
+    5: [["Latha", "The set matches. Tikka did not fight the necklace."]]
+  },
   bag() { try { return JSON.parse(localStorage.getItem(this.key)) || []; } catch (e) { return []; } },
   save(b) { localStorage.setItem(this.key, JSON.stringify(b)); },
+  orders() { try { return JSON.parse(localStorage.getItem(this.ordersKey)) || []; } catch (e) { return []; } },
+  saveOrder(o) { const all = this.orders(); all.unshift(o); localStorage.setItem(this.ordersKey, JSON.stringify(all)); },
+  wished() { try { return JSON.parse(localStorage.getItem(this.wishKey)) || []; } catch (e) { return []; } },
+  toggleWish(id) {
+    let w = this.wished();
+    w = w.includes(id) ? w.filter((x) => x !== id) : w.concat(id);
+    localStorage.setItem(this.wishKey, JSON.stringify(w));
+    return w;
+  },
   inr(n) { return "₹" + Math.round(n).toLocaleString("en-IN"); },
   product(id) { return this.products.find((p) => p.id === +id); },
   price(p, metal, size) { return Math.round(p.base * this.metals[metal] + (this.sizes[size] || 0)); },
@@ -24,12 +40,15 @@ const A = {
     this.save(b);
   },
   chrome(active) {
-    const links = [["index.html", "Home", "home"], ["shop.html", "Collection", "shop"], ["about.html", "The house", "about"], ["visit.html", "Visit", "visit"]];
+    const links = [["index.html", "Home", "home"], ["shop.html", "Collection", "shop"], ["orders.html", "Orders", "orders"], ["about.html", "The house", "about"], ["visit.html", "Visit", "visit"]];
     document.body.insertAdjacentHTML("afterbegin", `<header>
       <a class="logo" href="index.html">Atelier</a>
       <nav>${links.map((l) => `<a class="${active === l[2] ? "on" : ""}" href="${l[0]}">${l[1]}</a>`).join("")}
         <a class="bag" href="bag.html">Bag ${this.count()}</a></nav>
     </header>`);
-    document.body.insertAdjacentHTML("beforeend", `<footer><span>Atelier · a portfolio demonstration</span><span><a href="../">All demos</a> · <a href="../../">Portfolio</a></span></footer>`);
+    document.body.insertAdjacentHTML("beforeend", `<footer>
+      <span>Atelier · Park Lane, Secunderabad · 11:00–19:00 · 040 2780 1140</span>
+      <span><a href="care.html">Care</a> · <a href="orders.html">Orders</a> · <a href="../">All demos</a></span>
+    </footer>`);
   }
 };

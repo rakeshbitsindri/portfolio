@@ -27,6 +27,7 @@ document.getElementById("f").onsubmit = (e) => {
   if (kg > lot.left) { msg.textContent = "Only " + lot.left + " kg left."; return; }
   lot.left -= kg; lot.moved += kg;
   C.save(lots);
+  C.note("DC " + lot.id + " · " + kg + " kg out · " + lot.left + " kg left");
   msg.innerHTML = `Dispatched ${kg} kg from ${lot.id}. ${lot.left ? lot.left + " kg remain." : "Lot closed."} <a href="stock.html">Stock</a>`;
 };
 </script></body></html>

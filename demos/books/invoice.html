@@ -54,7 +54,7 @@ document.getElementById("issue").onclick = () => {
   const taxable = lines.reduce((s, l) => s + l.qty * l.rate, 0);
   const tax = lines.reduce((s, l) => s + l.qty * l.rate * l.gst / 100, 0);
   const no = "NT-" + st.seq;
-  st.invoices.unshift({ no, party: party().name, total: taxable + tax, kind: intra() ? "CGST+SGST" : "IGST" });
+  st.invoices.unshift({ no, party: party().name, total: taxable + tax, taxable, tax, kind: intra() ? "CGST+SGST" : "IGST", when: "2026-11-05", lines: lines.map((l) => ({ ...l })) });
   st.seq += 1; B.save(st);
   document.getElementById("msg").innerHTML = `${no} issued. <a href="ledger.html">Open the ledger</a>.`;
   document.getElementById("num").textContent = "NT-" + st.seq;

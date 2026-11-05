@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<base href="/portfolio/demos/coldroom/">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Harbour · aging</title>
+<link rel="stylesheet" href="site.css">
+</head><body>
+<main>
+  <div class="kicker">Aging</div>
+  <h1>Lots older than 21 days</h1>
+  <p class="muted">As of 30 Nov 2026. These are the ones a store manager calls about before the month bill.</p>
+  <div class="card" style="margin-top:1rem">
+    <table><thead><tr><th>Lot</th><th>Party</th><th>Goods</th><th class="num">Days</th><th class="num">Kg</th><th>Temp</th></tr></thead>
+    <tbody id="rows"></tbody></table>
+  </div>
+  <h2 style="margin:1.2rem 0 .4rem">Movement log</h2>
+  <div class="card" id="log"></div>
+</main>
+<script src="site.js"></script>
+<script>
+C.chrome("age");
+const asof = "2026-11-30";
+document.getElementById("rows").innerHTML = C.lots().filter((l) => l.left > 0).map((l) => {
+  const d = C.days(l.inn, asof);
+  return { l, d };
+}).filter((x) => x.d >= 21).map(({ l, d }) => `<tr><td>${l.id}</td><td>${l.party}</td><td>${l.goods}</td><td class="num">${d}</td><td class="num">${l.left}</td><td>${C.temps[l.loc]}°C</td></tr>`).join("") || `<tr><td colspan="6">Nothing over 21 days.</td></tr>`;
+const log = C.log();
+document.getElementById("log").innerHTML = log.length ? log.map((e) => `<div class="spread" style="padding:.35rem 0;border-bottom:1px solid var(--line)"><span class="muted">${e.t}</span><span>${e.line}</span></div>`).join("") : `<p class="muted">No movements yet. Receive or dispatch and come back.</p>`;
+</script>
+</body></html>

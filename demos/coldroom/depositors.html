@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<base href="/portfolio/demos/coldroom/">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Harbour · parties</title>
+<link rel="stylesheet" href="site.css">
+</head><body>
+<main>
+  <div class="kicker">Depositors</div>
+  <h1>Who stores here</h1>
+  <div class="card" style="margin-top:1rem" id="rows"></div>
+</main>
+<script src="site.js"></script>
+<script>
+C.chrome("who");
+const book = {
+  "Mehta Traders": { phone: "98490 22110", city: "Bowenpally", terms: "kg-day, bill on the 1st" },
+  "Coastal Foods": { phone: "90000 11882", city: "Kakinada", terms: "pallet-month, 30-day credit" }
+};
+const lots = C.lots();
+document.getElementById("rows").innerHTML = C.parties().map((name) => {
+  const mine = lots.filter((l) => l.party === name);
+  const info = book[name] || { phone: "—", city: "—", terms: "as agreed" };
+  const kg = mine.reduce((s, l) => s + l.left, 0);
+  return `<article style="padding:.7rem 0;border-bottom:1px solid var(--line)">
+    <div class="spread"><strong>${name}</strong><span>${kg.toLocaleString("en-IN")} kg open</span></div>
+    <div class="muted">${info.city} · ${info.phone} · ${info.terms}</div>
+    <div>${mine.map((l) => l.id + " " + l.goods).join(" · ") || "No open lots"}</div>
+  </article>`;
+}).join("");
+</script>
+</body></html>

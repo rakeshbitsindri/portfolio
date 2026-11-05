@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<base href="/portfolio/demos/academy/">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Northline · tasks</title>
+<link rel="stylesheet" href="site.css">
+</head><body>
+<main>
+  <div class="kicker">Tasks</div>
+  <h1>On you, and on the floor</h1>
+  <form class="row" id="f" style="margin:1rem 0">
+    <input name="title" placeholder="Add a task" required style="flex:1;border:1px solid var(--line);border-radius:8px;padding:.5rem">
+    <button class="btn">Add</button>
+  </form>
+  <div id="list"></div>
+</main>
+<script src="site.js"></script>
+<script>
+H.chrome("tasks");
+function draw() {
+  const s = H.state();
+  document.getElementById("list").innerHTML = s.tasks.map((t) => `<div class="spread card" style="margin-bottom:.45rem"><label style="display:flex;gap:.5rem;align-items:center"><input type="checkbox" data-id="${t.id}" ${t.open ? "" : "checked"} style="width:auto"> <span style="${t.open ? "" : "text-decoration:line-through"}">${t.title}</span></label><span class="muted">${t.who}</span></div>`).join("");
+}
+document.getElementById("list").onchange = (e) => {
+  const id = +e.target.dataset.id;
+  const s = H.state();
+  const t = s.tasks.find((x) => x.id === id);
+  if (t) t.open = !e.target.checked;
+  H.save(s); draw();
+};
+document.getElementById("f").onsubmit = (e) => {
+  e.preventDefault();
+  const s = H.state();
+  s.tasks.unshift({ id: Date.now(), title: new FormData(e.target).get("title"), who: "You", open: true });
+  H.save(s); e.target.reset(); draw();
+};
+draw();
+</script>
+</body></html>

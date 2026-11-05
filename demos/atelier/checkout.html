@@ -21,7 +21,7 @@ function draw() {
   const f = document.getElementById("f");
   if (location.hash === "#done") {
     document.getElementById("title").textContent = "It is placed.";
-    f.innerHTML = `<p>Order <strong>${location.hash.slice(1) === "done" ? (sessionStorage.getItem("atelier_order") || "AT-2400") : ""}</strong> · ${A.inr(+sessionStorage.getItem("atelier_paid") || 0)} by ${sessionStorage.getItem("atelier_pay") || "UPI"}.</p><p class="muted">A real house would email this. Here the receipt stays in this browser.</p><a class="btn" href="index.html">Back to the house</a>`;
+    f.innerHTML = `<p>Order <strong>${sessionStorage.getItem("atelier_order") || "AT-2400"}</strong> · ${A.inr(+sessionStorage.getItem("atelier_paid") || 0)} by ${sessionStorage.getItem("atelier_pay") || "UPI"}.</p><p class="muted">The receipt is on your orders page, in this browser.</p><a class="btn" href="orders.html">See orders</a>`;
     return;
   }
   if (step === 0) f.innerHTML = `<label>Name<input name="name" value="${ship.name}" required></label><label>City<input name="city" value="${ship.city}"></label><label>PIN<input name="pin" value="${ship.pin}" required pattern="\\d{6}"></label><button class="btn">Continue</button>`;
@@ -34,7 +34,9 @@ document.getElementById("f").onsubmit = (e) => {
   if (step === 0) { ship.name = fd.get("name"); ship.city = fd.get("city"); ship.pin = fd.get("pin"); if (!/^\d{6}$/.test(ship.pin || "")) return; }
   if (step === 1) ship.pay = fd.get("pay");
   if (step === 2) {
-    sessionStorage.setItem("atelier_order", "AT-" + (2400 + bag.length * 17));
+    const no = "AT-" + (2400 + A.orders().length * 17 + bag.length);
+    A.saveOrder({ no, name: ship.name, city: ship.city, pin: ship.pin, pay: ship.pay, total: A.total(), lines: bag, when: new Date().toISOString().slice(0, 10) });
+    sessionStorage.setItem("atelier_order", no);
     sessionStorage.setItem("atelier_paid", String(A.total()));
     sessionStorage.setItem("atelier_pay", ship.pay);
     A.save([]);

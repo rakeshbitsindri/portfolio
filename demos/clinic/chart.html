@@ -32,7 +32,10 @@ document.getElementById("f").onsubmit = (e) => {
   const fd = new FormData(e.target);
   const st = K.state();
   const p = st.patients.find((x) => x.id === +id);
-  p.visits.unshift({ date: K.today, complaint: fd.get("complaint"), rx: fd.get("remedy") + " × " + fd.get("days") + " days", follow: fd.get("follow") });
+  const remedy = String(fd.get("remedy") || "");
+  p.visits.unshift({ date: K.today, complaint: fd.get("complaint"), rx: remedy + " × " + fd.get("days") + " days", follow: fd.get("follow") });
+  const bottle = (st.stock || []).find((b) => remedy.toLowerCase().indexOf(b.name.toLowerCase()) === 0);
+  if (bottle && bottle.bottles > 0) bottle.bottles -= 1;
   K.save(st); e.target.reset(); draw();
 };
 draw();

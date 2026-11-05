@@ -15,7 +15,8 @@
   <div class="grid">
     <a class="card" href="documents.html"><strong>Documents</strong><p class="muted">Policies and runbooks, with checkout.</p></a>
     <a class="card" href="learn.html"><strong>Learning</strong><p class="muted">Four short lessons and one question.</p></a>
-    <div class="card"><strong>News</strong><p class="muted">Thursday change window, 18:00–22:00. The new runbook is in Documents.</p></div>
+    <a class="card" href="news.html"><strong>News</strong><p class="muted">Thursday change window, 18:00–22:00. The new runbook is in Documents.</p></a>
+    <a class="card" href="tasks.html"><strong>Tasks</strong><p class="muted" id="openTasks">Open work on the floor.</p></a>
     <a class="card" href="people.html"><strong>People</strong><p class="muted">Who can see this hub.</p></a>
   </div>
 </main>
@@ -25,4 +26,7 @@ H.chrome("home");
 const s = H.state();
 document.getElementById("lessons").textContent = Object.keys(s.done).length + "/4";
 document.getElementById("out").textContent = Object.values(s.docs).flat().filter((d) => d.out).length;
+const open = (s.tasks || []).filter((t) => t.open).length;
+const el = document.getElementById("openTasks");
+if (el) el.textContent = open + " open. Tick them off on the tasks page.";
 </script></body></html>
