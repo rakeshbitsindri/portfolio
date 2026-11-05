@@ -27,8 +27,8 @@ label { display:block; font-size:.75rem; color:var(--muted); margin:.35rem 0; }
 .row { display:flex; gap:.5rem; flex-wrap:wrap; }
 footer { padding:1rem 4vw; color:var(--muted); font-size:.78rem; display:flex; justify-content:space-between; }
 img { max-width:100%; }
-table { display:block; width:100%; overflow-x:auto; }
 @media (max-width:800px) {
+  table { display:block; width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; }
   .grid, .kpis { grid-template-columns:1fr 1fr; }
   header { flex-direction:column; align-items:flex-start; }
   header nav { width:100%; }

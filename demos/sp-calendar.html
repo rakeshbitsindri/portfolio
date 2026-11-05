@@ -16,6 +16,11 @@
     .cell .d { color:var(--sub); font-weight:700; }
     .cell:hover { border-color:var(--accent); }
     .ev { background:var(--accent-lt); color:var(--accent); border-radius:4px; padding:.1rem .3rem; margin-top:.2rem; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    @media (max-width:640px) {
+      .cell { min-height:52px; font-size:.68rem; padding:.15rem; }
+      .dow { font-size:.62rem; }
+      .ev { font-size:.62rem; }
+    }
   </style>
 </head>
 <body data-accent>

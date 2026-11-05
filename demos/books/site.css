@@ -8,21 +8,22 @@ header nav { display:flex; flex-wrap:wrap; }
 header a { color:#d5e2f0; margin-left:1rem; }
 header a.on { color:#fff; }
 .logo { font-family:"Source Serif 4",serif; color:#fff !important; margin-left:0 !important; font-size:1.2rem; }
-main { max-width:1000px; margin:0 auto; padding:1.6rem 1rem 3rem; }
+main { max-width:1000px; margin:0 auto; padding:1.6rem 1rem 3rem; min-width:0; }
 h1 { font-family:"Source Serif 4",serif; font-size:2.2rem; }
 .kicker { font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; color:var(--navy); }
-.card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:1rem; }
+.card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:1rem; overflow-x:auto; max-width:100%; }
 table { width:100%; border-collapse:collapse; font-size:.88rem; }
 th, td { text-align:left; padding:.4rem; border-bottom:1px solid var(--line); }
 .num { text-align:right; font-variant-numeric:tabular-nums; }
 input, select { font:inherit; border:1px solid var(--line); border-radius:8px; padding:.4rem .5rem; }
 .btn { background:var(--navy); color:#fff; border:0; border-radius:8px; padding:.5rem .85rem; font:inherit; cursor:pointer; }
 .muted { color:var(--muted); }
-.spread { display:flex; justify-content:space-between; gap:.6rem; }
+.spread { display:flex; justify-content:space-between; gap:.6rem; flex-wrap:wrap; }
+.spread > .card { flex:1 1 8.5rem; min-width:0; }
 footer { padding:1rem 4vw; color:var(--muted); font-size:.78rem; display:flex; justify-content:space-between; flex-wrap:wrap; gap:.4rem; }
 img { max-width:100%; }
-table { display:block; overflow-x:auto; }
 @media (max-width:760px) {
+  table { display:block; overflow-x:auto; -webkit-overflow-scrolling:touch; }
   header { flex-direction:column; align-items:flex-start; }
   header nav { width:100%; }
   header a { margin-left:.7rem; font-size:.86rem; }

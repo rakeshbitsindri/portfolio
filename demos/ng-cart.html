@@ -12,6 +12,7 @@
     .prod { display:flex; flex-direction:column; gap:.35rem; }
     .prod .thumb { height:84px; border-radius:8px; }
     .line { display:grid; grid-template-columns:1fr auto auto; gap:.6rem; align-items:center; padding:.5rem 0; border-bottom:1px solid var(--rule); }
+    @media (max-width:560px) { .line { grid-template-columns:1fr; } }
     .qty { display:flex; align-items:center; gap:.3rem; }
     .qty button { width:26px; height:26px; border-radius:6px; border:1px solid var(--rule); background:#fff; cursor:pointer; }
   </style>
