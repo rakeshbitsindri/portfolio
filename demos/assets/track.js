@@ -1,6 +1,6 @@
-/* Records a visit in this browser only. No IP address is stored. */
+/* Sends each page view to the shared visit log. No IP address is stored. */
 (function () {
-  var KEY = "rk_visits_v1";
+  var API = "https://crudcrud.com/api/cc582e3d13ca4c75aca609dbe9da43cb/visits";
   var GEO = "rk_geo_v1";
   var SID = "rk_sid";
   var sid = sessionStorage.getItem(SID);
@@ -11,6 +11,9 @@
   var uid = sid + "-" + Date.now().toString(36);
   var t0 = Date.now();
   var depth = 0;
+  var remoteId = null;
+  var sending = null;
+  var dirty = false;
   function pct() {
     var el = document.documentElement;
     var max = el.scrollHeight - el.clientHeight;
@@ -21,7 +24,7 @@
     var u = navigator.userAgent || "";
     var name = "Browser";
     if (/Edg\//.test(u)) name = "Edge";
-    else if (/Chrome\//.test(u) && !/Edg\//.test(u)) name = "Chrome";
+    else if (/Chrome\//.test(u)) name = "Chrome";
     else if (/Firefox\//.test(u)) name = "Firefox";
     else if (/Safari\//.test(u)) name = "Safari";
     var os = "Other";
@@ -32,28 +35,11 @@
     else if (/Linux/.test(u)) os = "Linux";
     return { name: name, os: os };
   }
-  function load() {
-    try { return JSON.parse(localStorage.getItem(KEY)) || []; }
-    catch (e) { return []; }
-  }
-  function save(all) {
-    localStorage.setItem(KEY, JSON.stringify(all.slice(-400)));
-  }
-  function patch(extra) {
-    var all = load();
-    for (var i = all.length - 1; i >= 0; i--) {
-      if (all[i].uid === uid) {
-        for (var k in extra) all[i][k] = extra[k];
-        save(all);
-        return;
-      }
-    }
-  }
   var b = ua();
   var path = (location.pathname || "/").replace(/^\/portfolio/, "") || "/";
   var ref = "direct";
   try { if (document.referrer) ref = new URL(document.referrer).host || "direct"; } catch (e) {}
-  var row = {
+  var record = {
     uid: uid,
     id: sid,
     t: new Date().toISOString(),
@@ -73,15 +59,48 @@
     depth: 0,
     ms: 0
   };
-  var all = load();
-  all.push(row);
-  save(all);
+  function payload() {
+    return {
+      uid: record.uid, id: record.id, t: record.t, path: record.path, ref: record.ref,
+      lang: record.lang, tz: record.tz, sw: record.sw, sh: record.sh,
+      browser: record.browser, os: record.os, city: record.city, region: record.region,
+      country: record.country, lat: record.lat, lon: record.lon, depth: record.depth, ms: record.ms
+    };
+  }
+  function write() {
+    var body = JSON.stringify(payload());
+    if (!remoteId) {
+      if (sending) { dirty = true; return sending; }
+      sending = fetch(API, { method: "POST", headers: { "Content-Type": "application/json" }, body: body })
+        .then(function (r) { return r.json(); })
+        .then(function (j) {
+          remoteId = j && j._id;
+          sending = null;
+          if (dirty) { dirty = false; write(); }
+        })
+        .catch(function () { sending = null; });
+      return sending;
+    }
+    return fetch(API + "/" + remoteId, { method: "PUT", headers: { "Content-Type": "application/json" }, body: body }).catch(function () {});
+  }
+  write();
   window.addEventListener("scroll", function () { depth = Math.max(depth, pct()); }, { passive: true });
-  function flush() { patch({ depth: Math.max(depth, pct()), ms: Date.now() - t0 }); }
+  function flush() {
+    record.depth = Math.max(depth, pct());
+    record.ms = Date.now() - t0;
+    write();
+  }
   document.addEventListener("visibilitychange", function () { if (document.visibilityState === "hidden") flush(); });
   window.addEventListener("pagehide", flush);
-  setInterval(flush, 5000);
-  function apply(g) { patch({ city: g.city || "", region: g.region || "", country: g.country || "", lat: g.lat, lon: g.lon }); }
+  setInterval(flush, 8000);
+  function apply(g) {
+    record.city = g.city || "";
+    record.region = g.region || "";
+    record.country = g.country || "";
+    record.lat = g.lat;
+    record.lon = g.lon;
+    write();
+  }
   var cached = sessionStorage.getItem(GEO);
   if (cached) { try { apply(JSON.parse(cached)); } catch (e) {} }
   else {
