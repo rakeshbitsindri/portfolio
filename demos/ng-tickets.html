@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="tkApp">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/portfolio/">
+  <title>AngularJS · Support tickets (master-detail)</title>
+  <link rel="stylesheet" href="demos/assets/demo.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+  <style>
+    [data-accent]{--accent:#c2255c;--accent-lt:#fbe4ee;}
+    .tk { padding:.6rem .7rem; border:1px solid var(--rule); border-radius:10px; margin-bottom:.5rem; cursor:pointer; }
+    .tk.on { border-color:var(--accent); background:var(--accent-lt); }
+    .tk h4 { font-size:.9rem; }
+  </style>
+</head>
+<body data-accent ng-controller="Ctrl">
+  <nav class="dnav">
+    <a class="brand" href="demos/">Rakesh<span>·</span>demos</a>
+    <div class="links"><a href="demos/">All demos</a><a href="./">Portfolio</a><a href="resume.html">Résumé</a></div>
+  </nav>
+  <div class="dwrap">
+    <div class="dhead">
+      <div class="eyebrow">AngularJS 1.8 · master-detail · filters</div>
+      <h1>Support desk</h1>
+      <p class="lede">Pick a ticket on the left to see its detail and timeline on the right. Filter by status or priority, reply, and change status — the list updates live.</p>
+    </div>
+
+    <div class="toolbar">
+      <input ng-model="q" placeholder="Search tickets" style="flex:1;min-width:150px">
+      <select ng-model="st"><option value="">Any status</option><option>Open</option><option>Pending</option><option>Closed</option></select>
+      <select ng-model="pr"><option value="">Any priority</option><option>High</option><option>Medium</option><option>Low</option></select>
+    </div>
+
+    <div class="split">
+      <div>
+        <div class="tk" ng-repeat="t in filtered()" ng-class="{on: sel.id===t.id}" ng-click="open(t)">
+          <div class="spread">
+            <h4>{{ t.subject }}</h4>
+            <span class="pill" ng-class="{Open:'warn',Pending:'accent',Closed:'ok'}[t.status]">{{ t.status }}</span>
+          </div>
+          <div class="muted" style="font-size:.76rem">#{{ t.id }} · {{ t.customer }} · {{ t.pri }} priority</div>
+        </div>
+        <p class="empty" ng-if="filtered().length===0">No tickets match.</p>
+      </div>
+
+      <div class="card" ng-if="sel">
+        <div class="spread">
+          <h3>{{ sel.subject }}</h3>
+          <select ng-model="sel.status"><option>Open</option><option>Pending</option><option>Closed</option></select>
+        </div>
+        <div class="muted" style="font-size:.8rem;margin-bottom:.6rem">#{{ sel.id }} · {{ sel.customer }} · {{ sel.pri }} priority</div>
+        <div class="stack">
+          <div class="card pad-sm" ng-repeat="m in sel.thread" style="background:var(--parchment);border:0">
+            <div class="spread"><strong style="font-size:.84rem">{{ m.who }}</strong><span class="muted mono" style="font-size:.7rem">{{ m.t }}</span></div>
+            <div style="font-size:.86rem">{{ m.body }}</div>
+          </div>
+        </div>
+        <div class="row" style="margin-top:.8rem">
+          <input ng-model="reply" placeholder="Write a reply…" style="flex:1" ng-keydown="$event.keyCode===13 && send()">
+          <button class="btn btn-primary" ng-click="send()">Reply</button>
+        </div>
+      </div>
+      <div class="card" ng-if="!sel"><p class="empty">Select a ticket to view the thread.</p></div>
+    </div>
+  </div>
+
+  <script>
+    angular.module("tkApp", []).controller("Ctrl", function ($scope) {
+      let id = 2000;
+      const mk = (s, c, st, p, thread) => ({ id: ++id, subject: s, customer: c, status: st, pri: p, thread });
+      $scope.tickets = [
+        mk("Login button not responding", "Acme Corp", "Open", "High", [{ who: "Customer", t: "09:12", body: "The submit button does nothing on mobile Safari." }]),
+        mk("Add SSO for SharePoint hub", "Northwind", "Pending", "Medium", [{ who: "Customer", t: "Yesterday", body: "Can we wire Azure AD SSO?" }, { who: "Agent", t: "Yesterday", body: "Scoping it now." }]),
+        mk("Invoice PDF misaligned", "Globex", "Open", "Low", [{ who: "Customer", t: "Mon", body: "Totals overflow the column in print." }]),
+        mk("Dark mode flicker", "Initech", "Closed", "Low", [{ who: "Customer", t: "Last week", body: "Flash of light theme on load." }, { who: "Agent", t: "Last week", body: "Fixed with a pre-paint class." }])
+      ];
+      $scope.q = ""; $scope.st = ""; $scope.pr = ""; $scope.sel = $scope.tickets[0]; $scope.reply = "";
+      $scope.filtered = function () {
+        const q = ($scope.q || "").toLowerCase();
+        return $scope.tickets.filter((t) =>
+          (!q || t.subject.toLowerCase().includes(q) || t.customer.toLowerCase().includes(q)) &&
+          (!$scope.st || t.status === $scope.st) && (!$scope.pr || t.pri === $scope.pr));
+      };
+      $scope.open = (t) => { $scope.sel = t; };
+      $scope.send = function () {
+        if (!$scope.reply.trim()) return;
+        $scope.sel.thread.push({ who: "Agent", t: "now", body: $scope.reply.trim() });
+        if ($scope.sel.status === "Open") $scope.sel.status = "Pending";
+        $scope.reply = "";
+      };
+    });
+  </script>
+</body>
+</html>

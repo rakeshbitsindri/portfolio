@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="formApp">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/portfolio/">
+  <title>AngularJS · Forms &amp; validation</title>
+  <link rel="stylesheet" href="demos/assets/demo.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+  <style>
+    [data-accent]{--accent:#5a4fcf;--accent-lt:#ecebfb;}
+    .err { color: var(--bad); font-size: .74rem; }
+    .strength { height:7px;border-radius:999px;background:var(--parchment);overflow:hidden;margin-top:.3rem; }
+    .strength i { display:block;height:100%;transition:width .3s,background .3s; }
+    .ok-row { color: var(--ok); font-size:.8rem; }
+  </style>
+</head>
+<body data-accent ng-controller="Ctrl">
+  <nav class="dnav">
+    <a class="brand" href="demos/">Rakesh<span>·</span>demos</a>
+    <div class="links"><a href="demos/">All demos</a><a href="./">Portfolio</a><a href="resume.html">Résumé</a></div>
+  </nav>
+  <div class="dwrap">
+    <div class="dhead">
+      <div class="eyebrow">AngularJS 1.8 · ngForm · custom directive</div>
+      <h1>Account setup &amp; validation</h1>
+      <p class="lede">Required fields, email pattern, length rules, matching passwords, and a custom <span class="mono">password-strength</span> directive — with a live validity summary. Submit stays disabled until the form is valid.</p>
+    </div>
+
+    <div class="split">
+      <div class="card">
+        <form name="f" novalidate ng-submit="submit()" class="stack">
+          <label class="field">Full name
+            <input name="name" ng-model="m.name" ng-minlength="2" required>
+            <span class="err" ng-show="f.name.$touched && f.name.$error.required">Name is required.</span>
+            <span class="err" ng-show="f.name.$error.minlength">At least 2 characters.</span>
+          </label>
+          <label class="field">Work email
+            <input name="email" type="email" ng-model="m.email" required>
+            <span class="err" ng-show="f.email.$touched && f.email.$error.required">Email is required.</span>
+            <span class="err" ng-show="f.email.$error.email">Enter a valid email.</span>
+          </label>
+          <label class="field">Role
+            <select name="role" ng-model="m.role" required>
+              <option value="">Choose…</option>
+              <option>Front-end developer</option>
+              <option>SharePoint developer</option>
+              <option>Full-stack engineer</option>
+            </select>
+            <span class="err" ng-show="f.role.$touched && f.role.$error.required">Pick a role.</span>
+          </label>
+          <label class="field">Password
+            <input name="pw" type="password" ng-model="m.pw" password-strength ng-minlength="8" required>
+            <div class="strength"><i ng-style="{width: strength.pct+'%', background: strength.color}"></i></div>
+            <span class="muted" style="font-size:.74rem">{{ strength.label }}</span>
+          </label>
+          <label class="field">Confirm password
+            <input name="pw2" type="password" ng-model="m.pw2" required>
+            <span class="err" ng-show="m.pw2 && m.pw !== m.pw2">Passwords do not match.</span>
+          </label>
+          <label class="row" style="gap:.5rem;font-size:.84rem">
+            <input type="checkbox" ng-model="m.terms" style="width:auto"> I accept the engagement terms
+          </label>
+          <button class="btn btn-primary" type="submit" ng-disabled="f.$invalid || m.pw !== m.pw2 || !m.terms">Create account</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <h3>Live validity</h3>
+        <div class="stack" style="font-size:.84rem">
+          <div class="ok-row" ng-if="f.name.$valid">✓ Name</div><div class="err" ng-if="f.name.$invalid">• Name</div>
+          <div class="ok-row" ng-if="f.email.$valid">✓ Email</div><div class="err" ng-if="f.email.$invalid">• Email</div>
+          <div class="ok-row" ng-if="f.role.$valid">✓ Role</div><div class="err" ng-if="f.role.$invalid">• Role</div>
+          <div class="ok-row" ng-if="f.pw.$valid">✓ Password length</div><div class="err" ng-if="f.pw.$invalid">• Password length</div>
+          <div class="ok-row" ng-if="m.pw && m.pw===m.pw2">✓ Passwords match</div><div class="err" ng-if="!m.pw || m.pw!==m.pw2">• Passwords match</div>
+          <div class="ok-row" ng-if="m.terms">✓ Terms accepted</div><div class="err" ng-if="!m.terms">• Terms accepted</div>
+        </div>
+        <div ng-if="done" class="card pad-sm" style="margin-top:1rem;background:var(--accent-lt);border:0">
+          <strong>Submitted ✓</strong>
+          <pre class="mono" style="font-size:.72rem;white-space:pre-wrap;margin-top:.4rem">{{ submitted }}</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    angular.module("formApp", [])
+      .directive("passwordStrength", function () {
+        return {
+          require: "ngModel", link: function (scope, el, attr, ctrl) {
+            ctrl.$parsers.push(function (v) {
+              v = v || "";
+              let s = 0;
+              if (v.length >= 8) s++;
+              if (/[A-Z]/.test(v)) s++;
+              if (/[0-9]/.test(v)) s++;
+              if (/[^A-Za-z0-9]/.test(v)) s++;
+              const map = [
+                { pct: 10, color: "#c0392b", label: "Too weak" },
+                { pct: 35, color: "#c0392b", label: "Weak" },
+                { pct: 60, color: "#b4690e", label: "Fair" },
+                { pct: 80, color: "#1f8a5b", label: "Good" },
+                { pct: 100, color: "#1f8a5b", label: "Strong" }
+              ];
+              scope.strength = v ? map[s] : { pct: 0, color: "#c0392b", label: "Enter a password" };
+              return v;
+            });
+          }
+        };
+      })
+      .controller("Ctrl", function ($scope) {
+        $scope.m = { role: "" };
+        $scope.strength = { pct: 0, color: "#c0392b", label: "Enter a password" };
+        $scope.done = false;
+        $scope.submit = function () {
+          $scope.done = true;
+          $scope.submitted = JSON.stringify({ name: $scope.m.name, email: $scope.m.email, role: $scope.m.role }, null, 2);
+        };
+      });
+  </script>
+</body>
+</html>

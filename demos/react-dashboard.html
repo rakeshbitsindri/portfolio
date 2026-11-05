@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/portfolio/">
+  <title>React · Hooks dashboard</title>
+  <link rel="stylesheet" href="demos/assets/demo.css">
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>[data-accent]{--accent:#087f5b;--accent-lt:#e3f3ed;}</style>
+</head>
+<body data-accent>
+  <nav class="dnav">
+    <a class="brand" href="demos/">Rakesh<span>·</span>demos</a>
+    <div class="links"><a href="demos/">All demos</a><a href="./">Portfolio</a><a href="resume.html">Résumé</a></div>
+  </nav>
+  <div class="dwrap">
+    <div class="dhead">
+      <div class="eyebrow">React 18 · hooks · useMemo</div>
+      <h1>React team dashboard</h1>
+      <p class="lede">A React app using <span class="mono">useState</span>, <span class="mono">useMemo</span>, and a derived KPI view. Filter and sort the members; the metrics recompute with memoization.</p>
+    </div>
+    <div id="root"></div>
+  </div>
+  <script type="text/babel">
+    const { useState, useMemo } = React;
+    const seed = [
+      { name: "Rakesh K.", role: "Front-end", commits: 182, pr: 41, status: "active" },
+      { name: "S. Patel", role: "Front-end", commits: 97, pr: 22, status: "active" },
+      { name: "M. Osei", role: "SharePoint", commits: 140, pr: 33, status: "active" },
+      { name: "D. Novak", role: "SharePoint", commits: 64, pr: 12, status: "away" },
+      { name: "T. Alvarez", role: "QA", commits: 51, pr: 28, status: "active" },
+      { name: "N. Haas", role: "QA", commits: 38, pr: 9, status: "away" }
+    ];
+    function App() {
+      const [role, setRole] = useState("all");
+      const [sort, setSort] = useState("commits");
+      const rows = useMemo(() => {
+        return seed.filter(m => role === "all" || m.role === role)
+          .slice().sort((a, b) => b[sort] - a[sort]);
+      }, [role, sort]);
+      const kpis = useMemo(() => ({
+        commits: rows.reduce((s, m) => s + m.commits, 0),
+        pr: rows.reduce((s, m) => s + m.pr, 0),
+        active: rows.filter(m => m.status === "active").length
+      }), [rows]);
+      return (
+        <div>
+          <div className="toolbar">
+            <label className="field">Role
+              <select value={role} onChange={e => setRole(e.target.value)}>
+                <option value="all">All roles</option><option>Front-end</option><option>SharePoint</option><option>QA</option>
+              </select>
+            </label>
+            <label className="field">Sort by
+              <select value={sort} onChange={e => setSort(e.target.value)}>
+                <option value="commits">Commits</option><option value="pr">Pull requests</option>
+              </select>
+            </label>
+          </div>
+          <div className="kpis" style={{ marginBottom: "1rem" }}>
+            <div className="kpi"><b>{rows.length}</b><span>Members</span></div>
+            <div className="kpi"><b>{kpis.commits}</b><span>Commits</span></div>
+            <div className="kpi"><b>{kpis.pr}</b><span>Pull requests</span></div>
+            <div className="kpi"><b>{kpis.active}</b><span>Active now</span></div>
+          </div>
+          <div className="card">
+            <table className="table">
+              <thead><tr><th>Name</th><th>Role</th><th className="num">Commits</th><th className="num">PRs</th><th>Status</th></tr></thead>
+              <tbody>
+                {rows.map(m => (
+                  <tr key={m.name}>
+                    <td>{m.name}</td><td>{m.role}</td>
+                    <td className="num">{m.commits}</td><td className="num">{m.pr}</td>
+                    <td><span className={"pill " + (m.status === "active" ? "ok" : "mut")}>{m.status}</span></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      );
+    }
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="taApp">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/portfolio/">
+  <title>AngularJS · Debounced typeahead</title>
+  <link rel="stylesheet" href="demos/assets/demo.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+  <style>
+    [data-accent]{--accent:#3b5bdb;--accent-lt:#e7ecfd;}
+    .res { border:1px solid var(--rule); border-radius:10px; overflow:hidden; }
+    .res li { list-style:none; padding:.6rem .8rem; border-bottom:1px solid var(--rule); cursor:pointer; display:flex; justify-content:space-between; }
+    .res li:last-child { border-bottom:0; }
+    .res li.active, .res li:hover { background:var(--accent-lt); }
+    .res b { color:var(--accent); }
+    .spin { width:14px;height:14px;border:2px solid var(--rule);border-top-color:var(--accent);border-radius:50%;animation:sp .7s linear infinite;display:inline-block; }
+    @keyframes sp { to { transform:rotate(360deg); } }
+  </style>
+</head>
+<body data-accent ng-controller="Ctrl">
+  <nav class="dnav">
+    <a class="brand" href="demos/">Rakesh<span>·</span>demos</a>
+    <div class="links"><a href="demos/">All demos</a><a href="./">Portfolio</a><a href="resume.html">Résumé</a></div>
+  </nav>
+  <div class="dwrap">
+    <div class="dhead">
+      <div class="eyebrow">AngularJS 1.8 · debounce · $q promise · keyboard nav</div>
+      <h1>Typeahead search</h1>
+      <p class="lede">Type to search a mock service with a 250&nbsp;ms debounce and a simulated network delay. Use ↑ ↓ and Enter. Matches are highlighted.</p>
+    </div>
+
+    <div class="card" style="max-width:560px">
+      <label class="field">Search frameworks &amp; tools
+        <input ng-model="q" ng-change="onChange()" ng-keydown="key($event)" placeholder="e.g. ang, react, share…" autofocus>
+      </label>
+      <div style="margin:.6rem 0;min-height:1.2rem">
+        <span ng-if="loading"><span class="spin"></span> <span class="muted" style="font-size:.8rem">searching…</span></span>
+        <span ng-if="!loading && q" class="muted" style="font-size:.8rem">{{ results.length }} result(s)</span>
+      </div>
+      <ul class="res" ng-if="results.length">
+        <li ng-repeat="r in results" ng-class="{active: $index===cursor}" ng-click="pick(r)" ng-mouseenter="cursor=$index">
+          <span ng-bind-html="hl(r.name)"></span>
+          <span class="tag">{{ r.cat }}</span>
+        </li>
+      </ul>
+      <p class="empty" ng-if="q && !loading && results.length===0">No matches for “{{ q }}”.</p>
+      <div class="card pad-sm" style="margin-top:1rem;background:var(--accent-lt);border:0" ng-if="chosen">
+        Selected: <strong>{{ chosen.name }}</strong> <span class="tag">{{ chosen.cat }}</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    angular.module("taApp", []).controller("Ctrl", function ($scope, $timeout, $q, $sce) {
+      const data = [
+        ["AngularJS","Front-end"],["Angular","Front-end"],["React","Front-end"],["Vue","Front-end"],["Svelte","Front-end"],
+        ["SharePoint Framework","Microsoft 365"],["SharePoint Online","Microsoft 365"],["Power Automate","Microsoft 365"],["Power Apps","Microsoft 365"],
+        ["HTML5","Web"],["CSS Grid","Web"],["Flexbox","Web"],["TypeScript","Language"],["JavaScript","Language"],
+        ["Node.js","Back-end"],["Express","Back-end"],["Django","Back-end"],["FastAPI","Back-end"],["PostgreSQL","Data"],["MongoDB","Data"]
+      ].map((d) => ({ name: d[0], cat: d[1] }));
+      $scope.q = ""; $scope.results = []; $scope.loading = false; $scope.cursor = 0; $scope.chosen = null;
+      let timer = null;
+
+      function query(term) {
+        // simulated async service
+        const def = $q.defer();
+        $timeout(() => {
+          const t = term.toLowerCase();
+          def.resolve(data.filter((d) => d.name.toLowerCase().includes(t)));
+        }, 300);
+        return def.promise;
+      }
+      $scope.onChange = function () {
+        if (timer) $timeout.cancel(timer);
+        if (!$scope.q) { $scope.results = []; $scope.loading = false; return; }
+        $scope.loading = true;
+        timer = $timeout(function () {
+          query($scope.q).then((r) => { $scope.results = r; $scope.cursor = 0; $scope.loading = false; });
+        }, 250);
+      };
+      $scope.hl = function (name) {
+        if (!$scope.q) return $sce.trustAsHtml(name);
+        const re = new RegExp("(" + $scope.q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + ")", "ig");
+        return $sce.trustAsHtml(name.replace(re, "<b>$1</b>"));
+      };
+      $scope.key = function (e) {
+        if (!$scope.results.length) return;
+        if (e.keyCode === 40) { $scope.cursor = Math.min($scope.cursor + 1, $scope.results.length - 1); e.preventDefault(); }
+        else if (e.keyCode === 38) { $scope.cursor = Math.max($scope.cursor - 1, 0); e.preventDefault(); }
+        else if (e.keyCode === 13) { $scope.pick($scope.results[$scope.cursor]); }
+      };
+      $scope.pick = function (r) { $scope.chosen = r; $scope.q = r.name; $scope.results = []; };
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/portfolio/">
+  <title>HTML5 · Interactive SVG org chart</title>
+  <link rel="stylesheet" href="demos/assets/demo.css">
+  <style>[data-accent]{--accent:#1098ad;--accent-lt:#def2f4;}
+    svg { width:100%; height:auto; background:#fff; border:1px solid var(--rule); border-radius:12px; }
+    .node rect { fill:#fff; stroke:var(--accent); stroke-width:1.5; cursor:pointer; }
+    .node.sel rect { fill:var(--accent-lt); }
+    .node text { font-family:var(--sans); font-size:12px; fill:var(--text); pointer-events:none; }
+    .node .role { fill:var(--sub); font-size:10px; }
+    .edge { stroke:var(--rule); stroke-width:1.5; fill:none; }
+  </style>
+</head>
+<body data-accent>
+  <nav class="dnav">
+    <a class="brand" href="demos/">Rakesh<span>·</span>demos</a>
+    <div class="links"><a href="demos/">All demos</a><a href="./">Portfolio</a><a href="resume.html">Résumé</a></div>
+  </nav>
+  <div class="dwrap">
+    <div class="dhead">
+      <div class="eyebrow">HTML5 · SVG · recursive layout</div>
+      <h1>Org chart</h1>
+      <p class="lede">A hierarchy rendered as SVG with a recursive layout algorithm. Click a node to collapse or expand its branch; the tree re-lays out instantly.</p>
+    </div>
+    <div class="toolbar"><span class="muted" style="font-size:.84rem" id="info">Click a node to toggle its children.</span></div>
+    <svg id="svg" viewBox="0 0 900 460" preserveAspectRatio="xMidYMin meet"></svg>
+  </div>
+  <script>
+    const tree = {
+      id: "ceo", name: "A. Rivera", role: "VP Engineering", children: [
+        { id: "fe", name: "R. Kumar", role: "Front-end lead", children: [
+          { id: "a1", name: "S. Patel", role: "AngularJS dev" },
+          { id: "a2", name: "J. Lee", role: "HTML/CSS dev" }
+        ]},
+        { id: "sp", name: "M. Osei", role: "SharePoint lead", children: [
+          { id: "s1", name: "D. Novak", role: "SPFx dev" },
+          { id: "s2", name: "K. Chen", role: "Power Platform" }
+        ]},
+        { id: "qa", name: "T. Alvarez", role: "QA lead", children: [
+          { id: "q1", name: "N. Haas", role: "Automation" }
+        ]}
+      ]
+    };
+    const collapsed = {};
+    const svg = document.getElementById("svg");
+    const NODE_W = 120, NODE_H = 46, HGAP = 24, VGAP = 60;
+
+    function measure(n) {
+      if (collapsed[n.id] || !n.children || !n.children.length) { n._w = NODE_W; return NODE_W; }
+      let w = 0; n.children.forEach((c) => { w += measure(c) + HGAP; }); w -= HGAP;
+      n._w = Math.max(NODE_W, w); return n._w;
+    }
+    function place(n, x, depth, out, edges) {
+      const y = 20 + depth * VGAP;
+      const cx = x + n._w / 2;
+      out.push({ n, x: cx - NODE_W / 2, y });
+      if (!collapsed[n.id] && n.children && n.children.length) {
+        let cxp = x;
+        n.children.forEach((c) => {
+          place(c, cxp, depth + 1, out, edges);
+          edges.push([cx, y + NODE_H, cxp + c._w / 2, 20 + (depth + 1) * VGAP]);
+          cxp += c._w + HGAP;
+        });
+      }
+    }
+    function render() {
+      measure(tree);
+      const out = [], edges = [];
+      place(tree, 20, 0, out, edges);
+      let html = "";
+      edges.forEach((e) => {
+        const my = (e[1] + e[3]) / 2;
+        html += `<path class="edge" d="M${e[0]},${e[1]} C${e[0]},${my} ${e[2]},${my} ${e[2]},${e[3]}"/>`;
+      });
+      out.forEach((o) => {
+        const hasKids = o.n.children && o.n.children.length;
+        const mark = hasKids ? (collapsed[o.n.id] ? " +" : " −") : "";
+        html += `<g class="node" onclick="toggle('${o.n.id}')">
+          <rect x="${o.x}" y="${o.y}" width="${NODE_W}" height="${NODE_H}" rx="8"/>
+          <text x="${o.x + 10}" y="${o.y + 19}">${o.n.name}${mark}</text>
+          <text class="role" x="${o.x + 10}" y="${o.y + 34}">${o.n.role}</text>
+        </g>`;
+      });
+      svg.innerHTML = html;
+      const totalW = tree._w + 40;
+      svg.setAttribute("viewBox", `0 0 ${Math.max(900, totalW)} 460`);
+    }
+    window.toggle = function (id) { collapsed[id] = !collapsed[id]; document.getElementById("info").textContent = (collapsed[id] ? "Collapsed " : "Expanded ") + id; render(); };
+    render();
+  </script>
+</body>
+</html>

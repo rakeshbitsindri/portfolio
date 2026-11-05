@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="cartApp">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/portfolio/">
+  <title>AngularJS · Shopping cart</title>
+  <link rel="stylesheet" href="demos/assets/demo.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+  <style>
+    [data-accent]{--accent:#1f7a4d;--accent-lt:#e2f3ea;}
+    .prod { display:flex; flex-direction:column; gap:.35rem; }
+    .prod .thumb { height:84px; border-radius:8px; }
+    .line { display:grid; grid-template-columns:1fr auto auto; gap:.6rem; align-items:center; padding:.5rem 0; border-bottom:1px solid var(--rule); }
+    .qty { display:flex; align-items:center; gap:.3rem; }
+    .qty button { width:26px; height:26px; border-radius:6px; border:1px solid var(--rule); background:#fff; cursor:pointer; }
+  </style>
+</head>
+<body data-accent ng-controller="Ctrl">
+  <nav class="dnav">
+    <a class="brand" href="demos/">Rakesh<span>·</span>demos</a>
+    <div class="links"><a href="demos/">All demos</a><a href="./">Portfolio</a><a href="resume.html">Résumé</a></div>
+  </nav>
+  <div class="dwrap">
+    <div class="dhead">
+      <div class="eyebrow">AngularJS 1.8 · cart · computed totals · coupon</div>
+      <h1>Store checkout</h1>
+      <p class="lede">Add products, change quantities, apply a coupon (<span class="mono">SAVE10</span>), and watch subtotal, tax, and total recalculate instantly.</p>
+    </div>
+
+    <div class="split">
+      <div>
+        <div class="grid grid-3">
+          <div class="card prod" ng-repeat="p in products">
+            <div class="thumb" ng-style="{background:p.color}"></div>
+            <strong>{{ p.name }}</strong>
+            <span class="muted mono">{{ money(p.price) }}</span>
+            <button class="btn btn-primary btn-sm" ng-click="add(p)">Add to cart</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Cart <span class="tag">{{ count() }} items</span></h3>
+        <p class="empty" ng-if="cart.length===0">Cart is empty. Add something.</p>
+        <div class="line" ng-repeat="l in cart">
+          <div>
+            <div style="font-size:.88rem;font-weight:600">{{ l.name }}</div>
+            <div class="muted mono" style="font-size:.74rem">{{ money(l.price) }}</div>
+          </div>
+          <div class="qty">
+            <button ng-click="dec(l)">−</button><span class="mono">{{ l.qty }}</span><button ng-click="inc(l)">+</button>
+          </div>
+          <div class="mono">{{ money(l.price*l.qty) }}</div>
+        </div>
+
+        <div class="stack" style="margin-top:1rem" ng-if="cart.length">
+          <div class="row">
+            <input ng-model="coupon" placeholder="Coupon code" style="flex:1">
+            <button class="btn btn-sm" ng-click="applyCoupon()">Apply</button>
+          </div>
+          <div class="spread"><span class="muted">Subtotal</span><span class="mono">{{ money(subtotal()) }}</span></div>
+          <div class="spread" ng-if="discount()"><span class="muted">Discount</span><span class="mono" style="color:var(--ok)">−{{ money(discount()) }}</span></div>
+          <div class="spread"><span class="muted">Tax (8%)</span><span class="mono">{{ money(tax()) }}</span></div>
+          <div class="spread" style="font-weight:700;font-size:1.05rem"><span>Total</span><span class="mono">{{ money(total()) }}</span></div>
+          <button class="btn btn-primary" ng-click="checkout()">Checkout</button>
+          <div class="muted" style="font-size:.78rem" ng-if="msg">{{ msg }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    angular.module("cartApp", []).controller("Ctrl", function ($scope) {
+      $scope.money = (n) => "$" + Number(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      $scope.products = [
+        { id: 1, name: "Starter plan", price: 29, color: "#1f7a4d" },
+        { id: 2, name: "Pro plan", price: 79, color: "#2a7f7a" },
+        { id: 3, name: "Team seat", price: 19, color: "#5a4fcf" },
+        { id: 4, name: "Priority support", price: 49, color: "#b4690e" },
+        { id: 5, name: "Onboarding", price: 199, color: "#b5451f" },
+        { id: 6, name: "Audit add-on", price: 120, color: "#0e7c86" }
+      ];
+      $scope.cart = []; $scope.coupon = ""; $scope.applied = 0; $scope.msg = "";
+      $scope.add = function (p) {
+        const l = $scope.cart.find((x) => x.id === p.id);
+        if (l) l.qty++; else $scope.cart.push({ id: p.id, name: p.name, price: p.price, qty: 1 });
+      };
+      $scope.inc = (l) => l.qty++;
+      $scope.dec = (l) => { l.qty--; if (l.qty <= 0) $scope.cart = $scope.cart.filter((x) => x !== l); };
+      $scope.count = () => $scope.cart.reduce((s, l) => s + l.qty, 0);
+      $scope.subtotal = () => $scope.cart.reduce((s, l) => s + l.price * l.qty, 0);
+      $scope.discount = () => $scope.subtotal() * $scope.applied;
+      $scope.tax = () => ($scope.subtotal() - $scope.discount()) * 0.08;
+      $scope.total = () => $scope.subtotal() - $scope.discount() + $scope.tax();
+      $scope.applyCoupon = function () {
+        if (($scope.coupon || "").toUpperCase() === "SAVE10") { $scope.applied = 0.10; $scope.msg = "Coupon applied: 10% off."; }
+        else { $scope.applied = 0; $scope.msg = "Invalid coupon."; }
+      };
+      $scope.checkout = function () { $scope.msg = "Order placed — " + $scope.money($scope.total()) + " charged (demo)."; $scope.cart = []; $scope.applied = 0; };
+    });
+  </script>
+</body>
+</html>

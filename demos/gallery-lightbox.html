@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/portfolio/">
+  <title>HTML5 · Filterable gallery + lightbox</title>
+  <link rel="stylesheet" href="demos/assets/demo.css">
+  <style>
+    [data-accent]{--accent:#0b7285;--accent-lt:#def1f4;}
+    .gal { columns:4 180px; column-gap:.8rem; }
+    .gal figure { break-inside:avoid; margin:0 0 .8rem; border-radius:12px; overflow:hidden; cursor:pointer; position:relative; }
+    .gal .tile { display:grid; place-items:center; color:#fff; font-family:var(--serif); font-size:1.3rem; }
+    .gal figcaption { position:absolute; left:0; right:0; bottom:0; background:linear-gradient(transparent,rgba(0,0,0,.6)); color:#fff; font-size:.76rem; padding:1.2rem .6rem .5rem; }
+    .lb { position:fixed; inset:0; background:rgba(14,14,12,.85); display:grid; place-items:center; z-index:40; padding:1rem; }
+    .lb .frame { max-width:560px; width:100%; }
+    .lb .big { height:320px; border-radius:14px; display:grid; place-items:center; color:#fff; font-family:var(--serif); font-size:2rem; }
+    .lb .ctl { display:flex; justify-content:space-between; margin-top:.8rem; color:#fff; }
+    .lb button { background:#fff; border:0; border-radius:8px; padding:.5rem .9rem; cursor:pointer; font:inherit; font-weight:600; }
+  </style>
+</head>
+<body data-accent>
+  <nav class="dnav">
+    <a class="brand" href="demos/">Rakesh<span>·</span>demos</a>
+    <div class="links"><a href="demos/">All demos</a><a href="./">Portfolio</a><a href="resume.html">Résumé</a></div>
+  </nav>
+  <div class="dwrap">
+    <div class="dhead">
+      <div class="eyebrow">HTML5 · CSS columns · lightbox</div>
+      <h1>Masonry gallery</h1>
+      <p class="lede">A CSS-columns masonry layout with category filters and a keyboard-navigable lightbox (← → and Esc). Thumbnails are generated gradients, so it stays offline.</p>
+    </div>
+    <div class="tabs" id="filters">
+      <button class="on" data-f="all">All</button><button data-f="UI">UI</button><button data-f="Brand">Brand</button><button data-f="Data">Data</button>
+    </div>
+    <div class="gal" id="gal"></div>
+  </div>
+  <div class="lb" id="lb" hidden>
+    <div class="frame">
+      <div class="big" id="big"></div>
+      <div class="ctl"><button id="prev">← Prev</button><span id="cap" class="mono"></span><button id="next">Next →</button></div>
+      <div style="text-align:center;margin-top:.6rem"><button id="close">Close (Esc)</button></div>
+    </div>
+  </div>
+  <script>
+    const cats = ["UI", "Brand", "Data"];
+    const grad = (i) => `linear-gradient(135deg,hsl(${i * 37 % 360} 55% 45%),hsl(${(i * 37 + 60) % 360} 55% 55%))`;
+    const items = Array.from({ length: 16 }, (_, i) => ({ id: i + 1, cat: cats[i % 3], h: 120 + (i % 4) * 40, title: cats[i % 3] + " concept " + (i + 1) }));
+    let filter = "all", visible = [];
+    function render() {
+      visible = items.filter((it) => filter === "all" || it.cat === filter);
+      document.getElementById("gal").innerHTML = visible.map((it, idx) =>
+        `<figure data-i="${idx}"><div class="tile" style="height:${it.h}px;background:${grad(it.id)}">${it.id}</div><figcaption>${it.title}</figcaption></figure>`).join("");
+    }
+    document.getElementById("filters").addEventListener("click", (e) => {
+      const b = e.target.closest("button"); if (!b) return;
+      [...e.currentTarget.children].forEach((x) => x.classList.toggle("on", x === b));
+      filter = b.dataset.f; render();
+    });
+    let cur = 0;
+    const lb = document.getElementById("lb");
+    function openAt(i) { cur = i; const it = visible[i]; document.getElementById("big").style.background = grad(it.id); document.getElementById("big").textContent = it.id; document.getElementById("cap").textContent = it.title + " · " + (i + 1) + "/" + visible.length; lb.hidden = false; }
+    document.getElementById("gal").addEventListener("click", (e) => { const f = e.target.closest("figure"); if (f) openAt(+f.dataset.i); });
+    document.getElementById("next").onclick = () => openAt((cur + 1) % visible.length);
+    document.getElementById("prev").onclick = () => openAt((cur - 1 + visible.length) % visible.length);
+    document.getElementById("close").onclick = () => lb.hidden = true;
+    lb.addEventListener("click", (e) => { if (e.target === lb) lb.hidden = true; });
+    window.addEventListener("keydown", (e) => { if (lb.hidden) return; if (e.key === "Escape") lb.hidden = true; if (e.key === "ArrowRight") document.getElementById("next").click(); if (e.key === "ArrowLeft") document.getElementById("prev").click(); });
+    render();
+  </script>
+</body>
+</html>

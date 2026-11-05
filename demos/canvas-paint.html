@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/portfolio/">
+  <title>HTML5 · Canvas paint</title>
+  <link rel="stylesheet" href="demos/assets/demo.css">
+  <style>
+    [data-accent]{--accent:#7048e8;--accent-lt:#efe9fd;}
+    canvas { width:100%; height:420px; background:#fff; border:1px solid var(--rule); border-radius:12px; touch-action:none; cursor:crosshair; display:block; }
+    .sw { width:26px;height:26px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--rule);cursor:pointer; }
+    .sw.on { box-shadow:0 0 0 2px var(--accent); }
+  </style>
+</head>
+<body data-accent>
+  <nav class="dnav">
+    <a class="brand" href="demos/">Rakesh<span>·</span>demos</a>
+    <div class="links"><a href="demos/">All demos</a><a href="./">Portfolio</a><a href="resume.html">Résumé</a></div>
+  </nav>
+  <div class="dwrap">
+    <div class="dhead">
+      <div class="eyebrow">HTML5 · Canvas 2D · pointer events</div>
+      <h1>Sketch pad</h1>
+      <p class="lede">Draw with the mouse or finger. Pick a color and brush size, undo your last stroke, clear, or export the canvas as a PNG — all with the Canvas 2D API.</p>
+    </div>
+    <div class="toolbar">
+      <div class="row" id="swatches"></div>
+      <label class="field">Brush<input id="size" type="range" min="1" max="40" value="6"></label>
+      <button class="btn" id="undo">Undo</button>
+      <button class="btn" id="clear">Clear</button>
+      <button class="btn btn-primary right" id="save">Export PNG</button>
+    </div>
+    <canvas id="c"></canvas>
+  </div>
+  <script>
+    const canvas = document.getElementById("c");
+    const ctx = canvas.getContext("2d");
+    function fit() {
+      const r = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      const img = ctx.getImageData ? null : null;
+      canvas.width = r.width * dpr; canvas.height = r.height * dpr;
+      ctx.scale(dpr, dpr); ctx.lineCap = "round"; ctx.lineJoin = "round";
+      redraw();
+    }
+    let color = "#7048e8", size = 6, drawing = false, strokes = [], cur = null;
+    const colors = ["#0e0e0c", "#c0392b", "#b4690e", "#1f8a5b", "#2b6cb0", "#7048e8", "#c2255c"];
+    const host = document.getElementById("swatches");
+    colors.forEach((c, i) => {
+      const s = document.createElement("div");
+      s.className = "sw" + (i === 5 ? " on" : "");
+      s.style.background = c;
+      s.onclick = () => { color = c; [...host.children].forEach((x) => x.classList.remove("on")); s.classList.add("on"); };
+      host.appendChild(s);
+    });
+    document.getElementById("size").oninput = (e) => size = +e.target.value;
+    function pos(e) { const r = canvas.getBoundingClientRect(); const p = e.touches ? e.touches[0] : e; return { x: p.clientX - r.left, y: p.clientY - r.top }; }
+    function start(e) { drawing = true; cur = { color, size, pts: [pos(e)] }; e.preventDefault(); }
+    function move(e) { if (!drawing) return; cur.pts.push(pos(e)); redraw(cur); e.preventDefault(); }
+    function end() { if (drawing && cur) strokes.push(cur); drawing = false; cur = null; }
+    function line(s) { ctx.strokeStyle = s.color; ctx.lineWidth = s.size; ctx.beginPath(); s.pts.forEach((p, i) => i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)); ctx.stroke(); }
+    function redraw(extra) { const r = canvas.getBoundingClientRect(); ctx.clearRect(0, 0, r.width, r.height); strokes.forEach(line); if (extra) line(extra); }
+    canvas.addEventListener("mousedown", start); canvas.addEventListener("mousemove", move); window.addEventListener("mouseup", end);
+    canvas.addEventListener("touchstart", start); canvas.addEventListener("touchmove", move); window.addEventListener("touchend", end);
+    document.getElementById("undo").onclick = () => { strokes.pop(); redraw(); };
+    document.getElementById("clear").onclick = () => { strokes = []; redraw(); };
+    document.getElementById("save").onclick = () => {
+      const a = document.createElement("a"); a.download = "sketch.png"; a.href = canvas.toDataURL("image/png"); a.click();
+    };
+    window.addEventListener("resize", fit); fit();
+  </script>
+</body>
+</html>

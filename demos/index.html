@@ -5,42 +5,40 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <base href="/portfolio/">
   <title>Demos — Rakesh Kumar</title>
+  <meta name="description" content="37 interactive front-end, SharePoint, and full-stack demos.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lora:wght@600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --ivory:#faf9f5; --parchment:#f2efe4; --rule:#e8e4da; --text:#0e0e0c;
-      --sub:#6b6b68; --orange:#c96442; --orange-lt:#faeae3;
-      --mono:'JetBrains Mono',monospace; --serif:'Lora',Georgia,serif; --sans:'Inter',system-ui,sans-serif;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: var(--sans); background: var(--ivory); color: var(--text); line-height: 1.6; }
-    a { color: var(--orange); text-decoration: none; }
-    .topnav {
-      position: sticky; top: 0; z-index: 5; background: rgba(250,249,245,.92);
-      backdrop-filter: blur(10px); border-bottom: 1px solid var(--rule);
-      padding: .75rem 2rem; display: flex; justify-content: space-between; align-items: center; gap: 1rem;
-    }
-    .nav-brand { font-family: var(--serif); font-weight: 700; color: var(--text); }
-    .nav-links { display: flex; gap: .35rem; flex-wrap: wrap; }
-    .nav-link { font-size: .8rem; color: var(--sub); padding: .3rem .7rem; }
-    .wrap { max-width: 960px; margin: 0 auto; padding: 2.5rem 1.5rem 3rem; }
-    .eyebrow { font-size: .68rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--orange); }
-    h1 { font-family: var(--serif); font-size: 2.3rem; letter-spacing: -.02em; margin: .4rem 0 .6rem; }
-    .lede { color: var(--sub); max-width: 40rem; margin-bottom: 1.5rem; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-    .card {
-      background: #fff; border: 1px solid var(--rule); border-radius: 12px; padding: 1.2rem 1.25rem;
-      display: flex; flex-direction: column; gap: .45rem; min-height: 220px; color: inherit;
-    }
-    .card:hover { border-color: #d4cfbf; box-shadow: 0 8px 24px rgba(14,14,12,.06); }
-    .tag { font-family: var(--mono); font-size: .68rem; color: var(--orange); letter-spacing: .04em; }
-    h2 { font-size: 1.2rem; }
-    p { color: var(--sub); font-size: .9rem; flex: 1; }
-    .go { font-weight: 700; }
-    .swatch { height: 8px; border-radius: 99px; margin-bottom: .35rem; }
-    @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } .topnav { padding: .75rem 1rem; } }
+    :root { --ivory:#faf9f5; --parchment:#f2efe4; --rule:#e8e4da; --text:#0e0e0c; --sub:#6b6b68; --accent:#c96442;
+      --mono:'JetBrains Mono',monospace; --serif:'Lora',Georgia,serif; --sans:'Inter',system-ui,sans-serif; }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:var(--sans); background:var(--ivory); color:var(--text); line-height:1.6; }
+    a { color:var(--accent); text-decoration:none; }
+    .topnav { position:sticky; top:0; z-index:5; background:rgba(250,249,245,.93); backdrop-filter:blur(10px); border-bottom:1px solid var(--rule); padding:.75rem 2rem; display:flex; justify-content:space-between; align-items:center; gap:1rem; }
+    .nav-brand { font-family:var(--serif); font-weight:700; color:var(--text); }
+    .nav-links { display:flex; gap:.35rem; flex-wrap:wrap; }
+    .nav-link { font-size:.8rem; color:var(--sub); padding:.3rem .7rem; }
+    .wrap { max-width:1080px; margin:0 auto; padding:2.4rem 1.5rem 3rem; }
+    .eyebrow { font-family:var(--mono); font-size:.68rem; font-weight:500; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); }
+    h1 { font-family:var(--serif); font-size:2.3rem; letter-spacing:-.02em; margin:.35rem 0 .5rem; }
+    .lede { color:var(--sub); max-width:46rem; }
+    .jump { display:flex; gap:.4rem; flex-wrap:wrap; margin:1.3rem 0 .5rem; }
+    .jump a { font-size:.78rem; font-weight:600; border:1px solid var(--rule); border-radius:999px; padding:.3rem .8rem; color:var(--sub); }
+    .jump a:hover { border-color:var(--accent); color:var(--accent); text-decoration:none; }
+    .cat { margin-top:2.2rem; scroll-margin-top:70px; }
+    .cat-head { display:flex; align-items:baseline; gap:.7rem; margin-bottom:1rem; border-bottom:1px solid var(--rule); padding-bottom:.5rem; }
+    .cat-head h2 { font-family:var(--serif); font-size:1.4rem; }
+    .cat-head .count { font-family:var(--mono); font-size:.72rem; color:var(--sub); }
+    .dgrid { display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:1rem; }
+    .dcard { background:#fff; border:1px solid var(--rule); border-radius:12px; padding:1.1rem 1.15rem; display:flex; flex-direction:column; gap:.4rem; color:inherit; transition:.15s; }
+    .dcard:hover { border-color:#d4cfbf; box-shadow:0 10px 26px rgba(14,14,12,.08); transform:translateY(-1px); text-decoration:none; }
+    .swatch { height:7px; width:48px; border-radius:999px; }
+    .tag { font-family:var(--mono); font-size:.64rem; color:var(--sub); letter-spacing:.03em; text-transform:uppercase; }
+    .dcard h3 { font-size:1.05rem; }
+    .dcard p { font-size:.84rem; color:var(--sub); flex:1; }
+    .go { font-weight:700; font-size:.82rem; }
+    .footer { border-top:1px solid var(--rule); color:var(--sub); font-size:.8rem; padding:1.4rem 2rem; text-align:center; margin-top:2.5rem; }
+    @media(max-width:600px){ .topnav{padding:.75rem 1rem;} }
   </style>
 </head>
 <body>
@@ -54,60 +52,293 @@
     </div>
   </nav>
   <div class="wrap">
-    <div class="eyebrow">For review</div>
+    <div class="eyebrow">For review · 37 interactive demos</div>
     <h1>Works you can click</h1>
-    <p class="lede">Interactive proofs for the brief — AngularJS, HTML5/CSS, and SharePoint-style pages — plus a few set pieces you can play with. Nothing here needs a lab login.</p>
-    <div class="grid">
-      <a class="card" href="demos/angular-console.html">
-        <div class="swatch" style="background:#d6f25c"></div>
-        <div class="tag">ANGULARJS 1.8 · HTML5 · CSS</div>
-        <h2>Runboard</h2>
-        <p>Search the run list, open a result, and add a scenario. Progress ticks while you stay on the page.</p>
-        <span class="go">Open console →</span>
-      </a>
-      <a class="card" href="demos/sharepoint-site.html">
-        <div class="swatch" style="background:#0f6e78"></div>
-        <div class="tag">SHAREPOINT-STYLE SITE</div>
-        <h2>Northline intranet</h2>
-        <p>Edit page, reorder web parts, filter the document library, and open the lab calendar.</p>
-        <span class="go">Open site →</span>
-      </a>
-      <a class="card" href="demos/fiber-map.html">
-        <div class="swatch" style="background:#e7a15a"></div>
-        <div class="tag">HTML5 · SVG · PLAN / COMMIT</div>
-        <h2>Fiber map</h2>
-        <p>Click two ports, plan a cross-connect, then commit. Light travels the live fiber.</p>
-        <span class="go">Open map →</span>
-      </a>
-      <a class="card" href="demos/page-studio.html">
-        <div class="swatch" style="background:#9a3412"></div>
-        <div class="tag">WEB PARTS · DRAG AND DROP</div>
-        <h2>Page studio</h2>
-        <p>Drag hero, news, KPIs, and people onto a blank page. Remove any part. This is the editor view.</p>
-        <span class="go">Open studio →</span>
-      </a>
-      <a class="card" href="demos/handshake.html">
-        <div class="swatch" style="background:#f0b45a"></div>
-        <div class="tag">HTML5 · CSS MOTION</div>
-        <h2>Handshake theater</h2>
-        <p>Play a TLS 1.3 flight. Packets cross the stage. Scrub any step.</p>
-        <span class="go">Play it →</span>
-      </a>
-      <a class="card" href="resume.html">
-        <div class="swatch" style="background:#c96442"></div>
-        <div class="tag">HTML5 · CSS · PRINT</div>
-        <h2>Interactive résumé</h2>
-        <p>The long-form résumé, with a PDF download of the same layout.</p>
-        <span class="go">Open résumé →</span>
-      </a>
-      <a class="card" href="review.html">
-        <div class="swatch" style="background:#0e0e0c"></div>
-        <div class="tag">BROADER WORK</div>
-        <h2>Review pack</h2>
-        <p>Networking, lab platforms, MCP, and CapEx — context around the UI samples.</p>
-        <span class="go">Open review →</span>
-      </a>
+    <p class="lede">Built for the brief — AngularJS, HTML5/CSS, and SharePoint-style pages — plus full-stack and systems set pieces. Every demo is live and self-contained; nothing needs a login.</p>
+    <div class="jump">
+      <a href="#angularjs">AngularJS (12)</a><a href="#html5-and-css">HTML5 &amp; CSS (9)</a><a href="#sharepoint">SharePoint (5)</a><a href="#full-stack-and-modern-js">Full-stack &amp; modern JS (9)</a><a href="#systems-and-networking">Systems &amp; networking (2)</a>
     </div>
+    
+      <section class="cat" id="angularjs">
+        <div class="cat-head"><h2>AngularJS</h2><span class="count">12 demos</span></div>
+        <div class="dgrid">
+        <a class="dcard" href="angular-console.html">
+          <span class="swatch" style="background:#0e7c86"></span>
+          <span class="tag">AngularJS 1.8 · HTML5 · CSS</span>
+          <h3>Runboard console</h3>
+          <p>Live run console — filters, ng-repeat list, detail selection, and a form that queues a scenario with no reload.</p>
+          <span class="go">Open →</span>
+        </a>
+        <a class="dcard" href="ng-crud.html">
+          <span class="swatch" style="background:#2a7f7a"></span>
+          <span class="tag">AngularJS · CRUD · sort · paginate</span>
+          <h3>Inventory CRUD grid</h3>
+          <p>Create, read, update, delete over a data grid with search, column sort, status filter, and pagination.</p>
+          <span class="go">Open →</span>
+        </a>
+        <a class="dcard" href="ng-forms.html">
+          <span class="swatch" style="background:#5a4fcf"></span>
+          <span class="tag">AngularJS · ngForm · custom directive</span>
+          <h3>Forms &amp; validation</h3>
+          <p>Required, email, length, and match rules plus a custom password-strength directive and a live validity summary.</p>
+          <span class="go">Open →</span>
+        </a>
+        <a class="dcard" href="ng-kanban.html">
+          <span class="swatch" style="background:#0e7c86"></span>
+          <span class="tag">AngularJS · drag &amp; drop</span>
+          <h3>Kanban board</h3>
+          <p>Drag cards across columns (or use arrows), add tasks, and watch WIP counts update live.</p>
+          <span class="go">Open →</span>
+        </a>
+        <a class="dcard" href="ng-dashboard.html">
+          <span class="swatch" style="background:#b5451f"></span>
+          <span class="tag">AngularJS · SVG charts</span>
+          <h3>Analytics dashboard</h3>
+          <p>KPI cards, a bar chart, and an SVG donut that all recompute when you change range or region.</p>
+          <span class="go">Open →</span>
+        </a>
+        <a class="dcard" href="ng-cart.html">
+          <span class="swatch" style="background:#1f7a4d"></span>
+          <span class="tag">AngularJS · computed totals</span>
+          <h3>Shopping cart</h3>
+          <p>Add products, change quantities, apply a coupon, and watch subtotal, tax, and total recalculate instantly.</p>
+          <span class="go">Open →</span>
+        </a>
+        <a class="dcard" href="ng-typeahead.html">
+          <span class="swatch" style="background:#3b5bdb"></span>
+          <span class="tag">AngularJS · $q · debounce</span>
+          <h3>Debounced typeahead</h3>
+          <p>Search a mock service with debounce, a simulated network delay, highlighted matches, and keyboard nav.</p>
+          <span class="go">Open →</span>
+        </a>
+        <a class="dcard" href="ng-wizard.html">
+          <span class="swatch" style="background:#8a3ffc"></span>
+          <span class="tag">AngularJS · stepper</span>
+          <h3>Multi-step wizard</h3>
+          <p>A four-step flow with per-step validation gating and a final review summary.</p>
+          <span class="go">Open →</span>
+        </a>
+        <a class="dcard" href="ng-todo.html">
+          <span class="swatch" style="background:#0b7285"></span>
+          <span class="tag">AngularJS · filters · localStorage</span>
+          <h3>Task list</h3>
+          <p>Add, complete, edit, and filter tasks with a counter — persisted to localStorage across reloads.</p>
+          <span class="go">Open →</span>
+        </a>
+        <a class="dcard" href="ng-invoice.html">
+          <span class="swatch" style="background:#495057"></span>
+          <span class="tag">AngularJS · computed · print</span>
+          <h3>Invoice builder</h3>
+          <p>Add line items; amounts, subtotal, tax, and total recompute live. Print to a clean PDF layout.</p>
+          <span class="go">Open →</span>
+        </a>
+        <a class="dcard" href="ng-tickets.html">
+          <span class="swatch" style="background:#c2255c"></span>
+          <span class="tag">AngularJS · master-detail</span>
+          <h3>Support desk</h3>
+          <p>Master-detail ticket tracker — filter, open a thread, reply, and change status.</p>
+          <span class="go">Open →</span>
+        </a>
+        <a class="dcard" href="ng-directives.html">
+          <span class="swatch" style="background:#2b6cb0"></span>
+          <span class="tag">AngularJS · isolate scope</span>
+          <h3>Reusable directives</h3>
+          <p>Four custom directives built from scratch — star rating, toggle, tabs, accordion — each with its own scope.</p>
+          <span class="go">Open →</span>
+        </a></div>
+      </section>
+      <section class="cat" id="html5-and-css">
+        <div class="cat-head"><h2>HTML5 &amp; CSS</h2><span class="count">9 demos</span></div>
+        <div class="dgrid">
+        <a class="dcard" href="css-grid-dashboard.html">
+          <span class="swatch" style="background:#2f6f4f"></span>
+          <span class="tag">CSS Grid · responsive</span>
+          <h3>CSS Grid dashboard</h3>
+          <p>A responsive admin layout built with CSS Grid areas and auto-fit cards; collapses cleanly on mobile.</p>
+          <span class="go">Open →</span>
+        </a>
+        <a class="dcard" href="canvas-paint.html">
+          <span class="swatch" style="background:#7048e8"></span>
+          <span class="tag">Canvas 2D · pointer events</span>
+          <h3>Canvas sketch pad</h3>
+          <p>Draw with mouse or touch, pick color and brush, undo, clear, and export the canvas as a PNG.</p>
+          <span class="go">Open →</span>
+        </a>
+        <a class="dcard" href="canvas-charts.html">
+          <span class="swatch" style="background:#e8590c"></span>
+          <span class="tag">Canvas 2D · animated</span>
+          <h3>Charts without a library</h3>
+          <p>An animated line chart and bar chart drawn straight onto a canvas with axes and a hover tooltip.</p>
+          <span class="go">Open →</span>
+        </a>
+        <a class="dcard" href="svg-orgchart.html">
+          <span class="swatch" style="background:#1098ad"></span>
+          <span class="tag">SVG · recursive layout</span>
+          <h3>Interactive SVG org chart</h3>
+          <p>A hierarchy rendered as SVG with a recursive layout; click any node to collapse or expand its branch.</p>
+          <span class="go">Open →</span>
+        </a>
+        <a class="dcard" href="css-components.html">
+          <span class="swatch" style="background:#d6336c"></span>
+          <span class="tag">CSS-first · minimal JS</span>
+          <h3>Component kit</h3>
+          <p>Tabs, modal, toast, accordion, chips, segmented control, and a pure-CSS tooltip — reusable pieces.</p>
+          <span class="go">Open →</span>
+        </a>
+        <a class="dcard" href="theme-switcher.html">
+          <span class="swatch" style="background:#0ca678"></span>
+          <span class="tag">CSS variables · persisted</span>
+          <h3>Live theming</h3>
+          <p>Flip dark mode and pick an accent; everything retokens instantly and your choice is saved.</p>
+          <span class="go">Open →</span>
+        </a>
+        <a class="dcard" href="pricing-table.html">
+          <span class="swatch" style="background:#4263eb"></span>
+          <span class="tag">responsive · annual toggle</span>
+          <h3>Pricing table</h3>
+          <p>Three tiers with a monthly/annual toggle that recalculates every price; single column on mobile.</p>
+          <span class="go">Open →</span>
+        </a>
+        <a class="dcard" href="css-animations.html">
+          <span class="swatch" style="background:#f76707"></span>
+          <span class="tag">CSS keyframes · transforms</span>
+          <h3>Animation gallery</h3>
+          <p>Eight self-contained CSS animations — keyframes, transforms, and staggered delays, zero JS motion.</p>
+          <span class="go">Open →</span>
+        </a>
+        <a class="dcard" href="gallery-lightbox.html">
+          <span class="swatch" style="background:#0b7285"></span>
+          <span class="tag">CSS columns · lightbox</span>
+          <h3>Masonry gallery</h3>
+          <p>A CSS-columns masonry grid with category filters and a keyboard-navigable lightbox.</p>
+          <span class="go">Open →</span>
+        </a></div>
+      </section>
+      <section class="cat" id="sharepoint">
+        <div class="cat-head"><h2>SharePoint</h2><span class="count">5 demos</span></div>
+        <div class="dgrid">
+        <a class="dcard" href="sharepoint-site.html">
+          <span class="swatch" style="background:#0f6e78"></span>
+          <span class="tag">site pages · web parts</span>
+          <h3>Team site</h3>
+          <p>Intranet page model with hub nav, hero, web parts, document library, and a lab calendar — editable.</p>
+          <span class="go">Open →</span>
+        </a>
+        <a class="dcard" href="sp-list.html">
+          <span class="swatch" style="background:#0f6e78"></span>
+          <span class="tag">views · grouping · inline edit</span>
+          <h3>List with custom views</h3>
+          <p>A SharePoint-style list: switch views, group by a column, filter, sort, edit a cell inline, add items.</p>
+          <span class="go">Open →</span>
+        </a>
+        <a class="dcard" href="sp-approvals.html">
+          <span class="swatch" style="background:#0f6e78"></span>
+          <span class="tag">multi-stage approval</span>
+          <h3>Approval workflow</h3>
+          <p>Requests flow Manager → Finance → Procurement; approve or reject each stage and watch lanes update.</p>
+          <span class="go">Open →</span>
+        </a>
+        <a class="dcard" href="sp-calendar.html">
+          <span class="swatch" style="background:#0f6e78"></span>
+          <span class="tag">events web part</span>
+          <h3>Events calendar</h3>
+          <p>A month grid with events; click a day to add one, switch months with the arrows.</p>
+          <span class="go">Open →</span>
+        </a>
+        <a class="dcard" href="page-studio.html">
+          <span class="swatch" style="background:#9a3412"></span>
+          <span class="tag">drag-and-drop web parts</span>
+          <h3>Page studio</h3>
+          <p>Compose a page from a palette of web parts — drag or click to place hero, news, KPIs, people.</p>
+          <span class="go">Open →</span>
+        </a></div>
+      </section>
+      <section class="cat" id="full-stack-and-modern-js">
+        <div class="cat-head"><h2>Full-stack &amp; modern JS</h2><span class="count">9 demos</span></div>
+        <div class="dgrid">
+        <a class="dcard" href="react-dashboard.html">
+          <span class="swatch" style="background:#087f5b"></span>
+          <span class="tag">React 18 · hooks · useMemo</span>
+          <h3>React dashboard</h3>
+          <p>A React app with useState/useMemo and a memoized KPI view; filter and sort the team live.</p>
+          <span class="go">Open →</span>
+        </a>
+        <a class="dcard" href="vue-board.html">
+          <span class="swatch" style="background:#2f9e44"></span>
+          <span class="tag">Vue 3 · reactive · computed</span>
+          <h3>Vue habit tracker</h3>
+          <p>A Vue 3 app with reactive state and computed stats; toggle days and add habits, rate updates live.</p>
+          <span class="go">Open →</span>
+        </a>
+        <a class="dcard" href="api-explorer.html">
+          <span class="swatch" style="background:#1864ab"></span>
+          <span class="tag">mock backend · fetch</span>
+          <h3>REST API explorer</h3>
+          <p>A Postman-style client against an in-page mock REST server — pick an endpoint, send, inspect JSON + status.</p>
+          <span class="go">Open →</span>
+        </a>
+        <a class="dcard" href="chat-ui.html">
+          <span class="swatch" style="background:#5f3dc4"></span>
+          <span class="tag">simulated realtime</span>
+          <h3>Realtime chat UI</h3>
+          <p>A chat UI with a mocked agent that types before replying — the WebSocket pattern, offline.</p>
+          <span class="go">Open →</span>
+        </a>
+        <a class="dcard" href="datatable-api.html">
+          <span class="swatch" style="background:#0b7285"></span>
+          <span class="tag">server-side paging</span>
+          <h3>Server-paged table</h3>
+          <p>500 rows behind a mock API doing search, sort, and pagination server-side; the client holds one page.</p>
+          <span class="go">Open →</span>
+        </a>
+        <a class="dcard" href="auth-flow.html">
+          <span class="swatch" style="background:#364fc7"></span>
+          <span class="tag">mock JWT · session</span>
+          <h3>Authentication flow</h3>
+          <p>Register or log in against a mock auth service that mints a JWT, gating a protected dashboard.</p>
+          <span class="go">Open →</span>
+        </a>
+        <a class="dcard" href="notes-crud.html">
+          <span class="swatch" style="background:#e8590c"></span>
+          <span class="tag">CRUD · tags · persistence</span>
+          <h3>Notes app</h3>
+          <p>Create, edit, tag, search, and delete notes with autosave to localStorage.</p>
+          <span class="go">Open →</span>
+        </a>
+        <a class="dcard" href="analytics-live.html">
+          <span class="swatch" style="background:#2b8a3e"></span>
+          <span class="tag">polling · sparklines</span>
+          <h3>Live analytics</h3>
+          <p>A dashboard that polls a mock metrics feed each second — KPIs tick, sparklines scroll, events stream.</p>
+          <span class="go">Open →</span>
+        </a>
+        <a class="dcard" href="file-upload.html">
+          <span class="swatch" style="background:#1971c2"></span>
+          <span class="tag">drag-drop · progress</span>
+          <h3>File uploader</h3>
+          <p>Drag files in, validate by size and type, then watch a simulated upload with a cancelable progress bar.</p>
+          <span class="go">Open →</span>
+        </a></div>
+      </section>
+      <section class="cat" id="systems-and-networking">
+        <div class="cat-head"><h2>Systems &amp; networking</h2><span class="count">2 demos</span></div>
+        <div class="dgrid">
+        <a class="dcard" href="fiber-map.html">
+          <span class="swatch" style="background:#e7a15a"></span>
+          <span class="tag">SVG · plan / commit</span>
+          <h3>Fiber map</h3>
+          <p>Pick two ports, plan a cross-connect, commit it, and watch the light travel the live fiber.</p>
+          <span class="go">Open →</span>
+        </a>
+        <a class="dcard" href="handshake.html">
+          <span class="swatch" style="background:#f0b45a"></span>
+          <span class="tag">TLS 1.3 · CSS motion</span>
+          <h3>Handshake theater</h3>
+          <p>Play a TLS 1.3 flight into the first HTTP/3 response, or scrub any step.</p>
+          <span class="go">Open →</span>
+        </a></div>
+      </section>
   </div>
+  <div class="footer">© 2026 Rakesh Kumar · 37 demos · <a href="./">portfolio</a></div>
 </body>
 </html>

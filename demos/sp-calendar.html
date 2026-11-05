@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/portfolio/">
+  <title>SharePoint-style · Events calendar</title>
+  <link rel="stylesheet" href="demos/assets/demo.css">
+  <style>
+    [data-accent]{--accent:#0f6e78;--accent-lt:#def0f1;}
+    .sp-top { background:#0b3a4a; color:#fff; padding:.5rem 1rem; }
+    .cal { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
+    .dow { font-size:.72rem; text-transform:uppercase; color:var(--sub); text-align:center; font-weight:700; padding:.3rem 0; }
+    .cell { background:#fff; border:1px solid var(--rule); border-radius:8px; min-height:84px; padding:.3rem; font-size:.74rem; cursor:pointer; }
+    .cell.pad { background:transparent; border:0; cursor:default; }
+    .cell .d { color:var(--sub); font-weight:700; }
+    .cell:hover { border-color:var(--accent); }
+    .ev { background:var(--accent-lt); color:var(--accent); border-radius:4px; padding:.1rem .3rem; margin-top:.2rem; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  </style>
+</head>
+<body data-accent>
+  <nav class="dnav">
+    <a class="brand" href="demos/">Rakesh<span>·</span>demos</a>
+    <div class="links"><a href="demos/">All demos</a><a href="./">Portfolio</a><a href="resume.html">Résumé</a></div>
+  </nav>
+  <div class="sp-top"><strong>Northline Lab ▸ Team calendar</strong></div>
+  <div class="dwrap">
+    <div class="dhead">
+      <div class="eyebrow">SharePoint patterns · events web part</div>
+      <h1>Team calendar</h1>
+      <p class="lede">A month grid with events. Click a day to add an event; it renders in place. Switch months with the arrows. A customization sample, not a Microsoft product.</p>
+    </div>
+    <div class="spread" style="margin-bottom:.8rem">
+      <div class="row"><button class="btn btn-sm" id="prev">‹</button><strong id="label"></strong><button class="btn btn-sm" id="next">›</button></div>
+      <span class="muted" style="font-size:.8rem" id="count"></span>
+    </div>
+    <div class="cal" id="dow"></div>
+    <div class="cal" id="cal" style="margin-top:4px"></div>
+  </div>
+  <script>
+    const dows = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    document.getElementById("dow").innerHTML = dows.map((d) => `<div class="dow">${d}</div>`).join("");
+    let cur = new Date(2026, 10, 1);
+    const events = {
+      "2026-11-06": ["Change window"], "2026-11-12": ["TLS review"],
+      "2026-11-19": ["CapEx sync"], "2026-11-20": ["Fiber audit"]
+    };
+    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    function key(y, m, d) { return `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`; }
+    function render() {
+      const y = cur.getFullYear(), m = cur.getMonth();
+      document.getElementById("label").textContent = months[m] + " " + y;
+      const first = new Date(y, m, 1).getDay();
+      const days = new Date(y, m + 1, 0).getDate();
+      let html = "";
+      for (let i = 0; i < first; i++) html += '<div class="cell pad"></div>';
+      let total = 0;
+      for (let d = 1; d <= days; d++) {
+        const k = key(y, m, d);
+        const evs = events[k] || []; total += evs.length;
+        html += `<div class="cell" data-k="${k}"><div class="d">${d}</div>${evs.map((e) => `<div class="ev">${e}</div>`).join("")}</div>`;
+      }
+      document.getElementById("cal").innerHTML = html;
+      document.getElementById("count").textContent = total + " event(s) this month";
+    }
+    document.getElementById("cal").addEventListener("click", (e) => {
+      const c = e.target.closest(".cell"); if (!c || !c.dataset.k) return;
+      const t = prompt("Event title for " + c.dataset.k + ":");
+      if (t) { (events[c.dataset.k] = events[c.dataset.k] || []).push(t); render(); }
+    });
+    document.getElementById("prev").onclick = () => { cur.setMonth(cur.getMonth() - 1); render(); };
+    document.getElementById("next").onclick = () => { cur.setMonth(cur.getMonth() + 1); render(); };
+    render();
+  </script>
+</body>
+</html>

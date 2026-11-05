@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/portfolio/">
+  <title>HTML5 · Theme switcher</title>
+  <link rel="stylesheet" href="demos/assets/demo.css">
+  <style>
+    [data-accent]{--accent:#0ca678;--accent-lt:#def3ec;}
+    body.dark { --ivory:#15181c; --parchment:#1e232a; --rule:#2c333c; --text:#eef1f4; --sub:#9aa6b2; --accent-lt:#1d3a33; }
+    .preview { border:1px solid var(--rule); border-radius:12px; padding:1.2rem; background:var(--ivory); }
+    .sw { width:30px;height:30px;border-radius:8px;cursor:pointer;border:2px solid transparent; }
+    .sw.on { border-color:var(--text); }
+  </style>
+</head>
+<body data-accent>
+  <nav class="dnav">
+    <a class="brand" href="demos/">Rakesh<span>·</span>demos</a>
+    <div class="links"><a href="demos/">All demos</a><a href="./">Portfolio</a><a href="resume.html">Résumé</a></div>
+  </nav>
+  <div class="dwrap">
+    <div class="dhead">
+      <div class="eyebrow">HTML5 · CSS custom properties · persisted</div>
+      <h1>Live theming</h1>
+      <p class="lede">Flip dark mode and pick an accent — everything retokens instantly through CSS variables. Your choice is saved to <span class="mono">localStorage</span> and restored on reload.</p>
+    </div>
+
+    <div class="toolbar">
+      <button class="btn" id="mode">Toggle dark mode</button>
+      <div class="row right" id="accents"></div>
+    </div>
+
+    <div class="preview">
+      <div class="kpis" style="margin-bottom:1rem">
+        <div class="kpi"><b>128</b><span>Deploys</span></div>
+        <div class="kpi"><b>99.9%</b><span>Uptime</span></div>
+        <div class="kpi"><b>4.8</b><span>Rating</span></div>
+      </div>
+      <div class="card">
+        <h3>Sample card</h3>
+        <p class="muted">Buttons, pills, and inputs all follow the active theme tokens.</p>
+        <div class="row" style="margin-top:.7rem">
+          <button class="btn btn-primary">Primary</button>
+          <button class="btn">Secondary</button>
+          <span class="pill ok">ok</span><span class="pill warn">warn</span><span class="pill accent">accent</span>
+        </div>
+        <div class="row" style="margin-top:.7rem"><input placeholder="Input field" style="flex:1"><button class="btn">Go</button></div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const accents = ["#0ca678", "#c96442", "#5a4fcf", "#2b6cb0", "#c2255c", "#e8590c"];
+    const host = document.getElementById("accents");
+    function apply(a) { document.body.style.setProperty("--accent", a); document.body.style.setProperty("--accent-lt", a + "22"); [...host.children].forEach((s) => s.classList.toggle("on", s.dataset.a === a)); localStorage.setItem("demo_accent", a); }
+    accents.forEach((a) => { const s = document.createElement("div"); s.className = "sw"; s.style.background = a; s.dataset.a = a; s.onclick = () => apply(a); host.appendChild(s); });
+    document.getElementById("mode").onclick = () => { document.body.classList.toggle("dark"); localStorage.setItem("demo_dark", document.body.classList.contains("dark") ? "1" : "0"); };
+    if (localStorage.getItem("demo_dark") === "1") document.body.classList.add("dark");
+    apply(localStorage.getItem("demo_accent") || "#0ca678");
+  </script>
+</body>
+</html>

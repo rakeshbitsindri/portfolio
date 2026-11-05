@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="wizApp">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/portfolio/">
+  <title>AngularJS · Multi-step wizard</title>
+  <link rel="stylesheet" href="demos/assets/demo.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+  <style>
+    [data-accent]{--accent:#8a3ffc;--accent-lt:#f0e9fe;}
+    .steps2 { display:flex; gap:.4rem; margin-bottom:1.3rem; }
+    .steps2 .s { flex:1; text-align:center; font-size:.76rem; color:var(--sub); padding-bottom:.5rem; border-bottom:3px solid var(--rule); }
+    .steps2 .s.on { color:var(--accent); border-color:var(--accent); font-weight:700; }
+    .steps2 .s.done { color:var(--ok); border-color:var(--ok); }
+  </style>
+</head>
+<body data-accent ng-controller="Ctrl">
+  <nav class="dnav">
+    <a class="brand" href="demos/">Rakesh<span>·</span>demos</a>
+    <div class="links"><a href="demos/">All demos</a><a href="./">Portfolio</a><a href="resume.html">Résumé</a></div>
+  </nav>
+  <div class="dwrap">
+    <div class="dhead">
+      <div class="eyebrow">AngularJS 1.8 · stepper · per-step validation</div>
+      <h1>Project onboarding wizard</h1>
+      <p class="lede">A four-step flow with validation gating each step. You cannot advance until the current step is valid; the final step shows a review summary.</p>
+    </div>
+
+    <div class="card" style="max-width:620px">
+      <div class="steps2">
+        <div class="s" ng-repeat="s in labels" ng-class="{on: step===$index, done: step>$index}">{{ $index+1 }}. {{ s }}</div>
+      </div>
+
+      <div ng-switch="step">
+        <div ng-switch-when="0" class="stack">
+          <label class="field">Company<input ng-model="m.company" required></label>
+          <label class="field">Project name<input ng-model="m.project" required></label>
+        </div>
+        <div ng-switch-when="1" class="stack">
+          <label class="field">Primary stack
+            <select ng-model="m.stack"><option value="">Choose…</option><option>AngularJS</option><option>React</option><option>SharePoint</option><option>Full-stack</option></select>
+          </label>
+          <label class="field">Team size<input type="number" min="1" ng-model="m.team"></label>
+        </div>
+        <div ng-switch-when="2" class="stack">
+          <label class="field">Budget / month (₹)<input type="number" min="0" ng-model="m.budget"></label>
+          <label class="field">Start date<input type="date" ng-model="m.start"></label>
+        </div>
+        <div ng-switch-when="3" class="stack">
+          <h3>Review</h3>
+          <div class="card pad-sm" style="background:var(--parchment);border:0">
+            <div class="spread"><span class="muted">Company</span><strong>{{ m.company }}</strong></div>
+            <div class="spread"><span class="muted">Project</span><strong>{{ m.project }}</strong></div>
+            <div class="spread"><span class="muted">Stack</span><strong>{{ m.stack }}</strong></div>
+            <div class="spread"><span class="muted">Team</span><strong>{{ m.team }}</strong></div>
+            <div class="spread"><span class="muted">Budget</span><strong>₹{{ m.budget }}</strong></div>
+            <div class="spread"><span class="muted">Start</span><strong>{{ m.start }}</strong></div>
+          </div>
+          <div class="pill ok" ng-if="submitted">Submitted ✓</div>
+        </div>
+      </div>
+
+      <div class="spread" style="margin-top:1.3rem">
+        <button class="btn" ng-click="prev()" ng-disabled="step===0">Back</button>
+        <button class="btn btn-primary" ng-click="next()" ng-if="step<3" ng-disabled="!valid()">Continue</button>
+        <button class="btn btn-primary" ng-click="finish()" ng-if="step===3">Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    angular.module("wizApp", []).controller("Ctrl", function ($scope) {
+      $scope.labels = ["Company", "Stack", "Budget", "Review"];
+      $scope.step = 0; $scope.m = { stack: "", team: 1 }; $scope.submitted = false;
+      $scope.valid = function () {
+        const m = $scope.m;
+        if ($scope.step === 0) return m.company && m.project;
+        if ($scope.step === 1) return m.stack && m.team > 0;
+        if ($scope.step === 2) return m.budget >= 0 && m.start;
+        return true;
+      };
+      $scope.next = function () { if ($scope.valid() && $scope.step < 3) $scope.step++; };
+      $scope.prev = function () { if ($scope.step > 0) $scope.step--; };
+      $scope.finish = function () { $scope.submitted = true; };
+    });
+  </script>
+</body>
+</html>

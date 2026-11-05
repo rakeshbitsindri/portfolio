@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/portfolio/">
+  <title>HTML5 · Responsive CSS Grid dashboard</title>
+  <link rel="stylesheet" href="demos/assets/demo.css">
+  <style>
+    [data-accent]{--accent:#2f6f4f;--accent-lt:#e4f0ea;}
+    .app { display:grid; grid-template-columns:200px 1fr; grid-template-rows:auto 1fr; gap:0; min-height:calc(100vh - 56px);
+      grid-template-areas:"side top" "side main"; }
+    .side { grid-area:side; background:#fff; border-right:1px solid var(--rule); padding:1rem .75rem; }
+    .side a { display:block; padding:.5rem .6rem; border-radius:8px; color:var(--sub); font-size:.86rem; margin-bottom:.2rem; }
+    .side a.on, .side a:hover { background:var(--accent-lt); color:var(--accent); text-decoration:none; }
+    .top { grid-area:top; background:#fff; border-bottom:1px solid var(--rule); padding:.8rem 1.2rem; display:flex; justify-content:space-between; align-items:center; }
+    .main { grid-area:main; padding:1.2rem; overflow:auto; }
+    .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1rem; }
+    .widgets { display:grid; grid-template-columns:2fr 1fr; gap:1rem; margin-top:1rem; }
+    .toggle { display:none; }
+    @media(max-width:760px){
+      .app{ grid-template-columns:1fr; grid-template-areas:"top" "main"; }
+      .side{ position:fixed; inset:56px auto 0 0; width:200px; transform:translateX(-110%); transition:.2s; z-index:30; height:100%; }
+      .side.show{ transform:none; }
+      .toggle{ display:inline-flex; }
+      .widgets{ grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body data-accent>
+  <nav class="dnav">
+    <a class="brand" href="demos/">Rakesh<span>·</span>demos</a>
+    <div class="links"><a href="demos/">All demos</a><a href="./">Portfolio</a><a href="resume.html">Résumé</a></div>
+  </nav>
+  <div class="app">
+    <aside class="side" id="side">
+      <a class="on" href="#">Overview</a><a href="#">Orders</a><a href="#">Customers</a><a href="#">Products</a><a href="#">Reports</a><a href="#">Settings</a>
+    </aside>
+    <header class="top">
+      <div class="row"><button class="btn btn-sm toggle" onclick="document.getElementById('side').classList.toggle('show')">☰</button><strong>Overview</strong></div>
+      <span class="pill accent">CSS Grid · areas · auto-fit</span>
+    </header>
+    <main class="main">
+      <div class="cards">
+        <div class="kpi"><b>$84.2k</b><span>Revenue (30d)</span></div>
+        <div class="kpi"><b>1,208</b><span>Orders</span></div>
+        <div class="kpi"><b>3.9%</b><span>Conversion</span></div>
+        <div class="kpi"><b>96.4%</b><span>Uptime</span></div>
+      </div>
+      <div class="widgets">
+        <div class="card">
+          <h3>Weekly orders</h3>
+          <div style="display:flex;align-items:flex-end;gap:.5rem;height:160px">
+            <div style="flex:1;background:var(--accent);border-radius:6px 6px 0 0;height:40%"></div>
+            <div style="flex:1;background:var(--accent);border-radius:6px 6px 0 0;height:62%"></div>
+            <div style="flex:1;background:var(--accent);border-radius:6px 6px 0 0;height:55%"></div>
+            <div style="flex:1;background:var(--accent);border-radius:6px 6px 0 0;height:78%"></div>
+            <div style="flex:1;background:var(--accent);border-radius:6px 6px 0 0;height:70%"></div>
+            <div style="flex:1;background:var(--accent);border-radius:6px 6px 0 0;height:92%"></div>
+            <div style="flex:1;background:var(--accent);border-radius:6px 6px 0 0;height:85%"></div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Top products</h3>
+          <div class="stack">
+            <div class="spread"><span>Pro plan</span><span class="mono">412</span></div>
+            <div class="spread"><span>Team seat</span><span class="mono">307</span></div>
+            <div class="spread"><span>Audit add-on</span><span class="mono">188</span></div>
+            <div class="spread"><span>Onboarding</span><span class="mono">96</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:1rem">
+        <h3>Recent orders</h3>
+        <table class="table">
+          <thead><tr><th>Order</th><th>Customer</th><th>Status</th><th class="num">Total</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">#5821</td><td>Acme</td><td><span class="pill ok">Paid</span></td><td class="num">$1,240</td></tr>
+            <tr><td class="mono">#5820</td><td>Northwind</td><td><span class="pill warn">Pending</span></td><td class="num">$79</td></tr>
+            <tr><td class="mono">#5819</td><td>Globex</td><td><span class="pill ok">Paid</span></td><td class="num">$360</td></tr>
+            <tr><td class="mono">#5818</td><td>Initech</td><td><span class="pill bad">Refunded</span></td><td class="num">$49</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

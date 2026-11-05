@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/portfolio/">
+  <title>Full-stack · File upload</title>
+  <link rel="stylesheet" href="demos/assets/demo.css">
+  <style>[data-accent]{--accent:#1971c2;--accent-lt:#e3eefa;}
+    .drop { border:2px dashed #b9c6d6; border-radius:14px; padding:2.2rem 1rem; text-align:center; color:var(--sub); transition:.15s; cursor:pointer; }
+    .drop.over { border-color:var(--accent); background:var(--accent-lt); color:var(--accent); }
+    .file { display:grid; grid-template-columns:1fr auto; gap:.5rem .8rem; align-items:center; padding:.6rem 0; border-bottom:1px solid var(--rule); }
+    .file .bar { grid-column:1 / -1; }
+  </style>
+</head>
+<body data-accent>
+  <nav class="dnav">
+    <a class="brand" href="demos/">Rakesh<span>·</span>demos</a>
+    <div class="links"><a href="demos/">All demos</a><a href="./">Portfolio</a><a href="resume.html">Résumé</a></div>
+  </nav>
+  <div class="dwrap">
+    <div class="dhead">
+      <div class="eyebrow">Full-stack · drag &amp; drop · progress · validation</div>
+      <h1>File uploader</h1>
+      <p class="lede">Drag files in or browse. Each file validates by size and type, then shows a simulated upload with a progress bar you can cancel. No bytes leave your browser.</p>
+    </div>
+    <div class="split">
+      <div>
+        <div class="drop" id="drop">
+          <strong>Drop files here</strong><br><span>or click to browse · max 5 MB each</span>
+          <input type="file" id="input" multiple hidden>
+        </div>
+      </div>
+      <div class="card">
+        <div class="spread"><h3>Queue</h3><span class="tag" id="count">0 files</span></div>
+        <div id="files"></div>
+        <p class="empty" id="empty">Nothing queued yet.</p>
+      </div>
+    </div>
+  </div>
+  <script>
+    const MAX = 5 * 1024 * 1024;
+    const okTypes = ["image/", "text/", "application/pdf", "application/json"];
+    const files = [];
+    const drop = document.getElementById("drop"), input = document.getElementById("input");
+    function human(n) { return n > 1048576 ? (n / 1048576).toFixed(1) + " MB" : (n / 1024).toFixed(0) + " KB"; }
+    function render() {
+      document.getElementById("empty").hidden = files.length > 0;
+      document.getElementById("count").textContent = files.length + " files";
+      document.getElementById("files").innerHTML = files.map((f, i) => `
+        <div class="file">
+          <div><strong style="font-size:.86rem">${f.name}</strong> <span class="muted mono" style="font-size:.72rem">${human(f.size)}</span></div>
+          <div>${f.error ? `<span class="pill bad">${f.error}</span>` : f.done ? '<span class="pill ok">done</span>' : `<button class="btn btn-sm" data-cancel="${i}">cancel</button>`}</div>
+          ${f.error ? "" : `<div class="bar"><i style="width:${f.pct}%"></i></div>`}
+        </div>`).join("");
+    }
+    function add(fileList) {
+      [...fileList].forEach((file) => {
+        const rec = { name: file.name, size: file.size, pct: 0, done: false, error: null, cancelled: false };
+        if (file.size > MAX) rec.error = "too large";
+        else if (!okTypes.some((t) => file.type.startsWith(t) || file.type === t)) rec.error = file.type ? "type blocked" : null;
+        files.push(rec);
+        if (!rec.error) upload(rec);
+      });
+      render();
+    }
+    function upload(rec) {
+      const timer = setInterval(() => {
+        if (rec.cancelled) { clearInterval(timer); return; }
+        rec.pct = Math.min(100, rec.pct + 8 + Math.random() * 12);
+        if (rec.pct >= 100) { rec.done = true; clearInterval(timer); }
+        render();
+      }, 200);
+    }
+    drop.onclick = () => input.click();
+    input.onchange = (e) => add(e.target.files);
+    drop.addEventListener("dragover", (e) => { e.preventDefault(); drop.classList.add("over"); });
+    drop.addEventListener("dragleave", () => drop.classList.remove("over"));
+    drop.addEventListener("drop", (e) => { e.preventDefault(); drop.classList.remove("over"); add(e.dataTransfer.files); });
+    document.getElementById("files").addEventListener("click", (e) => {
+      const i = e.target.getAttribute("data-cancel"); if (i === null) return;
+      files[+i].cancelled = true; files[+i].error = "cancelled"; render();
+    });
+    render();
+  </script>
+</body>
+</html>

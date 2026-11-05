@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/portfolio/">
+  <title>Full-stack · Notes CRUD</title>
+  <link rel="stylesheet" href="demos/assets/demo.css">
+  <style>[data-accent]{--accent:#e8590c;--accent-lt:#fdeadd;}
+    .note { border:1px solid var(--rule); border-radius:10px; padding:.6rem .7rem; cursor:pointer; margin-bottom:.5rem; }
+    .note.on { border-color:var(--accent); background:var(--accent-lt); }
+    .note h4 { font-size:.9rem; } .note p { font-size:.78rem; color:var(--sub); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  </style>
+</head>
+<body data-accent>
+  <nav class="dnav">
+    <a class="brand" href="demos/">Rakesh<span>·</span>demos</a>
+    <div class="links"><a href="demos/">All demos</a><a href="./">Portfolio</a><a href="resume.html">Résumé</a></div>
+  </nav>
+  <div class="dwrap">
+    <div class="dhead">
+      <div class="eyebrow">Full-stack · CRUD · tags · localStorage</div>
+      <h1>Notes app</h1>
+      <p class="lede">Create, edit, tag, search, and delete notes with an autosave to <span class="mono">localStorage</span>. Click a note to edit it; changes persist across reloads.</p>
+    </div>
+    <div class="toolbar">
+      <input id="q" placeholder="Search notes or #tags" style="flex:1;min-width:160px">
+      <button class="btn btn-primary" id="new">+ New note</button>
+    </div>
+    <div class="split">
+      <div id="list"></div>
+      <div class="card">
+        <div id="editor" hidden class="stack">
+          <input id="title" placeholder="Title">
+          <textarea id="bodyText" placeholder="Write something… use #tags inline" style="min-height:160px"></textarea>
+          <div class="spread">
+            <span class="muted mono" id="saved" style="font-size:.74rem"></span>
+            <button class="btn btn-sm btn-danger" id="del">Delete</button>
+          </div>
+        </div>
+        <p class="empty" id="noSel">Select or create a note.</p>
+      </div>
+    </div>
+  </div>
+  <script>
+    const KEY = "demo_notes_v1";
+    let notes = JSON.parse(localStorage.getItem(KEY) || "null") || [
+      { id: 1, title: "AngularJS patterns", body: "Directives, filters, services. #angular #frontend", t: Date.now() },
+      { id: 2, title: "SharePoint hub ideas", body: "Hub nav, web parts, document views. #sharepoint", t: Date.now() }
+    ];
+    let selId = null, q = "";
+    const save = () => localStorage.setItem(KEY, JSON.stringify(notes));
+    const tags = (b) => (b.match(/#[\w-]+/g) || []);
+    function list() {
+      const t = q.toLowerCase();
+      const rows = notes.filter((n) => !t || (n.title + n.body).toLowerCase().includes(t)).sort((a, b) => b.t - a.t);
+      document.getElementById("list").innerHTML = rows.map((n) =>
+        `<div class="note ${n.id === selId ? "on" : ""}" data-id="${n.id}">
+          <h4>${n.title || "Untitled"}</h4><p>${n.body.replace(/</g, "&lt;") || "No content"}</p>
+          <div style="margin-top:.3rem">${tags(n.body).map((x) => `<span class="tag">${x}</span>`).join(" ")}</div>
+        </div>`).join("") || '<p class="empty">No notes match.</p>';
+    }
+    function open(id) {
+      selId = id; const n = notes.find((x) => x.id === id);
+      document.getElementById("noSel").hidden = true;
+      document.getElementById("editor").hidden = false;
+      document.getElementById("title").value = n.title;
+      document.getElementById("bodyText").value = n.body;
+      list();
+    }
+    function persistCurrent() {
+      const n = notes.find((x) => x.id === selId); if (!n) return;
+      n.title = document.getElementById("title").value;
+      n.body = document.getElementById("bodyText").value;
+      n.t = Date.now(); save();
+      document.getElementById("saved").textContent = "Saved " + new Date().toLocaleTimeString();
+      list();
+    }
+    document.getElementById("list").addEventListener("click", (e) => { const d = e.target.closest(".note"); if (d) open(+d.dataset.id); });
+    document.getElementById("new").onclick = () => { const id = Date.now(); notes.unshift({ id, title: "", body: "", t: id }); save(); open(id); document.getElementById("title").focus(); };
+    document.getElementById("title").addEventListener("input", persistCurrent);
+    document.getElementById("bodyText").addEventListener("input", persistCurrent);
+    document.getElementById("del").onclick = () => { notes = notes.filter((x) => x.id !== selId); selId = null; save(); document.getElementById("editor").hidden = true; document.getElementById("noSel").hidden = false; list(); };
+    document.getElementById("q").addEventListener("input", (e) => { q = e.target.value; list(); });
+    list();
+  </script>
+</body>
+</html>

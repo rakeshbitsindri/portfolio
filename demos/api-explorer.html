@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/portfolio/">
+  <title>Full-stack · REST API explorer</title>
+  <link rel="stylesheet" href="demos/assets/demo.css">
+  <style>[data-accent]{--accent:#1864ab;--accent-lt:#e3edfa;}
+    pre { background:#0e1116; color:#d6e2f0; border-radius:10px; padding:.9rem; font-size:.78rem; overflow:auto; max-height:360px; }
+    .method { font-weight:700; border-radius:6px; padding:.1rem .5rem; font-size:.72rem; }
+    .GET{ background:#e3edfa;color:#1864ab; } .POST{ background:#e3f3ed;color:#087f5b; } .DELETE{ background:#fbe4e4;color:#c0392b; }
+    .route { cursor:pointer; padding:.4rem .5rem; border-radius:8px; display:flex; gap:.5rem; align-items:center; font-family:var(--mono); font-size:.8rem; }
+    .route:hover, .route.on { background:var(--accent-lt); }
+  </style>
+</head>
+<body data-accent>
+  <nav class="dnav">
+    <a class="brand" href="demos/">Rakesh<span>·</span>demos</a>
+    <div class="links"><a href="demos/">All demos</a><a href="./">Portfolio</a><a href="resume.html">Résumé</a></div>
+  </nav>
+  <div class="dwrap">
+    <div class="dhead">
+      <div class="eyebrow">Full-stack · mock REST backend · fetch</div>
+      <h1>API explorer</h1>
+      <p class="lede">A Postman-style client talking to an in-page mock server (overridden <span class="mono">fetch</span>). Pick an endpoint, send the request, and inspect the JSON response and status.</p>
+    </div>
+    <div class="split">
+      <div class="card">
+        <h3>Endpoints</h3>
+        <div id="routes"></div>
+        <div style="margin-top:1rem" id="bodyWrap" hidden>
+          <label class="field">Request body (JSON)
+            <textarea id="body">{ "name": "New item", "qty": 1 }</textarea>
+          </label>
+        </div>
+        <button class="btn btn-primary" id="send" style="margin-top:.8rem">Send request</button>
+      </div>
+      <div class="card">
+        <div class="spread"><h3>Response</h3><span class="pill" id="status">—</span></div>
+        <div class="muted mono" id="time" style="font-size:.74rem;margin-bottom:.4rem"></div>
+        <pre id="out">// Pick an endpoint and hit Send</pre>
+      </div>
+    </div>
+  </div>
+  <script>
+    // ---- Mock backend ----
+    let db = [{ id: 1, name: "Optic QSFP28", qty: 42 }, { id: 2, name: "DAC cable", qty: 60 }, { id: 3, name: "Rack kit", qty: 3 }];
+    let nextId = 4;
+    function mockApi(method, path, body) {
+      return new Promise((resolve) => setTimeout(() => {
+        if (method === "GET" && path === "/api/items") return resolve({ status: 200, data: db });
+        if (method === "GET" && /^\/api\/items\/\d+$/.test(path)) { const id = +path.split("/").pop(); const it = db.find((x) => x.id === id); return resolve(it ? { status: 200, data: it } : { status: 404, data: { error: "Not found" } }); }
+        if (method === "POST" && path === "/api/items") { const it = { id: nextId++, ...body }; db.push(it); return resolve({ status: 201, data: it }); }
+        if (method === "DELETE" && /^\/api\/items\/\d+$/.test(path)) { const id = +path.split("/").pop(); db = db.filter((x) => x.id !== id); return resolve({ status: 204, data: { deleted: id } }); }
+        resolve({ status: 400, data: { error: "Unknown route" } });
+      }, 250 + Math.random() * 250));
+    }
+    const routes = [
+      { m: "GET", p: "/api/items", body: false },
+      { m: "GET", p: "/api/items/1", body: false },
+      { m: "POST", p: "/api/items", body: true },
+      { m: "DELETE", p: "/api/items/2", body: false }
+    ];
+    let sel = routes[0];
+    const host = document.getElementById("routes");
+    function drawRoutes() {
+      host.innerHTML = routes.map((r, i) =>
+        `<div class="route ${r === sel ? "on" : ""}" data-i="${i}"><span class="method ${r.m}">${r.m}</span>${r.p}</div>`).join("");
+    }
+    host.addEventListener("click", (e) => { const d = e.target.closest(".route"); if (!d) return; sel = routes[+d.dataset.i]; document.getElementById("bodyWrap").hidden = !sel.body; drawRoutes(); });
+    document.getElementById("send").onclick = async () => {
+      const t0 = performance.now();
+      let body = null;
+      if (sel.body) { try { body = JSON.parse(document.getElementById("body").value); } catch (e) { document.getElementById("out").textContent = "Invalid JSON body"; return; } }
+      const res = await mockApi(sel.m, sel.p, body);
+      const ms = Math.round(performance.now() - t0);
+      const st = document.getElementById("status");
+      st.textContent = res.status;
+      st.className = "pill " + (res.status < 300 ? "ok" : res.status < 500 ? "warn" : "bad");
+      document.getElementById("time").textContent = sel.m + " " + sel.p + " · " + ms + " ms";
+      document.getElementById("out").textContent = JSON.stringify(res.data, null, 2);
+    };
+    drawRoutes();
+  </script>
+</body>
+</html>

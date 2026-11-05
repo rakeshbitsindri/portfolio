@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/portfolio/">
+  <title>Full-stack · Realtime chat UI</title>
+  <link rel="stylesheet" href="demos/assets/demo.css">
+  <style>
+    [data-accent]{--accent:#5f3dc4;--accent-lt:#ece7fb;}
+    .chat { display:flex; flex-direction:column; height:460px; }
+    .msgs { flex:1; overflow:auto; display:flex; flex-direction:column; gap:.5rem; padding:.5rem; }
+    .msg { max-width:78%; padding:.5rem .75rem; border-radius:14px; font-size:.9rem; }
+    .msg.them { background:var(--parchment); align-self:flex-start; border-bottom-left-radius:4px; }
+    .msg.me { background:var(--accent); color:#fff; align-self:flex-end; border-bottom-right-radius:4px; }
+    .msg .t { font-size:.64rem; opacity:.6; margin-top:.2rem; }
+    .typing { align-self:flex-start; color:var(--sub); font-size:.8rem; padding:.2rem .5rem; }
+    .typing i { display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--sub);margin:0 1px;animation:bl 1s infinite; }
+    .typing i:nth-child(2){animation-delay:.2s;} .typing i:nth-child(3){animation-delay:.4s;}
+    @keyframes bl { 0%,100%{opacity:.3;} 50%{opacity:1;} }
+  </style>
+</head>
+<body data-accent>
+  <nav class="dnav">
+    <a class="brand" href="demos/">Rakesh<span>·</span>demos</a>
+    <div class="links"><a href="demos/">All demos</a><a href="./">Portfolio</a><a href="resume.html">Résumé</a></div>
+  </nav>
+  <div class="dwrap">
+    <div class="dhead">
+      <div class="eyebrow">Full-stack · simulated realtime · typing indicator</div>
+      <h1>Support chat</h1>
+      <p class="lede">A chat UI with a mocked agent that "types" before replying — the kind of realtime pattern you'd wire to a WebSocket. Try “pricing”, “angular”, or “sharepoint”.</p>
+    </div>
+    <div class="card chat" style="max-width:620px">
+      <div class="msgs" id="msgs"></div>
+      <div class="typing" id="typing" hidden><i></i><i></i><i></i> agent is typing</div>
+      <div class="row" style="padding:.5rem">
+        <input id="in" placeholder="Type a message…" style="flex:1" autofocus>
+        <button class="btn btn-primary" id="send">Send</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    const msgs = document.getElementById("msgs");
+    function now() { return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }); }
+    function add(text, who) {
+      const d = document.createElement("div");
+      d.className = "msg " + who;
+      d.innerHTML = text + `<div class="t">${now()}</div>`;
+      msgs.appendChild(d); msgs.scrollTop = msgs.scrollHeight;
+    }
+    function reply(q) {
+      q = q.toLowerCase();
+      if (q.includes("price") || q.includes("cost")) return "Our plans start at $19/mo. Want the full pricing page?";
+      if (q.includes("angular")) return "Yes — AngularJS 1.x and modern Angular both covered. See the AngularJS demos.";
+      if (q.includes("sharepoint")) return "SharePoint site customization is one of my focus areas — check the SharePoint demos.";
+      if (q.includes("hello") || q.includes("hi")) return "Hi! Ask me about pricing, AngularJS, or SharePoint.";
+      return "Got it — I'll route that to the right person. Anything else?";
+    }
+    const typing = document.getElementById("typing");
+    function send() {
+      const inp = document.getElementById("in"); const v = inp.value.trim(); if (!v) return;
+      add(v, "me"); inp.value = "";
+      typing.hidden = false; msgs.scrollTop = msgs.scrollHeight;
+      setTimeout(() => { typing.hidden = true; add(reply(v), "them"); }, 900 + Math.random() * 800);
+    }
+    document.getElementById("send").onclick = send;
+    document.getElementById("in").addEventListener("keydown", (e) => { if (e.key === "Enter") send(); });
+    add("Hi! I'm the demo assistant. Ask about pricing, AngularJS, or SharePoint.", "them");
+  </script>
+</body>
+</html>

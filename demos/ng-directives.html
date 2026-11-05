@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="dirApp">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/portfolio/">
+  <title>AngularJS · Reusable directives</title>
+  <link rel="stylesheet" href="demos/assets/demo.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+  <style>
+    [data-accent]{--accent:#2b6cb0;--accent-lt:#e3eefa;}
+    .star { cursor:pointer; font-size:1.5rem; color:var(--rule); }
+    .star.on { color:#f0a500; }
+    .switch { width:46px;height:26px;border-radius:999px;background:var(--rule);position:relative;cursor:pointer;transition:.2s; }
+    .switch.on { background:var(--accent); }
+    .switch i { position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s; }
+    .switch.on i { left:23px; }
+    .acc-item { border:1px solid var(--rule); border-radius:10px; margin-bottom:.5rem; overflow:hidden; }
+    .acc-head { padding:.7rem .9rem; cursor:pointer; display:flex; justify-content:space-between; font-weight:600; }
+    .acc-body { padding:0 .9rem .8rem; color:var(--sub); font-size:.88rem; }
+  </style>
+</head>
+<body data-accent ng-controller="Ctrl">
+  <nav class="dnav">
+    <a class="brand" href="demos/">Rakesh<span>·</span>demos</a>
+    <div class="links"><a href="demos/">All demos</a><a href="./">Portfolio</a><a href="resume.html">Résumé</a></div>
+  </nav>
+  <div class="dwrap">
+    <div class="dhead">
+      <div class="eyebrow">AngularJS 1.8 · custom directives · isolate scope</div>
+      <h1>Reusable component lab</h1>
+      <p class="lede">Four directives built from scratch — a star rating, a toggle switch, a tab set, and an accordion — each with its own isolate scope and two-way binding back to the controller.</p>
+    </div>
+
+    <div class="grid grid-2">
+      <div class="card">
+        <h3>Star rating <span class="tag">star-rating</span></h3>
+        <star-rating ng-model="rating" max="5"></star-rating>
+        <p class="muted" style="font-size:.84rem;margin-top:.5rem">Bound value: <strong>{{ rating }}</strong> / 5</p>
+      </div>
+
+      <div class="card">
+        <h3>Toggle switch <span class="tag">toggle-switch</span></h3>
+        <div class="row"><toggle-switch ng-model="notify"></toggle-switch> <span class="muted">Email notifications: <strong>{{ notify ? 'on' : 'off' }}</strong></span></div>
+      </div>
+
+      <div class="card">
+        <h3>Tabs <span class="tag">tab-set</span></h3>
+        <tab-set tabs="tabs" active="activeTab"></tab-set>
+        <p class="muted" style="font-size:.84rem">Active tab index: <strong>{{ activeTab }}</strong></p>
+      </div>
+
+      <div class="card">
+        <h3>Accordion <span class="tag">ng-repeat + state</span></h3>
+        <div class="acc-item" ng-repeat="a in faq">
+          <div class="acc-head" ng-click="a.open=!a.open">{{ a.q }} <span>{{ a.open ? '−' : '+' }}</span></div>
+          <div class="acc-body" ng-show="a.open">{{ a.a }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    angular.module("dirApp", [])
+      .directive("starRating", function () {
+        return {
+          restrict: "E", require: "ngModel", scope: { max: "@" },
+          template: '<span><span class="star" ng-repeat="s in stars" ng-class="{on: s<=val}" ng-click="set(s)">★</span></span>',
+          link: function (scope, el, attr, ctrl) {
+            scope.stars = []; for (let i = 1; i <= (+scope.max || 5); i++) scope.stars.push(i);
+            ctrl.$render = function () { scope.val = ctrl.$viewValue || 0; };
+            scope.set = function (s) { scope.val = s; ctrl.$setViewValue(s); };
+          }
+        };
+      })
+      .directive("toggleSwitch", function () {
+        return {
+          restrict: "E", require: "ngModel",
+          template: '<div class="switch" ng-class="{on: val}" ng-click="toggle()"><i></i></div>',
+          link: function (scope, el, attr, ctrl) {
+            ctrl.$render = function () { scope.val = !!ctrl.$viewValue; };
+            scope.toggle = function () { scope.val = !scope.val; ctrl.$setViewValue(scope.val); };
+          }
+        };
+      })
+      .directive("tabSet", function () {
+        return {
+          restrict: "E", scope: { tabs: "=", active: "=" },
+          template: '<div class="tabs"><button ng-repeat="t in tabs" ng-class="{on: $index===active}" ng-click="active=$index">{{t.title}}</button></div>' +
+            '<div style="font-size:.88rem;color:var(--sub)">{{ tabs[active].body }}</div>'
+        };
+      })
+      .controller("Ctrl", function ($scope) {
+        $scope.rating = 3; $scope.notify = true; $scope.activeTab = 0;
+        $scope.tabs = [
+          { title: "Overview", body: "Directives encapsulate markup + behavior into reusable tags." },
+          { title: "Scope", body: "Isolate scope keeps each instance independent." },
+          { title: "Binding", body: "ngModel wiring gives clean two-way data flow." }
+        ];
+        $scope.faq = [
+          { q: "Why directives?", a: "They turn repeated UI into a single testable unit.", open: true },
+          { q: "Isolate vs shared scope?", a: "Isolate scope prevents leaks between instances.", open: false },
+          { q: "Reusable across apps?", a: "Yes — drop the tag in and bind a model.", open: false }
+        ];
+      });
+  </script>
+</body>
+</html>

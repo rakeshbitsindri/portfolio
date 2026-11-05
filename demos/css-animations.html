@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/portfolio/">
+  <title>HTML5 · CSS animation gallery</title>
+  <link rel="stylesheet" href="demos/assets/demo.css">
+  <style>
+    [data-accent]{--accent:#f76707;--accent-lt:#fdebdd;}
+    .demo-cell { display:grid; place-items:center; height:120px; background:var(--parchment); border-radius:10px; margin-bottom:.6rem; overflow:hidden; }
+    .box { width:46px; height:46px; border-radius:10px; background:var(--accent); }
+    .pulse { animation:pulse 1.4s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{ transform:scale(1); opacity:1; } 50%{ transform:scale(1.4); opacity:.6; } }
+    .spin { animation:spin 1.6s linear infinite; border-radius:8px; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .bounce { animation:bounce 1.2s cubic-bezier(.5,.05,.5,.95) infinite; }
+    @keyframes bounce { 0%,100%{ transform:translateY(-22px); } 50%{ transform:translateY(22px); } }
+    .morph { animation:morph 3s ease-in-out infinite; }
+    @keyframes morph { 0%,100%{ border-radius:10px; } 50%{ border-radius:50%; transform:rotate(45deg); } }
+    .shimmer { width:120px;height:46px;border-radius:8px;background:linear-gradient(90deg,var(--rule) 25%,#fff 50%,var(--rule) 75%);background-size:200% 100%;animation:shimmer 1.3s linear infinite; }
+    @keyframes shimmer { to { background-position:-200% 0; } }
+    .flip { animation:flip 2.4s ease-in-out infinite; }
+    @keyframes flip { 0%,100%{ transform:perspective(200px) rotateY(0); } 50%{ transform:perspective(200px) rotateY(180deg); } }
+    .orbit { position:relative; width:60px; height:60px; }
+    .orbit::before { content:""; position:absolute; inset:0; border:2px dashed var(--rule); border-radius:50%; }
+    .orbit i { position:absolute; top:-6px; left:50%; width:14px; height:14px; margin-left:-7px; background:var(--accent); border-radius:50%; transform-origin:7px 36px; animation:spin 1.6s linear infinite; }
+    .wave { display:flex; gap:4px; align-items:flex-end; height:46px; }
+    .wave i { width:7px; background:var(--accent); border-radius:3px; animation:wave 1s ease-in-out infinite; }
+    .wave i:nth-child(2){ animation-delay:.15s; } .wave i:nth-child(3){ animation-delay:.3s; } .wave i:nth-child(4){ animation-delay:.45s; }
+    @keyframes wave { 0%,100%{ height:14px; } 50%{ height:46px; } }
+    pre { background:var(--text); color:var(--ivory); border-radius:8px; padding:.7rem; font-size:.72rem; overflow:auto; }
+  </style>
+</head>
+<body data-accent>
+  <nav class="dnav">
+    <a class="brand" href="demos/">Rakesh<span>·</span>demos</a>
+    <div class="links"><a href="demos/">All demos</a><a href="./">Portfolio</a><a href="resume.html">Résumé</a></div>
+  </nav>
+  <div class="dwrap">
+    <div class="dhead">
+      <div class="eyebrow">HTML5 · CSS keyframes · transforms</div>
+      <h1>Animation gallery</h1>
+      <p class="lede">Eight self-contained CSS animations — keyframes, transforms, and staggered delays. Click any card to copy its keyframe name. No JavaScript drives the motion.</p>
+    </div>
+    <div class="grid grid-4" id="g"></div>
+  </div>
+  <script src="demos/assets/demo.js"></script>
+  <script>
+    const items = [
+      ["Pulse", '<div class="box pulse"></div>', "pulse"],
+      ["Spin", '<div class="box spin"></div>', "spin"],
+      ["Bounce", '<div class="box bounce"></div>', "bounce"],
+      ["Morph", '<div class="box morph"></div>', "morph"],
+      ["Shimmer", '<div class="shimmer"></div>', "shimmer"],
+      ["Flip", '<div class="box flip"></div>', "flip"],
+      ["Orbit", '<div class="orbit"><i></i></div>', "orbit"],
+      ["Equalizer", '<div class="wave"><i></i><i></i><i></i><i></i></div>', "wave (staggered)"]
+    ];
+    document.getElementById("g").innerHTML = items.map((it) =>
+      `<div class="card hover" style="cursor:pointer;text-align:center" data-k="${it[2]}">
+        <div class="demo-cell">${it[1]}</div><strong style="font-size:.9rem">${it[0]}</strong>
+        <div class="tag" style="margin-top:.3rem">@keyframes ${it[2].split(" ")[0]}</div>
+      </div>`).join("");
+    document.getElementById("g").addEventListener("click", (e) => {
+      const c = e.target.closest("[data-k]"); if (!c) return; Demo.toast("Keyframe: " + c.dataset.k);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/portfolio/">
+  <title>Full-stack · Live analytics</title>
+  <link rel="stylesheet" href="demos/assets/demo.css">
+  <style>[data-accent]{--accent:#2b8a3e;--accent-lt:#e3f2e7;}
+    .spark { width:100%; height:48px; }
+    .live { display:inline-flex; align-items:center; gap:.3rem; font-size:.74rem; color:var(--accent); }
+    .live i { width:8px;height:8px;border-radius:50%;background:var(--accent);animation:bl 1.2s infinite; } @keyframes bl{50%{opacity:.3;}}
+    .feed li { list-style:none; font-size:.82rem; padding:.3rem 0; border-bottom:1px solid var(--rule); display:flex; justify-content:space-between; }
+  </style>
+</head>
+<body data-accent>
+  <nav class="dnav">
+    <a class="brand" href="demos/">Rakesh<span>·</span>demos</a>
+    <div class="links"><a href="demos/">All demos</a><a href="./">Portfolio</a><a href="resume.html">Résumé</a></div>
+  </nav>
+  <div class="dwrap">
+    <div class="dhead">
+      <div class="eyebrow">Full-stack · polling · live sparklines</div>
+      <h1>Live analytics</h1>
+      <p class="lede">A dashboard that polls a mock metrics feed every second — KPIs tick, sparklines scroll, and an event stream appends. Pause and resume the feed.</p>
+    </div>
+    <div class="toolbar"><span class="live"><i></i> live</span><button class="btn btn-sm right" id="toggle">Pause</button></div>
+    <div class="grid grid-4" style="margin-bottom:1rem">
+      <div class="kpi"><b id="k-users">0</b><span>Active users</span><svg class="spark" id="s-users"></svg></div>
+      <div class="kpi"><b id="k-rps">0</b><span>Requests/s</span><svg class="spark" id="s-rps"></svg></div>
+      <div class="kpi"><b id="k-lat">0</b><span>p95 latency (ms)</span><svg class="spark" id="s-lat"></svg></div>
+      <div class="kpi"><b id="k-err">0%</b><span>Error rate</span><svg class="spark" id="s-err"></svg></div>
+    </div>
+    <div class="card">
+      <h3>Event stream</h3>
+      <ul class="feed" id="feed"></ul>
+    </div>
+  </div>
+  <script>
+    const metrics = {
+      users: { el: "k-users", spark: "s-users", v: 120, hist: [], fmt: (v) => Math.round(v) },
+      rps: { el: "k-rps", spark: "s-rps", v: 340, hist: [], fmt: (v) => Math.round(v) },
+      lat: { el: "k-lat", spark: "s-lat", v: 42, hist: [], fmt: (v) => Math.round(v) },
+      err: { el: "k-err", spark: "s-err", v: 0.8, hist: [], fmt: (v) => v.toFixed(1) + "%" }
+    };
+    const paths = ["/api/items", "/login", "/dashboard", "/api/orders", "/assets/app.js"];
+    function spark(id, hist, max) {
+      const svg = document.getElementById(id); const w = svg.clientWidth || 120, h = 48;
+      const n = hist.length; if (n < 2) return;
+      const pts = hist.map((v, i) => `${(i / (n - 1)) * w},${h - (v / max) * h}`).join(" ");
+      svg.innerHTML = `<polyline fill="none" stroke="var(--accent)" stroke-width="2" points="${pts}"/>`;
+    }
+    function tick() {
+      for (const k in metrics) {
+        const m = metrics[k];
+        const jitter = (Math.random() - 0.5);
+        if (k === "users") m.v = Math.max(60, m.v + jitter * 12);
+        if (k === "rps") m.v = Math.max(120, m.v + jitter * 40);
+        if (k === "lat") m.v = Math.max(20, m.v + jitter * 10);
+        if (k === "err") m.v = Math.min(5, Math.max(0, m.v + jitter * 0.4));
+        m.hist.push(m.v); if (m.hist.length > 40) m.hist.shift();
+        document.getElementById(m.el).textContent = m.fmt(m.v);
+        spark(m.spark, m.hist, k === "err" ? 5 : k === "lat" ? 100 : k === "rps" ? 500 : 200);
+      }
+      const feed = document.getElementById("feed");
+      const li = document.createElement("li");
+      const code = Math.random() < 0.9 ? 200 : (Math.random() < 0.5 ? 404 : 500);
+      li.innerHTML = `<span class="mono">${paths[Math.floor(Math.random() * paths.length)]}</span><span class="pill ${code < 300 ? "ok" : code < 500 ? "warn" : "bad"}">${code}</span>`;
+      feed.prepend(li); while (feed.children.length > 8) feed.lastChild.remove();
+    }
+    let timer = setInterval(tick, 1000); tick();
+    document.getElementById("toggle").onclick = (e) => {
+      if (timer) { clearInterval(timer); timer = null; e.target.textContent = "Resume"; }
+      else { timer = setInterval(tick, 1000); e.target.textContent = "Pause"; }
+    };
+  </script>
+</body>
+</html>

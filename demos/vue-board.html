@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/portfolio/">
+  <title>Vue 3 · Reactive board</title>
+  <link rel="stylesheet" href="demos/assets/demo.css">
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <style>[data-accent]{--accent:#2f9e44;--accent-lt:#e4f3e7;}
+    .habit { display:flex; align-items:center; gap:.6rem; padding:.5rem 0; border-bottom:1px solid var(--rule); }
+    .dots7 { display:flex; gap:4px; } .dots7 i { width:16px;height:16px;border-radius:4px;background:var(--parchment);cursor:pointer; } .dots7 i.on { background:var(--accent); }
+  </style>
+</head>
+<body data-accent>
+  <nav class="dnav">
+    <a class="brand" href="demos/">Rakesh<span>·</span>demos</a>
+    <div class="links"><a href="demos/">All demos</a><a href="./">Portfolio</a><a href="resume.html">Résumé</a></div>
+  </nav>
+  <div class="dwrap">
+    <div class="dhead">
+      <div class="eyebrow">Vue 3 · composition-style options · computed</div>
+      <h1>Habit tracker</h1>
+      <p class="lede">A Vue 3 app with reactive state and computed stats. Toggle a day for any habit, add a new one, and watch the weekly completion rate update live.</p>
+    </div>
+    <div id="app">
+      <div class="kpis" style="margin-bottom:1rem">
+        <div class="kpi"><b>{{ habits.length }}</b><span>Habits</span></div>
+        <div class="kpi"><b>{{ totalTicks }}</b><span>Days done</span></div>
+        <div class="kpi"><b>{{ rate }}%</b><span>Weekly rate</span></div>
+        <div class="kpi"><b>{{ bestStreak }}</b><span>Best day count</span></div>
+      </div>
+      <div class="card">
+        <div class="toolbar">
+          <input v-model="draft" @keydown.enter="add" placeholder="New habit" style="flex:1">
+          <button class="btn btn-primary" @click="add">Add habit</button>
+        </div>
+        <div class="habit" v-for="(h,hi) in habits" :key="hi">
+          <strong style="flex:1;font-size:.9rem">{{ h.name }}</strong>
+          <div class="dots7">
+            <i v-for="(d,di) in h.days" :key="di" :class="{on:d}" @click="toggle(hi,di)"></i>
+          </div>
+          <span class="tag">{{ h.days.filter(Boolean).length }}/7</span>
+          <button class="btn btn-sm btn-danger" @click="remove(hi)">✕</button>
+        </div>
+        <p class="empty" v-if="!habits.length">No habits yet — add one.</p>
+      </div>
+    </div>
+  </div>
+  <script>
+    const { createApp } = Vue;
+    createApp({
+      data() {
+        return {
+          draft: "",
+          habits: [
+            { name: "Write AngularJS code", days: [true, true, false, true, true, false, false] },
+            { name: "Review a PR", days: [true, false, true, true, false, false, false] },
+            { name: "Ship a demo", days: [true, true, true, true, true, true, false] }
+          ]
+        };
+      },
+      computed: {
+        totalTicks() { return this.habits.reduce((s, h) => s + h.days.filter(Boolean).length, 0); },
+        rate() { const max = this.habits.length * 7 || 1; return Math.round(this.totalTicks / max * 100); },
+        bestStreak() {
+          let best = 0;
+          for (let d = 0; d < 7; d++) { const c = this.habits.filter(h => h.days[d]).length; if (c > best) best = c; }
+          return best;
+        }
+      },
+      methods: {
+        toggle(hi, di) { this.habits[hi].days[di] = !this.habits[hi].days[di]; },
+        add() { if (this.draft.trim()) { this.habits.push({ name: this.draft.trim(), days: [false, false, false, false, false, false, false] }); this.draft = ""; } },
+        remove(hi) { this.habits.splice(hi, 1); }
+      }
+    }).mount("#app");
+  </script>
+</body>
+</html>

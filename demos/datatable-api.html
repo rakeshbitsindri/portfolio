@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/portfolio/">
+  <title>Full-stack · Server-side data table</title>
+  <link rel="stylesheet" href="demos/assets/demo.css">
+  <style>[data-accent]{--accent:#0b7285;--accent-lt:#def1f4;}
+    .spin { width:16px;height:16px;border:2px solid var(--rule);border-top-color:var(--accent);border-radius:50%;animation:sp .7s linear infinite;display:inline-block; } @keyframes sp{to{transform:rotate(360deg);}}
+  </style>
+</head>
+<body data-accent>
+  <nav class="dnav">
+    <a class="brand" href="demos/">Rakesh<span>·</span>demos</a>
+    <div class="links"><a href="demos/">All demos</a><a href="./">Portfolio</a><a href="resume.html">Résumé</a></div>
+  </nav>
+  <div class="dwrap">
+    <div class="dhead">
+      <div class="eyebrow">Full-stack · server-side paging · debounced search</div>
+      <h1>Data table (server-paged)</h1>
+      <p class="lede">500 rows live behind a mock API that does the search, sort, and pagination server-side. The client only ever holds one page — the pattern you need for large datasets.</p>
+    </div>
+    <div class="toolbar">
+      <input id="q" placeholder="Search name or city" style="flex:1;min-width:160px">
+      <select id="size"><option value="10">10 / page</option><option value="25">25 / page</option><option value="50">50 / page</option></select>
+      <span id="busy" hidden><span class="spin"></span></span>
+    </div>
+    <div class="card">
+      <table class="table">
+        <thead><tr>
+          <th data-s="id">ID</th><th data-s="name">Name</th><th data-s="city">City</th>
+          <th data-s="plan">Plan</th><th data-s="mrr" class="num">MRR</th>
+        </tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <div class="spread" style="margin-top:.8rem">
+        <span class="muted" id="info" style="font-size:.8rem"></span>
+        <div class="row">
+          <button class="btn btn-sm" id="prev">Prev</button>
+          <span class="mono" id="page"></span>
+          <button class="btn btn-sm" id="next">Next</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    // ---- generate a "server" dataset ----
+    const cities = ["Austin", "Berlin", "Mumbai", "Tokyo", "Lima", "Cairo", "Oslo", "Perth"];
+    const plans = ["Starter", "Pro", "Team"];
+    const DB = Array.from({ length: 500 }, (_, i) => ({
+      id: i + 1, name: "Account " + (i + 1), city: cities[i % cities.length],
+      plan: plans[i % 3], mrr: 19 + (i * 7) % 180
+    }));
+    function serverQuery({ q, sort, dir, page, size }) {
+      return new Promise((resolve) => setTimeout(() => {
+        let rows = DB;
+        if (q) { const t = q.toLowerCase(); rows = rows.filter((r) => r.name.toLowerCase().includes(t) || r.city.toLowerCase().includes(t)); }
+        rows = rows.slice().sort((a, b) => (a[sort] > b[sort] ? 1 : a[sort] < b[sort] ? -1 : 0) * dir);
+        const total = rows.length;
+        const start = page * size;
+        resolve({ total, rows: rows.slice(start, start + size) });
+      }, 220));
+    }
+    let state = { q: "", sort: "id", dir: 1, page: 0, size: 10 };
+    let timer = null;
+    async function load() {
+      document.getElementById("busy").hidden = false;
+      const res = await serverQuery(state);
+      document.getElementById("busy").hidden = true;
+      document.getElementById("rows").innerHTML = res.rows.map((r) =>
+        `<tr><td class="mono">${r.id}</td><td>${r.name}</td><td>${r.city}</td><td><span class="pill ${r.plan === "Team" ? "accent" : r.plan === "Pro" ? "ok" : "mut"}">${r.plan}</span></td><td class="num">$${r.mrr}</td></tr>`).join("");
+      const pages = Math.max(1, Math.ceil(res.total / state.size));
+      document.getElementById("page").textContent = (state.page + 1) + " / " + pages;
+      document.getElementById("info").textContent = res.total + " rows match";
+      document.getElementById("prev").disabled = state.page === 0;
+      document.getElementById("next").disabled = state.page >= pages - 1;
+    }
+    document.getElementById("q").addEventListener("input", (e) => { clearTimeout(timer); timer = setTimeout(() => { state.q = e.target.value; state.page = 0; load(); }, 250); });
+    document.getElementById("size").onchange = (e) => { state.size = +e.target.value; state.page = 0; load(); };
+    document.getElementById("prev").onclick = () => { state.page--; load(); };
+    document.getElementById("next").onclick = () => { state.page++; load(); };
+    document.querySelectorAll("th[data-s]").forEach((th) => th.onclick = () => { const k = th.dataset.s; if (state.sort === k) state.dir *= -1; else { state.sort = k; state.dir = 1; } load(); });
+    load();
+  </script>
+</body>
+</html>

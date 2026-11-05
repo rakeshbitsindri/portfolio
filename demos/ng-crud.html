@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="crudApp">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/portfolio/">
+  <title>AngularJS · Inventory CRUD grid</title>
+  <link rel="stylesheet" href="demos/assets/demo.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+  <style>[data-accent]{--accent:#2a7f7a;--accent-lt:#e2f1f0;}</style>
+</head>
+<body data-accent ng-controller="Ctrl">
+  <nav class="dnav">
+    <a class="brand" href="demos/">Rakesh<span>·</span>demos</a>
+    <div class="links"><a href="demos/">All demos</a><a href="./">Portfolio</a><a href="resume.html">Résumé</a></div>
+  </nav>
+  <div class="dwrap">
+    <div class="dhead">
+      <div class="eyebrow">AngularJS 1.8 · CRUD · filter · sort · paginate</div>
+      <h1>Inventory manager</h1>
+      <p class="lede">Full create / read / update / delete over a data grid. Search, sort any column, filter by status, edit inline, and page through — all with two-way binding, no reload.</p>
+    </div>
+
+    <div class="kpis" style="margin-bottom:1rem">
+      <div class="kpi"><b>{{ items.length }}</b><span>SKUs</span></div>
+      <div class="kpi"><b>{{ totalUnits() }}</b><span>Units on hand</span></div>
+      <div class="kpi"><b>{{ money(totalValue()) }}</b><span>Stock value</span></div>
+      <div class="kpi"><b>{{ lowCount() }}</b><span>Low stock</span></div>
+    </div>
+
+    <div class="split">
+      <div class="card">
+        <div class="toolbar">
+          <input ng-model="q" placeholder="Search name or SKU" style="flex:1;min-width:160px">
+          <select ng-model="statusFilter">
+            <option value="">All status</option>
+            <option value="In stock">In stock</option>
+            <option value="Low">Low</option>
+            <option value="Out">Out</option>
+          </select>
+          <select ng-model="pageSize" ng-options="n for n in [5,8,12]"></select>
+        </div>
+        <table class="table">
+          <thead>
+            <tr>
+              <th ng-click="sortBy('sku')">SKU {{ arrow('sku') }}</th>
+              <th ng-click="sortBy('name')">Name {{ arrow('name') }}</th>
+              <th ng-click="sortBy('qty')" class="num">Qty {{ arrow('qty') }}</th>
+              <th ng-click="sortBy('price')" class="num">Price {{ arrow('price') }}</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="it in paged()">
+              <td class="mono">{{ it.sku }}</td>
+              <td>{{ it.name }}</td>
+              <td class="num">{{ it.qty }}</td>
+              <td class="num">{{ money(it.price) }}</td>
+              <td><span class="pill" ng-class="toneOf(it)">{{ status(it) }}</span></td>
+              <td class="num">
+                <button class="btn btn-sm" ng-click="edit(it)">Edit</button>
+                <button class="btn btn-sm btn-danger" ng-click="remove(it)">Delete</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="empty" ng-if="filtered().length===0">No items match. Clear the search or add one.</p>
+        <div class="spread" style="margin-top:.8rem" ng-if="pages()>1">
+          <span class="muted" style="font-size:.8rem">Page {{ page+1 }} / {{ pages() }}</span>
+          <div class="row">
+            <button class="btn btn-sm" ng-click="page=page-1" ng-disabled="page===0">Prev</button>
+            <button class="btn btn-sm" ng-click="page=page+1" ng-disabled="page>=pages()-1">Next</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>{{ draft.id ? 'Edit item' : 'Add item' }}</h3>
+        <form name="f" ng-submit="submit()" class="stack">
+          <label class="field">Name<input ng-model="draft.name" required></label>
+          <label class="field">SKU<input ng-model="draft.sku" required></label>
+          <div class="row">
+            <label class="field" style="flex:1">Qty<input type="number" min="0" ng-model="draft.qty" required></label>
+            <label class="field" style="flex:1">Price<input type="number" min="0" step="0.01" ng-model="draft.price" required></label>
+          </div>
+          <div class="row">
+            <button class="btn btn-primary" type="submit" ng-disabled="f.$invalid">{{ draft.id ? 'Save changes' : 'Add item' }}</button>
+            <button class="btn btn-ghost" type="button" ng-click="reset()" ng-if="draft.id">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    angular.module("crudApp", []).controller("Ctrl", function ($scope) {
+      $scope.money = (n) => "$" + Number(n || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      let id = 0;
+      const seed = [
+        ["QSFP-100G", "100G QSFP28 optic", 42, 180],
+        ["SFP-25G", "25G SFP28 optic", 8, 95],
+        ["CBL-MPO12", "MPO-12 fiber 3m", 0, 24],
+        ["LIC-BPS", "BPS feature license", 15, 1200],
+        ["RACK-42U", "42U rack kit", 3, 640],
+        ["PDU-20A", "Switched PDU 20A", 21, 310],
+        ["TAP-40G", "40G network TAP", 6, 540],
+        ["CBL-DAC3", "DAC cable 3m", 60, 38]
+      ];
+      $scope.items = seed.map((r) => ({ id: ++id, sku: r[0], name: r[1], qty: r[2], price: r[3] }));
+      $scope.q = ""; $scope.statusFilter = ""; $scope.pageSize = 5; $scope.page = 0;
+      $scope.sort = { key: "name", dir: 1 };
+      $scope.draft = {};
+
+      $scope.status = (it) => it.qty === 0 ? "Out" : it.qty <= 10 ? "Low" : "In stock";
+      $scope.toneOf = (it) => ({ Out: "bad", Low: "warn", "In stock": "ok" }[$scope.status(it)]);
+      $scope.totalUnits = () => $scope.items.reduce((s, i) => s + i.qty, 0);
+      $scope.totalValue = () => $scope.items.reduce((s, i) => s + i.qty * i.price, 0);
+      $scope.lowCount = () => $scope.items.filter((i) => i.qty <= 10).length;
+
+      $scope.filtered = function () {
+        const q = ($scope.q || "").toLowerCase();
+        let out = $scope.items.filter((i) =>
+          (!q || i.name.toLowerCase().includes(q) || i.sku.toLowerCase().includes(q)) &&
+          (!$scope.statusFilter || $scope.status(i) === $scope.statusFilter));
+        const k = $scope.sort.key, d = $scope.sort.dir;
+        out = out.slice().sort((a, b) => (a[k] > b[k] ? 1 : a[k] < b[k] ? -1 : 0) * d);
+        return out;
+      };
+      $scope.pages = () => Math.max(1, Math.ceil($scope.filtered().length / $scope.pageSize));
+      $scope.paged = function () {
+        if ($scope.page > $scope.pages() - 1) $scope.page = $scope.pages() - 1;
+        const start = $scope.page * $scope.pageSize;
+        return $scope.filtered().slice(start, start + $scope.pageSize);
+      };
+      $scope.sortBy = function (k) {
+        if ($scope.sort.key === k) $scope.sort.dir *= -1; else { $scope.sort.key = k; $scope.sort.dir = 1; }
+      };
+      $scope.arrow = (k) => $scope.sort.key === k ? ($scope.sort.dir > 0 ? "▲" : "▼") : "";
+      $scope.edit = (it) => { $scope.draft = angular.copy(it); };
+      $scope.reset = () => { $scope.draft = {}; };
+      $scope.remove = (it) => { $scope.items = $scope.items.filter((x) => x.id !== it.id); };
+      $scope.submit = function () {
+        const d = $scope.draft;
+        d.qty = Number(d.qty); d.price = Number(d.price);
+        if (d.id) {
+          const i = $scope.items.findIndex((x) => x.id === d.id);
+          $scope.items[i] = angular.copy(d);
+        } else {
+          d.id = ++id; $scope.items.unshift(angular.copy(d));
+        }
+        $scope.reset();
+      };
+    });
+  </script>
+</body>
+</html>

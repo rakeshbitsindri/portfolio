@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/portfolio/">
+  <title>Full-stack · Auth flow</title>
+  <link rel="stylesheet" href="demos/assets/demo.css">
+  <style>[data-accent]{--accent:#364fc7;--accent-lt:#e6e9fb;}
+    .token { word-break:break-all; font-family:var(--mono); font-size:.72rem; background:var(--parchment); border-radius:8px; padding:.6rem; }
+  </style>
+</head>
+<body data-accent>
+  <nav class="dnav">
+    <a class="brand" href="demos/">Rakesh<span>·</span>demos</a>
+    <div class="links"><a href="demos/">All demos</a><a href="./">Portfolio</a><a href="resume.html">Résumé</a></div>
+  </nav>
+  <div class="dwrap">
+    <div class="dhead">
+      <div class="eyebrow">Full-stack · mock JWT · protected route · session</div>
+      <h1>Authentication flow</h1>
+      <p class="lede">Register or log in against a mock auth service that mints a fake JWT. The session persists in <span class="mono">localStorage</span>, gating a protected dashboard. Log out to clear it.</p>
+    </div>
+
+    <div id="auth" class="card" style="max-width:420px">
+      <div class="tabs"><button class="on" id="tLogin">Log in</button><button id="tReg">Register</button></div>
+      <form id="form" class="stack">
+        <label class="field" id="nameWrap" hidden>Name<input id="name"></label>
+        <label class="field">Email<input id="email" type="email" value="demo@zanet.in"></label>
+        <label class="field">Password<input id="pw" type="password" value="demo1234"></label>
+        <div class="pill bad" id="err" hidden></div>
+        <button class="btn btn-primary" type="submit" id="submit">Log in</button>
+      </form>
+      <p class="muted" style="font-size:.78rem;margin-top:.6rem">Demo creds are prefilled. Register creates a local account.</p>
+    </div>
+
+    <div id="app" class="card" hidden style="max-width:560px">
+      <div class="spread"><h3>Protected dashboard</h3><button class="btn btn-sm" id="logout">Log out</button></div>
+      <p class="muted">Welcome back, <strong id="who"></strong>. This view only renders with a valid session.</p>
+      <div class="kpis" style="margin:1rem 0">
+        <div class="kpi"><b>12</b><span>Projects</span></div><div class="kpi"><b>3</b><span>Open PRs</span></div><div class="kpi"><b>98%</b><span>Health</span></div>
+      </div>
+      <h3 style="font-size:.95rem">Session token (mock JWT)</h3>
+      <div class="token" id="tok"></div>
+    </div>
+  </div>
+  <script>
+    const KEY = "demo_auth_session";
+    const USERS = "demo_auth_users";
+    let mode = "login";
+    const users = JSON.parse(localStorage.getItem(USERS) || "null") || [{ name: "Demo User", email: "demo@zanet.in", pw: "demo1234" }];
+    function saveUsers() { localStorage.setItem(USERS, JSON.stringify(users)); }
+    function b64(o) { return btoa(JSON.stringify(o)).replace(/=+$/, ""); }
+    function mintToken(u) { return b64({ alg: "HS256", typ: "JWT" }) + "." + b64({ sub: u.email, name: u.name, iat: Date.now(), exp: Date.now() + 36e5 }) + ".sig_" + Math.random().toString(36).slice(2, 10); }
+    function setMode(m) {
+      mode = m;
+      document.getElementById("tLogin").classList.toggle("on", m === "login");
+      document.getElementById("tReg").classList.toggle("on", m === "register");
+      document.getElementById("nameWrap").hidden = m === "login";
+      document.getElementById("submit").textContent = m === "login" ? "Log in" : "Create account";
+      document.getElementById("err").hidden = true;
+    }
+    document.getElementById("tLogin").onclick = () => setMode("login");
+    document.getElementById("tReg").onclick = () => setMode("register");
+    function showApp(session) {
+      document.getElementById("auth").hidden = true;
+      document.getElementById("app").hidden = false;
+      document.getElementById("who").textContent = session.name;
+      document.getElementById("tok").textContent = session.token;
+    }
+    function err(msg) { const e = document.getElementById("err"); e.textContent = msg; e.hidden = false; }
+    document.getElementById("form").addEventListener("submit", (ev) => {
+      ev.preventDefault();
+      const email = document.getElementById("email").value.trim();
+      const pw = document.getElementById("pw").value;
+      const name = document.getElementById("name").value.trim();
+      if (mode === "register") {
+        if (!name || !email || pw.length < 6) return err("Name, email, and a 6+ char password required.");
+        if (users.some((u) => u.email === email)) return err("That email already exists.");
+        users.push({ name, email, pw }); saveUsers();
+      }
+      const u = users.find((x) => x.email === email && x.pw === pw);
+      if (!u) return err("Invalid email or password.");
+      const session = { name: u.name, email: u.email, token: mintToken(u) };
+      localStorage.setItem(KEY, JSON.stringify(session));
+      showApp(session);
+    });
+    document.getElementById("logout").onclick = () => { localStorage.removeItem(KEY); document.getElementById("app").hidden = true; document.getElementById("auth").hidden = false; };
+    const existing = JSON.parse(localStorage.getItem(KEY) || "null");
+    if (existing) showApp(existing); else setMode("login");
+  </script>
+</body>
+</html>

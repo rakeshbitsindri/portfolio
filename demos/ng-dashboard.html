@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="dashApp">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/portfolio/">
+  <title>AngularJS · Analytics dashboard</title>
+  <link rel="stylesheet" href="demos/assets/demo.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+  <style>
+    [data-accent]{--accent:#b5451f;--accent-lt:#fbe8e1;}
+    .bars { display:flex; align-items:flex-end; gap:.5rem; height:180px; padding-top:.5rem; }
+    .bars .b { flex:1; background:var(--accent); border-radius:6px 6px 0 0; transition:height .5s; position:relative; }
+    .bars .b span { position:absolute; bottom:-1.4rem; left:0; right:0; text-align:center; font-size:.68rem; color:var(--sub); }
+    .legend { display:flex; gap:.8rem; flex-wrap:wrap; font-size:.78rem; }
+    .legend i { display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:.3rem; }
+  </style>
+</head>
+<body data-accent ng-controller="Ctrl">
+  <nav class="dnav">
+    <a class="brand" href="demos/">Rakesh<span>·</span>demos</a>
+    <div class="links"><a href="demos/">All demos</a><a href="./">Portfolio</a><a href="resume.html">Résumé</a></div>
+  </nav>
+  <div class="dwrap">
+    <div class="dhead">
+      <div class="eyebrow">AngularJS 1.8 · SVG charts · computed metrics</div>
+      <h1>Revenue dashboard</h1>
+      <p class="lede">KPI cards, a bar chart, and an SVG donut that all recompute when you change the range or region. Pure Angular bindings driving inline SVG.</p>
+    </div>
+
+    <div class="toolbar">
+      <label class="field">Range
+        <select ng-model="range" ng-change="recompute()">
+          <option value="6">Last 6 months</option>
+          <option value="12">Last 12 months</option>
+        </select>
+      </label>
+      <label class="field">Region
+        <select ng-model="region" ng-change="recompute()">
+          <option value="all">All regions</option>
+          <option value="amer">AMER</option>
+          <option value="emea">EMEA</option>
+          <option value="apac">APAC</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="kpis" style="margin-bottom:1rem">
+      <div class="kpi"><b>{{ money(total) }}</b><span>Total revenue</span></div>
+      <div class="kpi"><b>{{ money(avg) }}</b><span>Monthly average</span></div>
+      <div class="kpi"><b>{{ best.label }}</b><span>Best month ({{ money(best.v) }})</span></div>
+      <div class="kpi"><b>{{ growth }}%</b><span>MoM growth</span></div>
+    </div>
+
+    <div class="split">
+      <div class="card">
+        <h3>Revenue by month</h3>
+        <div class="bars">
+          <div class="b" ng-repeat="p in series" ng-style="{height: (p.v/max*100)+'%'}" title="{{p.label}}: {{money(p.v)}}">
+            <span>{{ p.label }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Traffic sources</h3>
+        <svg viewBox="0 0 120 120" width="100%" height="190">
+          <g transform="translate(60,60)">
+            <circle r="40" fill="none" stroke="var(--parchment)" stroke-width="18"></circle>
+            <circle ng-repeat="s in donut" r="40" fill="none" stroke-width="18"
+              ng-attr-stroke="{{s.color}}"
+              ng-attr-stroke-dasharray="{{s.len}} {{circ}}"
+              ng-attr-stroke-dashoffset="{{s.offset}}"
+              transform="rotate(-90)"></circle>
+            <text text-anchor="middle" dy="6" font-size="13" font-family="monospace" fill="#0e0e0c">{{ donutTotal }}%</text>
+          </g>
+        </svg>
+        <div class="legend">
+          <span ng-repeat="s in donut"><i ng-style="{background:s.color}"></i>{{ s.name }} {{ s.val }}%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    angular.module("dashApp", []).controller("Ctrl", function ($scope) {
+      $scope.money = (n) => "$" + Math.round(n).toLocaleString();
+      const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+      const factor = { all: 1, amer: 0.45, emea: 0.33, apac: 0.22 };
+      const base = [120,135,128,160,175,168,190,210,205,230,248,262].map((v) => v * 1000);
+      $scope.range = "6"; $scope.region = "all";
+      $scope.circ = 2 * Math.PI * 40;
+
+      $scope.recompute = function () {
+        const n = +$scope.range;
+        const f = factor[$scope.region];
+        const slice = base.slice(12 - n).map((v, i) => ({ label: months[12 - n + i], v: Math.round(v * f) }));
+        $scope.series = slice;
+        $scope.max = Math.max.apply(null, slice.map((p) => p.v));
+        $scope.total = slice.reduce((s, p) => s + p.v, 0);
+        $scope.avg = $scope.total / slice.length;
+        $scope.best = slice.reduce((a, b) => (b.v > a.v ? b : a), slice[0]);
+        const first = slice[0].v, last = slice[slice.length - 1].v;
+        $scope.growth = Math.round(((last - first) / first) * 100);
+
+        const parts = [["Organic", 44, "#b5451f"], ["Direct", 28, "#2a7f7a"], ["Referral", 18, "#5a4fcf"], ["Social", 10, "#b4690e"]];
+        let off = 0;
+        $scope.donut = parts.map((p) => {
+          const len = (p[1] / 100) * $scope.circ;
+          const seg = { name: p[0], val: p[1], color: p[2], len: len, offset: -off };
+          off += len; return seg;
+        });
+        $scope.donutTotal = 100;
+      };
+      $scope.recompute();
+    });
+  </script>
+</body>
+</html>

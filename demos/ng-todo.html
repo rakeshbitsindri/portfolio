@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="todoApp">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/portfolio/">
+  <title>AngularJS · Todo with persistence</title>
+  <link rel="stylesheet" href="demos/assets/demo.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+  <style>
+    [data-accent]{--accent:#0b7285;--accent-lt:#e0f1f4;}
+    .t { display:flex; align-items:center; gap:.6rem; padding:.55rem 0; border-bottom:1px solid var(--rule); }
+    .t.done span.txt { text-decoration:line-through; color:var(--sub); }
+    .t input[type=checkbox]{ width:18px;height:18px; }
+    .t .txt { flex:1; }
+  </style>
+</head>
+<body data-accent ng-controller="Ctrl">
+  <nav class="dnav">
+    <a class="brand" href="demos/">Rakesh<span>·</span>demos</a>
+    <div class="links"><a href="demos/">All demos</a><a href="./">Portfolio</a><a href="resume.html">Résumé</a></div>
+  </nav>
+  <div class="dwrap">
+    <div class="dhead">
+      <div class="eyebrow">AngularJS 1.8 · filters · localStorage</div>
+      <h1>Task list</h1>
+      <p class="lede">Add, complete, edit, and clear tasks. Filter by state and watch the counter. Everything persists in <span class="mono">localStorage</span>, so a refresh keeps your list.</p>
+    </div>
+
+    <div class="card" style="max-width:600px">
+      <div class="toolbar">
+        <input ng-model="newText" ng-keydown="$event.keyCode===13 && add()" placeholder="What needs doing?" style="flex:1">
+        <button class="btn btn-primary" ng-click="add()">Add</button>
+      </div>
+      <div class="tabs">
+        <button ng-class="{on:filter==='all'}" ng-click="filter='all'">All ({{ todos.length }})</button>
+        <button ng-class="{on:filter==='active'}" ng-click="filter='active'">Active ({{ left() }})</button>
+        <button ng-class="{on:filter==='done'}" ng-click="filter='done'">Done ({{ todos.length - left() }})</button>
+      </div>
+      <div class="t" ng-repeat="t in todos | filter:match" ng-class="{done:t.done}">
+        <input type="checkbox" ng-model="t.done" ng-change="persist()">
+        <span class="txt" ng-dblclick="t.editing=true" ng-hide="t.editing">{{ t.text }}</span>
+        <input ng-show="t.editing" ng-model="t.text" ng-blur="t.editing=false; persist()" ng-keydown="$event.keyCode===13 && (t.editing=false) && persist()">
+        <button class="btn btn-sm btn-danger" ng-click="remove(t)">✕</button>
+      </div>
+      <p class="empty" ng-if="(todos | filter:match).length===0">Nothing here.</p>
+      <div class="spread" style="margin-top:.8rem">
+        <span class="muted" style="font-size:.8rem">{{ left() }} left</span>
+        <button class="btn btn-sm" ng-click="clearDone()" ng-if="todos.length - left() > 0">Clear completed</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    angular.module("todoApp", []).controller("Ctrl", function ($scope) {
+      const KEY = "demo_todos_v1";
+      $scope.todos = JSON.parse(localStorage.getItem(KEY) || "null") || [
+        { text: "Review AngularJS demo", done: false },
+        { text: "Polish SharePoint hub", done: false },
+        { text: "Ship portfolio PDF", done: true }
+      ];
+      $scope.filter = "all"; $scope.newText = "";
+      $scope.persist = () => localStorage.setItem(KEY, JSON.stringify($scope.todos));
+      $scope.add = function () { if ($scope.newText.trim()) { $scope.todos.unshift({ text: $scope.newText.trim(), done: false }); $scope.newText = ""; $scope.persist(); } };
+      $scope.remove = function (t) { $scope.todos = $scope.todos.filter((x) => x !== t); $scope.persist(); };
+      $scope.left = () => $scope.todos.filter((t) => !t.done).length;
+      $scope.clearDone = function () { $scope.todos = $scope.todos.filter((t) => !t.done); $scope.persist(); };
+      $scope.match = function (t) { return $scope.filter === "all" || ($scope.filter === "active" && !t.done) || ($scope.filter === "done" && t.done); };
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/portfolio/">
+  <title>HTML5 · Canvas charts</title>
+  <link rel="stylesheet" href="demos/assets/demo.css">
+  <style>[data-accent]{--accent:#e8590c;--accent-lt:#fdeadd;}
+    canvas { width:100%; height:260px; display:block; }
+  </style>
+</head>
+<body data-accent>
+  <nav class="dnav">
+    <a class="brand" href="demos/">Rakesh<span>·</span>demos</a>
+    <div class="links"><a href="demos/">All demos</a><a href="./">Portfolio</a><a href="resume.html">Résumé</a></div>
+  </nav>
+  <div class="dwrap">
+    <div class="dhead">
+      <div class="eyebrow">HTML5 · Canvas 2D · hand-rolled charts</div>
+      <h1>Charts without a library</h1>
+      <p class="lede">An animated line chart and a bar chart drawn straight onto a canvas — axes, gridlines, and a hover tooltip, no Chart.js. Click “Randomize” to re-animate.</p>
+    </div>
+    <div class="toolbar"><button class="btn btn-primary" id="rand">Randomize data</button></div>
+    <div class="grid grid-2">
+      <div class="card"><h3>Latency (ms)</h3><canvas id="line"></canvas><div id="tip" class="muted mono" style="font-size:.78rem;min-height:1rem"></div></div>
+      <div class="card"><h3>Requests / region</h3><canvas id="bar"></canvas></div>
+    </div>
+  </div>
+  <script>
+    function setup(cv) { const dpr = window.devicePixelRatio || 1; const r = cv.getBoundingClientRect(); cv.width = r.width * dpr; cv.height = r.height * dpr; const x = cv.getContext("2d"); x.scale(dpr, dpr); return { x, w: r.width, h: r.height }; }
+    let lineData = [], barData = [];
+    function gen() {
+      lineData = Array.from({ length: 12 }, () => 20 + Math.round(Math.random() * 80));
+      barData = [["AMER", 0], ["EMEA", 0], ["APAC", 0], ["LATAM", 0]].map((b) => [b[0], 30 + Math.round(Math.random() * 70)]);
+    }
+    const accent = "#e8590c", grid = "#e8e4da", sub = "#6b6b68";
+    function drawLine(progress) {
+      const { x, w, h } = setup(document.getElementById("line"));
+      const pad = 28, max = 110, n = lineData.length;
+      x.strokeStyle = grid; x.lineWidth = 1;
+      for (let i = 0; i <= 4; i++) { const y = pad + (h - pad * 2) * i / 4; x.beginPath(); x.moveTo(pad, y); x.lineTo(w - 6, y); x.stroke(); }
+      x.strokeStyle = accent; x.lineWidth = 2.5; x.beginPath();
+      const count = Math.max(2, Math.floor(n * progress));
+      for (let i = 0; i < count; i++) {
+        const px = pad + (w - pad - 6) * i / (n - 1);
+        const py = pad + (h - pad * 2) * (1 - lineData[i] / max);
+        i ? x.lineTo(px, py) : x.moveTo(px, py);
+      }
+      x.stroke();
+      x.fillStyle = accent;
+      for (let i = 0; i < count; i++) {
+        const px = pad + (w - pad - 6) * i / (n - 1);
+        const py = pad + (h - pad * 2) * (1 - lineData[i] / max);
+        x.beginPath(); x.arc(px, py, 3, 0, 7); x.fill();
+      }
+    }
+    function drawBar(progress) {
+      const { x, w, h } = setup(document.getElementById("bar"));
+      const pad = 28, max = 110, n = barData.length, bw = (w - pad - 6) / n * 0.6;
+      x.fillStyle = sub; x.font = "11px monospace";
+      barData.forEach((b, i) => {
+        const bx = pad + (w - pad - 6) * (i + 0.2) / n;
+        const bh = (h - pad * 2) * (b[1] / max) * progress;
+        x.fillStyle = accent; x.fillRect(bx, h - pad - bh, bw, bh);
+        x.fillStyle = sub; x.fillText(b[0], bx, h - pad + 14);
+      });
+    }
+    function animate() {
+      let t = 0;
+      (function step() { t += 0.06; const p = Math.min(1, t); drawLine(p); drawBar(p); if (p < 1) requestAnimationFrame(step); })();
+    }
+    const cv = document.getElementById("line");
+    cv.addEventListener("mousemove", (e) => {
+      const r = cv.getBoundingClientRect(), pad = 28, n = lineData.length;
+      const i = Math.round((e.clientX - r.left - pad) / (r.width - pad - 6) * (n - 1));
+      if (i >= 0 && i < n) document.getElementById("tip").textContent = "Month " + (i + 1) + ": " + lineData[i] + " ms";
+    });
+    document.getElementById("rand").onclick = () => { gen(); animate(); };
+    window.addEventListener("resize", () => { drawLine(1); drawBar(1); });
+    gen(); animate();
+  </script>
+</body>
+</html>

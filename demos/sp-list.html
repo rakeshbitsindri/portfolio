@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/portfolio/">
+  <title>SharePoint-style · List with views</title>
+  <link rel="stylesheet" href="demos/assets/demo.css">
+  <style>
+    [data-accent]{--accent:#0f6e78;--accent-lt:#def0f1;}
+    .sp-top { background:#0b3a4a; color:#fff; padding:.5rem 1rem; display:flex; justify-content:space-between; align-items:center; }
+    .sp-cmd { background:#fff; border-bottom:1px solid var(--rule); padding:.5rem 1rem; display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; }
+    .grp-head { background:var(--parchment); font-weight:700; font-size:.82rem; padding:.45rem .5rem; cursor:pointer; }
+    .star { cursor:pointer; color:var(--rule); } .star.on { color:#f0a500; }
+    .ed { border:1px dashed transparent; border-radius:4px; padding:.1rem .2rem; cursor:text; }
+    .ed:hover { border-color:var(--rule); }
+  </style>
+</head>
+<body data-accent>
+  <nav class="dnav">
+    <a class="brand" href="demos/">Rakesh<span>·</span>demos</a>
+    <div class="links"><a href="demos/">All demos</a><a href="./">Portfolio</a><a href="resume.html">Résumé</a></div>
+  </nav>
+  <div class="sp-top"><strong>Northline Lab ▸ Equipment requests</strong><span style="font-size:.8rem">SharePoint-style list</span></div>
+  <div class="dwrap">
+    <div class="dhead">
+      <div class="eyebrow">SharePoint patterns · views · grouping · inline edit</div>
+      <h1>List with custom views</h1>
+      <p class="lede">A SharePoint-style list: switch views, group by a column, filter and sort, edit a cell inline, and add an item. A customization sample — not a Microsoft product.</p>
+    </div>
+    <div class="sp-cmd">
+      <button class="btn btn-sm btn-primary" id="add">+ New</button>
+      <select id="view" class="btn-sm" style="border-radius:8px"><option value="all">All items</option><option value="mine">Assigned to me</option><option value="open">Open only</option></select>
+      <select id="group" class="btn-sm" style="border-radius:8px"><option value="">No grouping</option><option value="status">Group by status</option><option value="owner">Group by owner</option></select>
+      <input id="q" placeholder="Filter" class="btn-sm" style="margin-left:auto">
+    </div>
+    <div class="card" style="margin-top:1rem;padding:.3rem .6rem">
+      <table class="table" id="tbl">
+        <thead><tr><th></th><th data-s="title">Title</th><th data-s="owner">Owner</th><th data-s="status">Status</th><th data-s="due">Due</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <p class="empty" id="empty" hidden>No items in this view.</p>
+    </div>
+  </div>
+  <script>
+    let id = 0;
+    const mk = (t, o, s, d, star) => ({ id: ++id, title: t, owner: o, status: s, due: d, star: !!star });
+    let items = [
+      mk("100G optics × 4", "Rakesh", "Open", "2026-11-10", true),
+      mk("Rack PDU swap", "Lab ops", "In review", "2026-11-12"),
+      mk("MPO-12 patch cables", "Rakesh", "Approved", "2026-11-05"),
+      mk("Spare APS blade", "QA lead", "Open", "2026-11-20"),
+      mk("Firewall license renew", "Lab ops", "Approved", "2026-11-02")
+    ];
+    const ME = "Rakesh";
+    let sort = { k: "title", d: 1 }, q = "", view = "all", group = "";
+    function tone(s) { return s === "Approved" ? "ok" : s === "Open" ? "warn" : "accent"; }
+    function current() {
+      let out = items.filter((it) => {
+        if (view === "mine" && it.owner !== ME) return false;
+        if (view === "open" && it.status !== "Open") return false;
+        if (q && !(it.title + it.owner).toLowerCase().includes(q.toLowerCase())) return false;
+        return true;
+      });
+      out.sort((a, b) => (a[sort.k] > b[sort.k] ? 1 : -1) * sort.d);
+      return out;
+    }
+    function rowHtml(it) {
+      return `<tr data-id="${it.id}">
+        <td><span class="star ${it.star ? "on" : ""}" data-star>★</span></td>
+        <td class="ed" contenteditable data-f="title">${it.title}</td>
+        <td>${it.owner}</td>
+        <td><span class="pill ${tone(it.status)}">${it.status}</span></td>
+        <td class="mono">${it.due}</td></tr>`;
+    }
+    function render() {
+      const rows = current();
+      const tb = document.getElementById("rows");
+      document.getElementById("empty").hidden = rows.length > 0;
+      if (!group) { tb.innerHTML = rows.map(rowHtml).join(""); return; }
+      const groups = {};
+      rows.forEach((it) => { const key = it[group]; (groups[key] = groups[key] || []).push(it); });
+      tb.innerHTML = Object.keys(groups).sort().map((k) =>
+        `<tr><td colspan="5" class="grp-head">▸ ${k} (${groups[k].length})</td></tr>` + groups[k].map(rowHtml).join("")).join("");
+    }
+    document.getElementById("rows").addEventListener("click", (e) => {
+      if (e.target.matches("[data-star]")) { const tr = e.target.closest("tr"); const it = items.find((x) => x.id == tr.dataset.id); it.star = !it.star; render(); }
+    });
+    document.getElementById("rows").addEventListener("blur", (e) => {
+      if (e.target.matches("[data-f]")) { const tr = e.target.closest("tr"); const it = items.find((x) => x.id == tr.dataset.id); it.title = e.target.textContent.trim(); }
+    }, true);
+    document.querySelectorAll("#tbl th[data-s]").forEach((th) => th.onclick = () => { const k = th.dataset.s; if (sort.k === k) sort.d *= -1; else { sort.k = k; sort.d = 1; } render(); });
+    document.getElementById("q").oninput = (e) => { q = e.target.value; render(); };
+    document.getElementById("view").onchange = (e) => { view = e.target.value; render(); };
+    document.getElementById("group").onchange = (e) => { group = e.target.value; render(); };
+    document.getElementById("add").onclick = () => { items.unshift(mk("New request", ME, "Open", "2026-12-01")); render(); };
+    render();
+  </script>
+</body>
+</html>

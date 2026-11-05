@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/portfolio/">
+  <title>SharePoint-style · Approval workflow</title>
+  <link rel="stylesheet" href="demos/assets/demo.css">
+  <style>
+    [data-accent]{--accent:#0f6e78;--accent-lt:#def0f1;}
+    .sp-top { background:#0b3a4a; color:#fff; padding:.5rem 1rem; }
+    .lanes { display:grid; grid-template-columns:repeat(3,1fr); gap:.8rem; }
+    .lane { background:var(--parchment); border-radius:12px; padding:.7rem; min-height:220px; }
+    .lane h3 { font-family:var(--sans); font-size:.82rem; text-transform:uppercase; color:var(--sub); margin-bottom:.6rem; display:flex; justify-content:space-between; }
+    .req { background:#fff; border:1px solid var(--rule); border-radius:10px; padding:.6rem .7rem; margin-bottom:.5rem; }
+    .steps3 { display:flex; gap:.2rem; margin:.4rem 0; }
+    .steps3 i { flex:1; height:5px; border-radius:3px; background:var(--rule); }
+    .steps3 i.done { background:var(--ok); } .steps3 i.rej { background:var(--bad); }
+    @media(max-width:820px){ .lanes{ grid-template-columns:1fr; } }
+  </style>
+</head>
+<body data-accent>
+  <nav class="dnav">
+    <a class="brand" href="demos/">Rakesh<span>·</span>demos</a>
+    <div class="links"><a href="demos/">All demos</a><a href="./">Portfolio</a><a href="resume.html">Résumé</a></div>
+  </nav>
+  <div class="sp-top"><strong>Northline Lab ▸ CapEx approvals</strong></div>
+  <div class="dwrap">
+    <div class="dhead">
+      <div class="eyebrow">SharePoint patterns · multi-stage approval</div>
+      <h1>Approval workflow</h1>
+      <p class="lede">Requests flow through Manager → Finance → Procurement. Approve or reject each stage; the item moves lanes and its progress bar fills. A customization sample.</p>
+    </div>
+    <div class="kpis" style="margin-bottom:1rem">
+      <div class="kpi"><b id="kP">0</b><span>Pending</span></div>
+      <div class="kpi"><b id="kA">0</b><span>Approved</span></div>
+      <div class="kpi"><b id="kR">0</b><span>Rejected</span></div>
+      <div class="kpi"><b id="kV">$0</b><span>Approved value</span></div>
+    </div>
+    <div class="lanes">
+      <div class="lane"><h3>Pending <span class="tag" id="cP">0</span></h3><div id="pending"></div></div>
+      <div class="lane"><h3>Approved <span class="tag" id="cA">0</span></h3><div id="approved"></div></div>
+      <div class="lane"><h3>Rejected <span class="tag" id="cR">0</span></h3><div id="rejected"></div></div>
+    </div>
+  </div>
+  <script>
+    const stages = ["Manager", "Finance", "Procurement"];
+    let id = 0;
+    const mk = (t, amt) => ({ id: ++id, title: t, amount: amt, stage: 0, state: "pending" });
+    let reqs = [
+      mk("8× 100G QSFP28 optics", 1440),
+      mk("42U rack + PDU", 980),
+      mk("APS feature license", 1200),
+      mk("Spare M8400 blade", 5200)
+    ];
+    function card(r) {
+      const bars = stages.map((s, i) => {
+        let cls = "";
+        if (r.state === "rejected" && i === r.stage) cls = "rej";
+        else if (i < r.stage || r.state === "approved") cls = "done";
+        return `<i class="${cls}"></i>`;
+      }).join("");
+      const ctl = r.state === "pending"
+        ? `<div class="row" style="margin-top:.4rem"><button class="btn btn-sm" data-ok="${r.id}">Approve ${stages[r.stage]}</button><button class="btn btn-sm btn-danger" data-no="${r.id}">Reject</button></div>`
+        : `<div class="muted" style="font-size:.76rem;margin-top:.3rem">${r.state === "approved" ? "Fully approved" : "Rejected at " + stages[r.stage]}</div>`;
+      return `<div class="req"><div class="spread"><strong style="font-size:.88rem">${r.title}</strong><span class="mono">$${r.amount}</span></div>
+        <div class="muted" style="font-size:.74rem">Stage: ${r.state === "pending" ? stages[r.stage] : "—"}</div>
+        <div class="steps3">${bars}</div>${ctl}</div>`;
+    }
+    function render() {
+      const by = (st) => reqs.filter((r) => r.state === st);
+      document.getElementById("pending").innerHTML = by("pending").map(card).join("") || '<p class="empty">None</p>';
+      document.getElementById("approved").innerHTML = by("approved").map(card).join("") || '<p class="empty">None</p>';
+      document.getElementById("rejected").innerHTML = by("rejected").map(card).join("") || '<p class="empty">None</p>';
+      document.getElementById("cP").textContent = document.getElementById("kP").textContent = by("pending").length;
+      document.getElementById("cA").textContent = document.getElementById("kA").textContent = by("approved").length;
+      document.getElementById("cR").textContent = document.getElementById("kR").textContent = by("rejected").length;
+      document.getElementById("kV").textContent = "$" + by("approved").reduce((s, r) => s + r.amount, 0).toLocaleString();
+    }
+    document.querySelector(".lanes").addEventListener("click", (e) => {
+      const ok = e.target.getAttribute("data-ok"), no = e.target.getAttribute("data-no");
+      if (ok) { const r = reqs.find((x) => x.id == ok); r.stage++; if (r.stage >= stages.length) r.state = "approved"; render(); }
+      if (no) { const r = reqs.find((x) => x.id == no); r.state = "rejected"; render(); }
+    });
+    render();
+  </script>
+</body>
+</html>

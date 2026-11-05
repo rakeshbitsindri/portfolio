@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/portfolio/">
+  <title>HTML5 · Responsive pricing</title>
+  <link rel="stylesheet" href="demos/assets/demo.css">
+  <style>
+    [data-accent]{--accent:#4263eb;--accent-lt:#e7ecfd;}
+    .tiers { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; }
+    .tier { background:#fff; border:1px solid var(--rule); border-radius:14px; padding:1.4rem 1.3rem; position:relative; }
+    .tier.pop { border-color:var(--accent); box-shadow:var(--shadow-lg); }
+    .tier .badge { position:absolute; top:-11px; left:50%; transform:translateX(-50%); background:var(--accent); color:#fff; font-size:.68rem; font-weight:700; padding:.2rem .7rem; border-radius:999px; text-transform:uppercase; letter-spacing:.05em; }
+    .price { font-family:var(--serif); font-size:2.4rem; font-weight:700; }
+    .price small { font-size:.9rem; color:var(--sub); font-weight:400; font-family:var(--sans); }
+    .feat { list-style:none; margin:1rem 0; }
+    .feat li { padding:.35rem 0; font-size:.88rem; border-bottom:1px solid var(--rule); }
+    .feat li::before { content:"✓"; color:var(--accent); font-weight:700; margin-right:.5rem; }
+    .toggle2 { display:inline-flex; border:1px solid var(--rule); border-radius:999px; overflow:hidden; }
+    .toggle2 button { border:0; background:#fff; padding:.45rem 1rem; cursor:pointer; font:inherit; font-size:.82rem; color:var(--sub); }
+    .toggle2 button.on { background:var(--accent); color:#fff; }
+    @media(max-width:820px){ .tiers{ grid-template-columns:1fr; } }
+  </style>
+</head>
+<body data-accent>
+  <nav class="dnav">
+    <a class="brand" href="demos/">Rakesh<span>·</span>demos</a>
+    <div class="links"><a href="demos/">All demos</a><a href="./">Portfolio</a><a href="resume.html">Résumé</a></div>
+  </nav>
+  <div class="dwrap">
+    <div class="dhead" style="text-align:center">
+      <div class="eyebrow">HTML5 · responsive · annual toggle</div>
+      <h1>Pricing</h1>
+      <p class="lede" style="margin:0 auto">Three tiers with a monthly / annual toggle that recalculates every price. Collapses to a single column on mobile.</p>
+    </div>
+    <div style="text-align:center;margin-bottom:1.3rem">
+      <div class="toggle2"><button class="on" id="m">Monthly</button><button id="a">Annual <span class="mono">-20%</span></button></div>
+    </div>
+    <div class="tiers" id="tiers"></div>
+  </div>
+  <script>
+    const plans = [
+      { name: "Starter", monthly: 19, pop: false, feats: ["1 project", "Community support", "1 GB storage", "Basic analytics"] },
+      { name: "Pro", monthly: 49, pop: true, feats: ["10 projects", "Priority support", "50 GB storage", "Advanced analytics", "Custom domain"] },
+      { name: "Team", monthly: 99, pop: false, feats: ["Unlimited projects", "Dedicated support", "500 GB storage", "SSO + audit log", "Roles & permissions"] }
+    ];
+    let annual = false;
+    function render() {
+      document.getElementById("tiers").innerHTML = plans.map((p) => {
+        const price = annual ? Math.round(p.monthly * 0.8) : p.monthly;
+        return `<div class="tier ${p.pop ? "pop" : ""}">
+          ${p.pop ? '<span class="badge">Most popular</span>' : ""}
+          <h3 style="font-family:var(--serif);font-size:1.2rem">${p.name}</h3>
+          <div class="price">$${price}<small>/mo${annual ? ", billed yearly" : ""}</small></div>
+          <ul class="feat">${p.feats.map((f) => `<li>${f}</li>`).join("")}</ul>
+          <button class="btn ${p.pop ? "btn-primary" : ""}" style="width:100%">Choose ${p.name}</button>
+        </div>`;
+      }).join("");
+    }
+    document.getElementById("m").onclick = () => { annual = false; document.getElementById("m").classList.add("on"); document.getElementById("a").classList.remove("on"); render(); };
+    document.getElementById("a").onclick = () => { annual = true; document.getElementById("a").classList.add("on"); document.getElementById("m").classList.remove("on"); render(); };
+    render();
+  </script>
+</body>
+</html>
