@@ -11,5 +11,5 @@
 B.chrome("ledger");
 const rows = B.state().invoices;
 document.getElementById("list").innerHTML = rows.length ? `<table><thead><tr><th>No</th><th>Date</th><th>Party</th><th>Tax</th><th class="num">Taxable</th><th class="num">Total</th></tr></thead><tbody>${rows.map((r) => `<tr><td>${r.no}</td><td>${r.when || ""}</td><td>${r.party}</td><td>${r.kind}</td><td class="num">${r.taxable != null ? B.inr(r.taxable) : "—"}</td><td class="num">${B.inr(r.total)}</td></tr>`).join("")}</tbody></table>` : `<p class="muted">Nothing issued yet. <a href="invoice.html">Raise one</a>.</p>`;
-</script><script src="/portfolio/demos/assets/track.js?v=5" defer></script>
+</script><script src="/portfolio/demos/assets/track.js?v=6" defer></script>
 </body></html>

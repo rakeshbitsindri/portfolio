@@ -3,6 +3,7 @@
   var API = "https://crudcrud.com/api/346cdbd003a44766829592311a142b6f/visits";
   var VID = "rk_vid";
   var RID = "rk_remote_id_v2";
+  var LOG = "rk_log_v1";
   var GEO = "rk_geo_v1";
   var vid = localStorage.getItem(VID);
   if (!vid) {
@@ -78,6 +79,16 @@
       depth: record.depth, ms: record.ms, views: record.views, hits: record.hits
     };
   }
+  function saveLocal() {
+    var all = [];
+    try { all = JSON.parse(localStorage.getItem(LOG)) || []; } catch (e) {}
+    var copy = payload();
+    copy.uid = record.id;
+    var i = -1;
+    for (var n = 0; n < all.length; n++) if (all[n].id === record.id) i = n;
+    if (i >= 0) all[i] = copy; else all.push(copy);
+    localStorage.setItem(LOG, JSON.stringify(all.slice(-100)));
+  }
   function write() {
     var body = JSON.stringify(payload());
     if (!remoteId) {
@@ -99,6 +110,7 @@
       body: body
     }).catch(function () { remoteId = null; localStorage.removeItem(RID); });
   }
+  saveLocal();
   write();
   window.addEventListener("scroll", function () { depth = Math.max(depth, pct()); }, { passive: true });
   function flush() {
@@ -110,6 +122,7 @@
       last.ms = record.ms;
       localStorage.setItem("rk_hits", JSON.stringify(record.hits));
     }
+    saveLocal();
     write();
   }
   document.addEventListener("visibilitychange", function () { if (document.visibilityState === "hidden") flush(); });
