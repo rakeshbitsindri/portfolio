@@ -16,7 +16,9 @@ h1 { font-family:Fraunces,serif; font-size:clamp(2.4rem,5vw,4.2rem); line-height
 .btn.ghost { background:transparent; color:var(--ink); border:1px solid var(--line); }
 .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:1rem; }
 .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:1rem; }
-.sw { height:160px; border-radius:12px; margin-bottom:.6rem; }
+.photo { width:100%; object-fit:cover; display:block; border-radius:12px; }
+.hero .photo { height:min(62vh,460px); border-radius:18px; }
+.card .photo { height:210px; margin-bottom:.6rem; }
 .muted { color:var(--muted); }
 .row { display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; }
 .spread { display:flex; justify-content:space-between; gap:1rem; align-items:center; }

@@ -27,7 +27,7 @@ function draw() {
   document.getElementById("empty").hidden = rows.length > 0;
   document.getElementById("grid").innerHTML = rows.map((p) => `
     <a class="card" href="piece.html?id=${p.id}">
-      <div class="sw" style="background:${p.color}"></div>
+      <img class="photo" src="${p.img}" alt="${p.name}">
       <strong>${p.name}</strong>
       <div class="muted">${p.cat} · ${p.metal}</div>
       <div>${A.inr(A.price(p, p.metal, "M"))}</div>

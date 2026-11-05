@@ -13,17 +13,25 @@
       <a class="btn" href="shop.html">Enter the collection</a>
       <a class="btn ghost" href="visit.html">Book a visit</a>
     </div>
-    <div class="sw" style="height:360px;background:linear-gradient(160deg,#6b3a1f,#f0d48a)"></div>
+    <img class="photo" src="atelier-hero.jpg" alt="Temple necklace on linen">
   </section>
   <div class="kicker" style="margin:2rem 0 .8rem">On the floor this week</div>
   <div class="grid" id="feat"></div>
+  <section class="hero" style="min-height:auto;margin-top:3rem">
+    <img class="photo" src="atelier-bench.jpg" alt="Finishing bench" style="height:280px">
+    <div>
+      <div class="kicker">On the bench</div>
+      <h2 style="font-family:Fraunces,serif;font-size:2rem">Metal is chosen in the room. The price on the piece page is the same number.</h2>
+      <p class="muted">Gold-tone, silver-tone, or kundan. Size adds a fixed making charge. The bag keeps that choice when you leave the page.</p>
+    </div>
+  </section>
 </main>
 <script src="site.js"></script>
 <script>
 A.chrome("home");
 document.getElementById("feat").innerHTML = A.products.slice(0, 3).map((p) => `
   <a class="card" href="piece.html?id=${p.id}">
-    <div class="sw" style="background:${p.color}"></div>
+    <img class="photo" src="${p.img}" alt="${p.name}">
     <strong>${p.name}</strong>
     <div class="muted">${p.cat}</div>
     <div>${A.inr(A.price(p, p.metal, "M"))}</div>

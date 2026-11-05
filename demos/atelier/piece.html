@@ -17,7 +17,7 @@ document.getElementById("crumb").textContent = p.name;
 let metal = p.metal, size = "M", qty = 1;
 function draw() {
   document.getElementById("view").innerHTML = `
-    <div class="sw" style="height:420px;background:${p.color}"></div>
+    <img class="photo" src="${p.img}" alt="${p.name}" style="height:min(70vh,520px)">
     <div>
       <div class="kicker">${p.cat}</div>
       <h1 style="font-size:3rem">${p.name}</h1>
@@ -37,7 +37,7 @@ function draw() {
   document.getElementById("minus").onclick = () => { qty = Math.max(1, qty - 1); draw(); };
   document.getElementById("plus").onclick = () => { qty += 1; draw(); };
   document.getElementById("add").onclick = () => {
-    A.add({ id: p.id, name: p.name, metal, size, qty, price: A.price(p, metal, size) });
+    A.add({ id: p.id, name: p.name, metal, size, qty, price: A.price(p, metal, size), img: p.img });
     location.href = "bag.html";
   };
 }
