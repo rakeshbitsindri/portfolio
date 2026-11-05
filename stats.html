@@ -6,6 +6,7 @@
   <base href="/portfolio/">
   <title>Visit stats · Rakesh Kumar</title>
   <link rel="stylesheet" href="demos/assets/demo.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <style>
     [data-accent]{--accent:#c96442;--accent-lt:#faeae3;}
     .filters { display:flex; gap:.4rem; flex-wrap:wrap; margin:.8rem 0 1rem; }
@@ -13,12 +14,13 @@
     .bars { display:flex; align-items:flex-end; gap:6px; height:120px; }
     .bars i { flex:1; background:var(--accent); border-radius:4px 4px 0 0; min-height:2px; position:relative; }
     .bars i span { position:absolute; top:-16px; left:50%; transform:translateX(-50%); font-size:.62rem; color:var(--sub); }
+    .dwrap { max-width: 1120px; }
     .split2 { display:grid; grid-template-columns:1.3fr .7fr; gap:1rem; }
     tr.pick { cursor:pointer; }
     tr.pick.on { background:var(--accent-lt); }
     .meter { height:8px; background:var(--parchment); border-radius:99px; overflow:hidden; }
     .meter b { display:block; height:100%; background:var(--accent); }
-    #map { width:100%; height:180px; background:#f4efe6; border-radius:12px; border:1px solid var(--rule); }
+    #map { width:100%; height:min(68vh, 560px); border-radius:12px; background:#d7e4ea; }
     @media(max-width:860px){ .split2{grid-template-columns:1fr;} }
   </style>
 </head>
@@ -46,15 +48,13 @@
     <button class="btn btn-sm" id="liveBtn">Live</button>
   </div>
   <div class="kpis" id="kpis" style="margin-bottom:1rem"></div>
-  <div class="split2">
-    <div class="card">
-      <h3>Visits by day</h3>
-      <div class="bars" id="days"></div>
-    </div>
-    <div class="card">
-      <h3>Where</h3>
-      <svg id="map" viewBox="0 0 360 180"></svg>
-    </div>
+  <div class="card" style="margin-bottom:1rem">
+    <div class="spread"><h3>Where</h3><span class="muted" id="mapNote" style="font-size:.8rem"></span></div>
+    <div id="map"></div>
+  </div>
+  <div class="card">
+    <h3>Visits by day</h3>
+    <div class="bars" id="days"></div>
   </div>
   <div class="split2" style="margin-top:1rem">
     <div class="card">
@@ -78,6 +78,7 @@
   </div>
   <div class="card" id="detail" style="margin-top:1rem" hidden></div>
 </div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="demos/assets/track.js"></script>
 <script>
 const API = "https://crudcrud.com/api/cc582e3d13ca4c75aca609dbe9da43cb/visits";
@@ -150,12 +151,7 @@ function draw() {
     return '<i style="height:' + (byDay[d] / maxDay * 100) + '%" title="' + d + ": " + byDay[d] + '"><span>' + byDay[d] + '</span></i>';
   }).join("") || '<p class="muted">No days in this filter.</p>';
 
-  var dots = list.filter(function (r) { return r.lat != null && r.lon != null; }).map(function (r) {
-    var x = (r.lon + 180) / 360 * 360;
-    var y = (90 - r.lat) / 180 * 180;
-    return '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="4" fill="#c96442" opacity="0.85"><title>' + r.city + "</title></circle>";
-  }).join("");
-  document.getElementById("map").innerHTML = '<rect width="360" height="180" fill="#f4efe6"/>' + dots;
+  drawMap(list);
 
   var bands = [0, 0, 0, 0];
   list.forEach(function (r) {
@@ -217,6 +213,48 @@ document.getElementById("liveBtn").onclick = function (e) {
   clearInterval(timer);
   if (on) timer = setInterval(refresh, 4000);
 };
+var map, markers, mapKey = "";
+function drawMap(list) {
+  if (!window.L) {
+    document.getElementById("mapNote").textContent = "Map tiles did not load.";
+    return;
+  }
+  if (!map) {
+    map = L.map("map", { scrollWheelZoom: true, worldCopyJump: true }).setView([22, 10], 2);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 18,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+    markers = L.layerGroup().addTo(map);
+  }
+  markers.clearLayers();
+  var pts = [];
+  list.forEach(function (r) {
+    if (r.lat == null || r.lon == null || r.lat === "" || r.lon === "") return;
+    var lat = +r.lat, lon = +r.lon;
+    if (!isFinite(lat) || !isFinite(lon)) return;
+    var mark = L.circleMarker([lat, lon], {
+      radius: picked === r.uid ? 11 : 8,
+      color: "#7a3419",
+      weight: 2,
+      fillColor: "#c96442",
+      fillOpacity: 0.92
+    });
+    mark.bindPopup("<strong>" + (r.city || "Visit") + (r.country ? ", " + r.country : "") + "</strong><br>" + r.path + "<br>" + r.browser + " · " + (r.depth || 0) + "% down");
+    mark.on("click", function () { picked = r.uid; draw(); });
+    mark.addTo(markers);
+    pts.push([lat, lon]);
+  });
+  document.getElementById("mapNote").textContent = pts.length ? pts.length + " located" : "No coordinates in this filter yet";
+  var key = pts.map(function (p) { return p[0].toFixed(2) + "," + p[1].toFixed(2); }).sort().join("|");
+  if (key !== mapKey) {
+    mapKey = key;
+    if (pts.length === 1) map.setView(pts[0], 6);
+    else if (pts.length > 1) map.fitBounds(pts, { padding: [36, 36], maxZoom: 5 });
+    else map.setView([22, 10], 2);
+  }
+  setTimeout(function () { map.invalidateSize(); }, 60);
+}
 document.getElementById("liveBtn").classList.add("on");
 document.getElementById("liveBtn").textContent = "Pause";
 timer = setInterval(refresh, 4000);
